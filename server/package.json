@@ -1,0 +1,36 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "for lms project",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrc-rdn/LMS-E-KABUHAYAN.git"
+  },
+  "author": "marco",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrc-rdn/LMS-E-KABUHAYAN/issues"
+  },
+  "homepage": "https://github.com/mrc-rdn/LMS-E-KABUHAYAN#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.74.0",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.16.3"
+  }
+}
