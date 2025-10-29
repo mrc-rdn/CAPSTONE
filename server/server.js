@@ -306,21 +306,6 @@ app.post("/admin/chapter/uploadvideo", uploadVideo.single("video"), async (req, 
  }
 });
 
-// app.get("/admin/chapter/chapterItems", async(req, res)=>{
-//   const {course_id} = req.body
-//   try {
-//     if(!req.isAuthenticated()){
-//       res.status(401).json({success: false, messsage: 'unauthorized access' })
-//     }
-//     if(req.user.role !== "SUPERADMIN"){
-//       res.status(401).json({success: false, message: 'invalid role'})
-//     }
-//     const query = `SELECT * `
-//   } catch (error) {
-    
-//   }
-// })
-
 app.delete("/admin/deletevideo", async(req, res)=>{
   try {
     
@@ -333,6 +318,59 @@ app.delete("/admin/deletevideo", async(req, res)=>{
     console.log(error)
   }
 })
+
+
+// this part is for getting the chapteritems to retrieve the video
+app.post("/admin/chapter/chapteritems", async(req, res)=>{
+  
+  try {
+    const {courseId, chapterId} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "SUPERADMIN"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+    const query = `SELECT * FROM chapters JOIN chapter_items ON chapters.id = chapter_items.chapter_id WHERE chapters.course_id = $1 AND chapter_items.chapter_id = $2`
+    const value = [courseId, chapterId]
+    const result = await db.query(query, value);
+    console.log(result.rows.length)
+    if (result.rows.length === 1){
+      res.json({success: true, message: 'success gathering your data', data: result.rows})
+    }else{
+      res.json({success: false ,messsage: 'there no video or quiz added yet', data: result.rows})
+    }
+    
+  } catch (error) {
+    res.json({success: false ,messsage: 'there no video or quiz added yet' })
+  }
+});
+
+app.post("/admin/chapter/chapterfirstitem", async(req, res)=>{
+  try {
+    const {courseId} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "SUPERADMIN"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+    const query = `SELECT * FROM chapters JOIN chapter_items ON chapters.id = chapter_items.chapter_id WHERE chapters.course_id = $1 AND chapter_items.order_index = $2`
+    const value = [courseId, 1]
+    const result = await db.query(query, value);
+    console.log(result.rows.length)
+    if (result.rows.length === 1){
+      res.json({success: true, message: 'success gathering your data', data: result.rows})
+    }else{
+      res.json({success: false ,messsage: 'there no video or quiz added yet', data: result.rows})
+    }
+    
+  } catch (error) {
+    res.json({success: false ,messsage: 'there no video or quiz added yet' })
+  }
+})
+
+
 
 
 
