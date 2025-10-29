@@ -4,6 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
 import Chapter from './chapter';
 import VideoUpload from './VideoUpload';
+import ChapterItemsContent from './ChapterItemsContent';
 
 export default function SelectedCourse(props) {
     const exit = false; 
@@ -12,9 +13,10 @@ export default function SelectedCourse(props) {
     const [isModal, setModal] = useState(false);
     const [chapter, setChapter] = useState([]);
     const [chapterLength, setChapterLength] = useState([])
-    const [chapterDetails , setChapterDetails] = useState({id: null, index_chapter: null})
+    const [chapterDetails , setChapterDetails] = useState({id: null, chapter_index: null})
+    const [videoData, setVideoData] = useState("")
   
-
+    const [isVideo, setVideo] = useState(false);
     const [isquiz, setQuiz] = useState(false)
     const [isUploadVideo, setUploadvideo] = useState(false)
     
@@ -26,29 +28,44 @@ export default function SelectedCourse(props) {
       setModal(exit)
     }
     async function handleShowChapter(id, chapter_index){
-      setChapterDetails({id, chapter_index})
-      
-      
+      setChapterDetails({id: id, index_chapter: chapter_index})
+      try {
+        const response = await axios.post('http://localhost:3000/admin/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true})
+        console.log(response)
+        setVideo(response.data.success)
+        setVideoData(response.data.data[0].source_url)
+      } catch (error) {
+        console.log(error)
+      }
+
     }
 
     useEffect(()=>{
       async function fetchData(){
        // console.log(course)
         try {
-          const response = await axios.post('http://localhost:3000/admin/course/chapter', {course_Id: course.id}, {withCredentials: true});
+          
+          const [response, chapterItems] = await Promise.all([
+            axios.post('http://localhost:3000/admin/course/chapter', {course_Id: course.id}, {withCredentials: true}),
+            axios.post('http://localhost:3000/admin/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
+
+          ]) 
           setChapter(response.data.data)
           setChapterLength(response.data.chapterLength)
-          
+          setVideo(chapterItems.data.success)
+          setVideoData(chapterItems.data.data[0].source_url)
+          console.log(chapterItems.data.data[0].source_url)
         } catch (error) {
           console.log(error)
         }
       }
-      fetchData()
       
+      fetchData()
+      console.log()
     }, [])
 
     
-  console.log(chapterDetails)
+
   return (
     
     <div className='w-full h-full bg-white absolute '>
@@ -69,10 +86,9 @@ export default function SelectedCourse(props) {
         </div>
 
         <div className='flex h-full w-full '>
+          {isVideo? <ChapterItemsContent videoURL={videoData} />:
           <div className='h-full w-full grid place-items-center'>
-            <h1>{chapterDetails.id}</h1>
             <button 
-            
               className= {isquiz? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
               onClick={
                 (e)=>{ 
@@ -91,9 +107,11 @@ export default function SelectedCourse(props) {
                   Upload Video
             </button>
 
+
             {isquiz? <h1>QUIZ BUILDER</h1>:null}
             {isUploadVideo? <VideoUpload course_id={id} chapter_details={chapterDetails}/> :null}
-          </div>
+            
+          </div>}
           
           <div className='ml-auto h-full w-90 bg-white'>
             <div className='h-10 bg-white flex items-center'>

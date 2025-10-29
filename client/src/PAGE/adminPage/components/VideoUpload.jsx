@@ -18,7 +18,7 @@ export default function VideoUpload(props) {
     formData.append("video", video);
     formData.append("title", title);
     formData.append("course_id", props.course_id);
-    formData.append("order_index", props.chapter_details.chapter_index);
+    formData.append("order_index", props.chapter_details.index_chapter);
     formData.append("chapter_id", props.chapter_details.id);
 
     try {
@@ -35,6 +35,7 @@ export default function VideoUpload(props) {
       console.error("❌ Upload failed:", error);
     } finally {
       setUploading(false);
+      
     }
   }
 
