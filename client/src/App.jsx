@@ -23,7 +23,7 @@ import TrainerProfile from "./PAGE/TrainerPage/TrainerProfile"
 //this for trainee
 import TraineeDashboard from "./PAGE/TraineePage/TraineeDashboard"
 import TRAINEEProtectedRoute from "./PAGE/TraineePage/components/TRAINEEProtectedRoute"
-import TraineeMyBatch from "./PAGE/TraineePage/TraineeMyBatch";
+import TraineeCourse from "./PAGE/TraineePage/TraineeCourse";
 import TraineeMessages from "./PAGE/TraineePage/TraineeMessages";
 import TraineeProfile from "./PAGE/TraineePage/TraineeProfile";
 
@@ -44,7 +44,7 @@ export default function App() {
 
 
         <Route path="/trainee/dashboard" element={<TRAINEEProtectedRoute><TraineeDashboard /></TRAINEEProtectedRoute>}/>
-        <Route path="/trainee/mybatch" element={<TRAINEEProtectedRoute><TraineeMyBatch/></TRAINEEProtectedRoute>}/>
+        <Route path="/trainee/mybatch" element={<TRAINEEProtectedRoute><TraineeCourse/></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/messages" element={<TRAINEEProtectedRoute><TraineeMessages/></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/profile" element={<TRAINEEProtectedRoute><TraineeProfile /></TRAINEEProtectedRoute>}/>
 

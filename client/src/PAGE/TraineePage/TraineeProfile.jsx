@@ -1,13 +1,16 @@
 import React from 'react'
 import Navbar from './components/Navbar'
+import Header from './components/Header'
 
 export default function Profile() {
   return (
     <div className="flex w-screen h-screen">
             
         <Navbar/>
-        <h1>profile</h1>    
-             
+        
+      <div className='w-full bg-gray-200'>
+        <Header title="Profile" />  
+      </div>
     </div>
       
   )

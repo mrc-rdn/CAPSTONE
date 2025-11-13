@@ -32,7 +32,7 @@ export default function Navrbar(props) {
           <DashboardIcon /> Dashboard
         </Link>
         <Link to="/trainee/mybatch" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
-          <GroupsIcon /> My Batch
+          <GroupsIcon /> Course
         </Link>
         <Link to="/trainee/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <MessageIcon /> Messages

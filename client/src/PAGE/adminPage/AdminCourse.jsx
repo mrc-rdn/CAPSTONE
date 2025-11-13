@@ -77,7 +77,7 @@ export default function AdminModules() {
           
           
         </div>
-        {isSelectedCourse? <SelectedCourse handleBack={handleExitSelectedCourse} data_course={data.find((course)=> {return course.id === id})} />: null}
+        { isSelectedCourse? <SelectedCourse handleBack={handleExitSelectedCourse} data_course={data.find((course)=> {return course.id === id})} />: null }
         { isModal?<CourseModal onExit={handleExit} />: null}
         
     </div>

@@ -1,41 +1,83 @@
 import React, {useState, useEffect} from 'react'
 import AddChapterModal from './AddChapterModal';
+import AddTraineeModal from './AddTraineeModal';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
 import Chapter from './chapter';
 import VideoUpload from './VideoUpload';
-import ChapterItemsContent from './ChapterItemsContent';
+import VideoPlayer from './VideoPlayer';
+import CreateQuiz from './CreateQuizModal';
+import QuizList from './QuizList';
 
 export default function SelectedCourse(props) {
     const exit = false; 
     const [course, setCourse] = useState(props.data_course)
     const {id, title, description } = course
-    const [isModal, setModal] = useState(false);
+    const [isChapterModal, setChapterModal] = useState(false);
+    const [isEnrollModal, setEnrollModal] = useState(false);
+    const [isQiuzModal, setQiuzModal] =  useState(false)
     const [chapter, setChapter] = useState([]);
     const [chapterLength, setChapterLength] = useState([])
     const [chapterDetails , setChapterDetails] = useState({id: null, chapter_index: null})
+
     const [videoData, setVideoData] = useState("")
+    const [refresh, setRefresh]= useState(0);
   
+    const [isLessonUploaded, setLessonUpload] = useState(false)
+    const [isQuiz, setQuiz] = useState(false)
+    const [quizData, setQuizData] = useState([]);
     const [isVideo, setVideo] = useState(false);
-    const [isquiz, setQuiz] = useState(false)
+    const [isQuizUpload, setQuizUpload] = useState(false)
     const [isUploadVideo, setUploadvideo] = useState(false)
     
 
-    function handleOpenModal(){
-      setModal(true)
+    function handleOpenChapterModal(){
+      setChapterModal(true)
     }
-    function handleExitModal(exit){
-      setModal(exit)
+    
+    function handleExitChapterModal(exit){
+      setChapterModal(exit)
+      
+    }
+    function handleOpenEnrollModal(){
+      setEnrollModal(true)
+    }
+    function handleExitEnrollModal(exit){
+      setEnrollModal(exit)
+    }
+
+    function handleExitQuizModal(exit){
+      setQiuzModal(exit)
     }
     async function handleShowChapter(id, chapter_index){
       setChapterDetails({id: id, index_chapter: chapter_index})
       try {
-        const response = await axios.post('http://localhost:3000/admin/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true})
-        console.log(response)
-        setVideo(response.data.success)
-        setVideoData(response.data.data[0].source_url)
+        const [video, quiz] = await Promise.all([
+          axios.post('http://localhost:3000/admin/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true}),
+          axios.post('http://localhost:3000/admin/chapter/quiz', {chapterId: id  }, {withCredentials: true})
+
+        ])
+          if(video.data.success){
+            console.log(video.data.data.length)
+            setVideo(video.data.success)
+            setVideoData(video.data.data[0].source_url)
+            setQuiz(false)
+            setLessonUpload(false)
+            
+          }else{
+            console.log(quiz.data.data.length)
+            setVideo(false)
+            setQuiz(quiz.data.success)
+            setQuizData(quiz.data.data)
+            setLessonUpload(false)
+          }
+        //if(video.data)
+        
       } catch (error) {
-        console.log(error)
+        console.log('there is error or your not yet uploaded any videos or quiz',error)
+        setVideo(false)
+        setQuiz(false)
+        setLessonUpload(true)
       }
 
     }
@@ -49,12 +91,13 @@ export default function SelectedCourse(props) {
             axios.post('http://localhost:3000/admin/course/chapter', {course_Id: course.id}, {withCredentials: true}),
             axios.post('http://localhost:3000/admin/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
 
-          ]) 
+          ]) ;
+          
           setChapter(response.data.data)
           setChapterLength(response.data.chapterLength)
           setVideo(chapterItems.data.success)
           setVideoData(chapterItems.data.data[0].source_url)
-          console.log(chapterItems.data.data[0].source_url)
+          
         } catch (error) {
           console.log(error)
         }
@@ -62,9 +105,11 @@ export default function SelectedCourse(props) {
       
       fetchData()
       console.log()
-    }, [])
+    }, [refresh])
 
-    
+    function handleRefresh(){
+      setRefresh(prev => prev + 1)
+    }
 
   return (
     
@@ -79,41 +124,49 @@ export default function SelectedCourse(props) {
           <h1 className="text-xl font-medium ml-20">{title}</h1>
 
           <button
-            onClick={handleOpenModal}
+            onClick={handleOpenChapterModal}
             className='ml-auto m-5'>
               + Add Chapter
           </button>
+
+          <button
+            onClick={handleOpenEnrollModal}
+            className='m-5'>
+            + Add Trainee
+          </button>
         </div>
 
-        <div className='flex h-full w-full '>
-          {isVideo? <ChapterItemsContent videoURL={videoData} />:
-          <div className='h-full w-full grid place-items-center'>
+        <div className='flex h-full w-full flex '>
+          {isQuiz?<QuizList quizData={quizData} /> : null }
+          {isVideo? <VideoPlayer videoURL={videoData} />:null}
+
+          {isLessonUploaded?<div className='h-full w-full grid place-items-center'>
             <button 
-              className= {isquiz? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
+              className= {isQuizUpload? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
               onClick={
                 (e)=>{ 
                   e.preventDefault(); 
-                  setQuiz(true) ,
+                  setQuizUpload(true),
+                  setQiuzModal(true)
                   setUploadvideo(false)}}>
                     Create Quiz
             </button>
 
             <button 
-               className= {isUploadVideo? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
+              className= {isUploadVideo? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
               onClick={(e)=>{ 
                 e.preventDefault(); 
-                setQuiz(false) ,
+                setQuizUpload(false) ,
                 setUploadvideo(true)}}>
                   Upload Video
             </button>
 
 
-            {isquiz? <h1>QUIZ BUILDER</h1>:null}
             {isUploadVideo? <VideoUpload course_id={id} chapter_details={chapterDetails}/> :null}
             
-          </div>}
+          </div>:null}
           
-          <div className='ml-auto h-full w-90 bg-white'>
+          <div className='ml-auto h-full w-100 bg-white'>
             <div className='h-10 bg-white flex items-center'>
               <h1 className='text-large ml-3 font-bold'>Course content</h1>
             </div>
@@ -129,15 +182,13 @@ export default function SelectedCourse(props) {
             }
           </div>
         </div>
-            {isModal?<AddChapterModal onExit={handleExitModal} course_id={id} chapter_no={chapterLength} />: null}
-            
+            {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} onRefresh={handleRefresh} course_id={id} chapter_no={chapterLength} />: null}
+            {isEnrollModal?<AddTraineeModal onExit={handleExitEnrollModal}/>:null}
+            {isQiuzModal? <CreateQuiz onExit={handleExitQuizModal} chapterId={chapterDetails.id} />: null }
           
             
             
-        </div>
-       
-       
-      
+      </div>
     </div>
     
   )

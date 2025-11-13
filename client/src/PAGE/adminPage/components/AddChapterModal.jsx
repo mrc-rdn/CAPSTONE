@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import {Link, Navigate} from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 
@@ -7,18 +8,18 @@ export default function AddChapterModal(props) {
     const exit = false
     const [chapterTitle, setChapterTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [order, setOrder] = useState("");
-   
+    const [isChapterAdded, setChapterAdded] = useState(false);
+    
 
     
     async function handleSubmit(e){
-      
+      e.preventDefault();
         try {
           const response = await axios.post('http://localhost:3000/admin/course/addchapter',
             {course_id: props.course_id, chapter_name: chapterTitle, description: description, chapter_no: props.chapter_no + 1},
             {withCredentials:true}
           )  
-         
+          setChapterAdded(true)
         } catch (err) {
             console.log(err)
         }
@@ -32,8 +33,9 @@ export default function AddChapterModal(props) {
       <div className='w-250 h-150 bg-white'>
 
       
-        <button onClick={()=>{props.onExit(exit)}}><CloseIcon /></button>
-        <form onSubmit={handleSubmit} 
+        <button onClick={()=>{props.onExit(exit); props.onRefresh();}}><CloseIcon /></button>
+
+       {isChapterAdded?<h1>Chapter is Added</h1>: <form onSubmit={handleSubmit} 
         className='flex'>
             <input 
             className='w-100 h-10 text-2xl bg-green-500 m-3'
@@ -58,7 +60,7 @@ export default function AddChapterModal(props) {
               className='w-50 h-10 text-2xl bg-green-500'
               type='submit'>Submit</button>
         </form>
-
+}
         
 
       </div> 

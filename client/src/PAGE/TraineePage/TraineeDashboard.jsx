@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import Navbar from './components/Navbar'
 import axios from 'axios'
+import Header from './components/Header'
 
 export default function TraineeDashboard() {
   const [data , setData] = useState([])
@@ -24,7 +25,10 @@ export default function TraineeDashboard() {
   return (
     <div className='flex h-full w-full'>
       <Navbar />
-      <h1>{data.username}</h1>
+      <div className='w-full bg-gray-200'>
+        <Header title="Dashoard" />
+      </div>
+      
     </div>
   )
 }
