@@ -6,6 +6,8 @@ export default function CreateQuiz(props) {
   const exit = false
   const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState([]);
+  const [isMouseOver , setMouseOver] = useState(false)
+  const [isMouseOverCloseModal, setMouseOverCloseModal] = useState(false)
 
   const addQuestion = (type) => {
     setQuestions([
@@ -13,6 +15,11 @@ export default function CreateQuiz(props) {
       { type, question_text: "", choices: [], correct_answer: "" },
     ]);
   };
+  const deleteQuestion = (index) => {
+    const updated = [...questions];
+    updated.splice(index, 1);
+    setQuestions(updated)
+  }
 
   const updateQuestion = (index, field, value) => {
     const updated = [...questions];
@@ -42,59 +49,69 @@ export default function CreateQuiz(props) {
   };
     return (
       <div className='w-full h-full bg-gray-500/40 absolute grid place-items-center'>
-        <div className='w-350 h-150 bg-white'>
-          <button onClick={()=>{props.onExit(exit)}}><CloseIcon /></button>   
-          <h1>Trainee</h1>
-            <div className="p-4 over">
+        <div className='w-360 h-150 bg-white overflow-y-scroll p-3 rounded-md'>
+          <button 
+            onClick={()=>{props.onExit(exit)}} 
+            onMouseOver={()=>setMouseOverCloseModal(true)} 
+            onMouseOut={()=>setMouseOverCloseModal(false)}
+            className={isMouseOverCloseModal?'text-red-500':''}>
+            <CloseIcon  />
+          </button>   
+            <div className="p-4 w-full">
               <h2 className="text-xl font-bold mb-4">Create a Quiz</h2>
               <input
                 placeholder="Quiz Title"
-                className="border p-2 mb-4 w-full"
+                className="border-2 border-green-700 p-2 mb-4 w-full rounded-md"
+                required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
 
               <div className="flex gap-2 mb-4">
-                <button onClick={() => addQuestion("fill_blank")} className="bg-blue-500 text-white px-3 py-1 rounded">
+                <button onClick={() => addQuestion("fill_blank")} className="bg-green-500 text-white px-3 py-1 rounded">
                   Add Fill in the Blank
                 </button>
-                <button onClick={() => addQuestion("multiple_choice")} className="bg-green-500 text-white px-3 py-1 rounded">
+                <button onClick={() => addQuestion("multiple_choice")} className="bg-green-700 text-white px-3 py-1 rounded">
                   Add Multiple Choice
                 </button>
               </div>
 
-              {questions.map((q, i) => (
-                <div key={i} className="border p-3 mb-4 rounded">
-                  <h3 className="font-semibold mb-2">Question {i + 1} ({q.type})</h3>
+              {questions.map((question, index) => (
+                <div key={index} className="border p-3 mb-4 rounded bg-green-700 text-white">
+                  <div className='w-full h-10 flex'>
+                    <h3 className="font-semibold mb-2">Question {index + 1} ({question.type})</h3>
+                    <CloseIcon onClick={(e)=>{ deleteQuestion(index)}} className='ml-auto' />
+                  </div>
+                  
                   <input
                     placeholder="Question text"
-                    value={q.question_text}
-                    onChange={(e) => updateQuestion(i, "question_text", e.target.value)}
-                    className="border p-2 w-full mb-2"
+                    value={question.question_text}
+                    onChange={(e) => updateQuestion(index, "question_text", e.target.value)}
+                    className="border p-2 w-full mb-2 rounded-md"
                   />
-
-                  {q.type === "fill_blank" ? (
+                 
+                  {question.type === "fill_blank" ? (
                     <input
                       placeholder="Correct Answer"
-                      value={q.correct_answer}
-                      onChange={(e) => updateQuestion(i, "correct_answer", e.target.value)}
-                      className="border p-2 w-full"
+                      value={question.correct_answer}
+                      onChange={(e) => updateQuestion(index, "correct_answer", e.target.value)}
+                      className="border p-2 w-full rounded-md"
                     />
                   ) : (
                     <div>
-                      {q.choices.map((c, j) => (
-                        <div key={j} className="flex items-center mb-2">
+                      {question.choices.map((choice, j) => (
+                        <div key={j} className="flex items-center mb-2 ">
                           <input
                             placeholder={`Choice ${j + 1}`}
-                            value={c.choice_text}
-                            onChange={(e) => handleChoiceChange(i, j, "choice_text", e.target.value)}
-                            className="border p-2 flex-1"
+                            value={choice.choice_text}
+                            onChange={(e) => handleChoiceChange(index, j, "choice_text", e.target.value)}
+                            className="border p-2 flex-1 rounded-md"
                           />
                           <input
                             type="checkbox"
-                            checked={c.is_correct}
+                            checked={choice.is_correct}
                             onChange={(e) =>
-                              handleChoiceChange(i, j, "is_correct", e.target.checked)
+                              handleChoiceChange(index, j, "is_correct", e.target.checked)
                             }
                             className="ml-2"
                           />
@@ -102,17 +119,18 @@ export default function CreateQuiz(props) {
                         </div>
                       ))}
                       <button
-                        onClick={() => addChoice(i)}
-                        className="bg-gray-500 text-white px-2 py-1 rounded"
+                        onClick={() => addChoice(index)}
+                        className="bg-green-500 text-white px-2 py-1 rounded"
                       >
                         Add Choice
                       </button>
                     </div>
-                  )}
+                  )} 
                 </div>
               ))}
 
-              <button onClick={saveQuiz} className="bg-blue-700 text-white px-4 py-2 rounded">
+              <button onClick={saveQuiz} onMouseOver={()=>setMouseOver(false)} onMouseOut={()=>setMouseOver(true)} 
+              className={isMouseOver?"bg-white border-1 border-green-700 text-green px-4 py-2 rounded " : "bg-green-700 border-1 border-green-700 text-white px-4 py-2 rounded "}>
                 Save Quiz
               </button>
             </div>
