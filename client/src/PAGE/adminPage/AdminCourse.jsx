@@ -4,7 +4,7 @@ import Navbar from './components/Navbar'
 import Header from './components/Header'
 import CourseModal from './components/CourseModal'
 import Course from './components/Course'
-import SelectedCourse from './components/SelectedCourse';
+import SelectedCourse from './components/SelectedCourse'
 
 export default function AdminModules() {
   const [isModal, setIsModal] = useState(false)

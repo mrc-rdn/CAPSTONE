@@ -327,6 +327,7 @@ app.delete("/admin/deletevideo", async(req, res)=>{
   }
 });
 
+//to create a quiz
 app.post("/admin/chapter/createquiz", async (req, res) => {
   const { chapter_id, title, questions } = req.body;
 
@@ -353,7 +354,7 @@ app.post("/admin/chapter/createquiz", async (req, res) => {
 
       if (q.type === "multiple_choice" && q.choices) {
         for (const c of q.choices) {
-          await pool.query(
+          await db.query(
             "INSERT INTO choices (question_id, choice_text, is_correct) VALUES ($1, $2, $3)",
             [questionId, c.choice_text, c.is_correct]
           );
@@ -368,6 +369,7 @@ app.post("/admin/chapter/createquiz", async (req, res) => {
   }
 });
 
+//this is to fetch data or the question inside the database
 app.post("/admin/chapter/quiz", async (req, res) => {
   const { chapterId } = req.body;
   try {
@@ -378,11 +380,11 @@ app.post("/admin/chapter/quiz", async (req, res) => {
       return res.status(401).json({success: false, message: 'invalid role'})
     }
     const quizzes = await db.query(
-      "SELECT * FROM quizzes  JOIN questions ON questions.quiz_id = quizzes.id WHERE chapter_id = $1",
+      "SELECT quizzes.id AS quiz_id, quizzes.chapter_id, questions.id AS question_id, questions.question_text, questions.type, questions.correct_answer, choices.id AS choice_id, choices.choice_text, choices.is_correct FROM quizzes JOIN questions ON quizzes.id = questions.quiz_id LEFT JOIN choices ON questions.id = choices.question_id WHERE quizzes.chapter_id = $1 ORDER BY questions.id, choices.id",
       [chapterId]
     );
 
-    if(quizzes.rows.length === 1){
+    if(quizzes.rows.length > 1){
       res.json({success: true , data:quizzes.rows});
     }else(
       res.json({success: false , message: 'there is no quiz yet'})
@@ -446,17 +448,6 @@ app.post("/admin/chapter/chapterfirstitem", async(req, res)=>{
 });
 
 
-
-
-
-// app.get("/admin/:chapter", async(req, res)=>{
-//   const chapter_No = req.params 
-//   try {
-//     const query = `SELECT * FROM courses `
-//   } catch (error) {
-    
-//   }
-// })
 
 app.post("/admin/dashboard/logout", (req, res, next) => {
 
