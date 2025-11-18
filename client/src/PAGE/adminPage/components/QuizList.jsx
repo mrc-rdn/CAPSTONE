@@ -21,14 +21,15 @@ function groupQuizzes(quizData) {
   return Object.values(grouped);
 }
 
+
 export default function QuizList(props) {
 
   const groupedQuizzes = groupQuizzes(props.quizData)
   
 
   return (
-    <div className='w-full h-full p-5 overflow-y'>
-      <h2 className="text-lg font-bold mb-2">Available Quizzes</h2>
+    <div className='w-full h-full flex flex-col items-center overflow-y-scroll p-5'>
+      <h2 className="text-lg font-bold ">Available Quizzes</h2>
 
       {groupedQuizzes.map((quiz , index ) => (
         <>

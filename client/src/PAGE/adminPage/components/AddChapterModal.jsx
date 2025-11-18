@@ -9,6 +9,7 @@ export default function AddChapterModal(props) {
     const [chapterTitle, setChapterTitle] = useState("");
     const [description, setDescription] = useState("");
     const [isChapterAdded, setChapterAdded] = useState(false);
+    const [isMouseOver, setMouseOver] = useState(false)
     
 
     
@@ -30,35 +31,47 @@ export default function AddChapterModal(props) {
 
   return (
     <div className='w-full h-full bg-gray-500/40 absolute grid place-items-center'>
-      <div className='w-250 h-150 bg-white'>
+      <div className='w-130 h-90 bg-white p-3 rounded'>
 
-      
+
         <button onClick={()=>{props.onExit(exit); props.onRefresh();}}><CloseIcon /></button>
-
+        <h1  className='text-2xl mt-3 mb-3 '>Create Chapter</h1>
        {isChapterAdded?<h1>Chapter is Added</h1>: <form onSubmit={handleSubmit} 
-        className='flex'>
+        className='flex flex-col items-center'>
+          <div className='w-100 flex flex-col m-3'>
+            <label >Chapter Title</label>
             <input 
-            className='w-100 h-10 text-2xl bg-green-500 m-3'
+            className='w-full h-10 text-2xl bg-green-500 rounded p-1'
             onChange={(e)=>{setChapterTitle(e.target.value) }}
             type="text" 
+            maxLength="25"
+            required
             placeholder='Chapter title'
             value={chapterTitle} />
-
+          </div>
+            
+          <div className='w-100 flex flex-col m-3'>
+            <label>Description</label>
             <input 
-            className='w-100 h-10 text-2xl bg-green-500 m-3'
+            className='w-full h-10 text-2xl bg-green-500 rounded p-1'
             onChange={(e)=>{setDescription(e.target.value)}}
             type="text" 
+            maxLength='40'
+            required
             placeholder='Description' 
-            value={description}/>
-
-            
-            
-
+            value={description}/>   <label htmlFor=""></label>
+           
+          </div>
+                                 
             
 
             <button
-              className='w-50 h-10 text-2xl bg-green-500'
-              type='submit'>Submit</button>
+              className={isMouseOver?'m-3 w-50 h-10 text-2xl text-white bg-green-500 rounded':'m-3 w-50 h-10 text-2xl text-green-500 bg-white border-2  rounded' }
+              onMouseOver={()=> setMouseOver(true)}
+              onMouseOut={()=> setMouseOver(false)}
+              type='submit'>
+                Submit
+            </button>
         </form>
 }
         

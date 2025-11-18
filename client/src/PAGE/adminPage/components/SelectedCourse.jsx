@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import AddChapterModal from './AddChapterModal';
 import AddTraineeModal from './AddTraineeModal';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -111,11 +112,43 @@ export default function SelectedCourse(props) {
       setRefresh(prev => prev + 1)
     }
 
+    const handleDragEnd = async (result) => {
+      const { source, destination } = result;
+
+      if (!destination) return; // dropped outside
+
+      // Copy chapter array
+      const items = Array.from(chapter);
+
+      // Remove the dragged item
+      const [reorderedItem] = items.splice(source.index, 1);
+
+      // Insert it at new position
+      items.splice(destination.index, 0, reorderedItem);
+
+      // Update local state
+      setChapter(items);
+
+      // Prepare data for backend
+      const orderedChapters = items.map((item, index) => ({
+        id: item.id,
+        order_index: index + 1, // or whatever your indexing is
+      }));
+
+      try {
+        await axios.put('http://localhost:3000/admin/chapter/reorder', { orderedChapters });
+        console.log('Chapter order saved!');
+      } catch (err) {
+        console.error('Failed to save chapter order', err);
+      }
+    };
+
   return (
     
     <div className='w-full h-full bg-white absolute '>
       <div className='flex w-full h-full bg-gray-200 flex flex-col'>
-        <div className='flex w-full h-15 bg-green-700 items-center text-white'>
+        {/* {HEADER} */}
+        <div className='flex w-full h-1/12 bg-green-700 items-center text-white'>
           <button 
             onClick={()=>{props.handleBack(exit)}}
             className='ml-5 text-large' >
@@ -136,7 +169,7 @@ export default function SelectedCourse(props) {
           </button>
         </div>
 
-        <div className='flex h-full w-full flex '>
+        <div className='flex h-11/12 w-full flex '>
           {isQuiz?<QuizList quizData={quizData} /> : null }
           {isVideo? <VideoPlayer videoURL={videoData} />:null}
 
@@ -166,27 +199,55 @@ export default function SelectedCourse(props) {
             
           </div>:null}
           
-          <div className='ml-auto h-full w-100 bg-white'>
-            <div className='h-10 bg-white flex items-center'>
-              <h1 className='text-large ml-3 font-bold'>Course content</h1>
+            
+          
+
+          <div className="ml-auto h-full w-140 bg-white overflow-y-scroll">
+            <div className="h-10 bg-white flex items-center">
+              <h1 className="text-large ml-3 font-bold">Course content</h1>
             </div>
-            {chapter.map((chapter)=>{
-              return(<Chapter 
-                id={chapter.id}
-                key={chapter.id}
-                title={chapter.title} 
-                chapter_no={chapter.order_index}
-                description={chapter.description} 
-                handleOpenChapter={handleShowChapter} />)
-              })
-            }
+            
+
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="chapterList">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {chapter.map((item, index) => (
+                      <Draggable
+                        key={item.id}
+                        draggableId={String(item.id)}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`${snapshot.isDragging ? "bg-green-300" : ""}`}
+                          >
+                            <Chapter
+                              id={item.id}
+                              title={item.title}
+                              chapter_no={item.order_index}
+                              description={item.description}
+                              handleOpenChapter={handleShowChapter}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
         </div>
-            {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} onRefresh={handleRefresh} course_id={id} chapter_no={chapterLength} />: null}
-            {isEnrollModal?<AddTraineeModal onExit={handleExitEnrollModal}/>:null}
-            {isQiuzModal? <CreateQuiz onExit={handleExitQuizModal} chapterId={chapterDetails.id} />: null }
-          
-            
+
+
+          {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} onRefresh={handleRefresh} course_id={id} chapter_no={chapterLength} />: null}
+          {isEnrollModal?<AddTraineeModal onExit={handleExitEnrollModal}/>:null}
+          {isQiuzModal? <CreateQuiz onExit={handleExitQuizModal} chapterId={chapterDetails.id} />: null }          
             
       </div>
     </div>

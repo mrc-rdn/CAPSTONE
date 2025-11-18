@@ -96,7 +96,7 @@ export default function CustomVideoPlayer(props) {
   return (
   <div className=" w-full flex justify-center">
     <div
-      className="relative bg-black overflow-hidden mb-auto w-250 h-130"
+      className="relative bg-black overflow-hidden mb-auto w-full h-130"
 
     >
       <video

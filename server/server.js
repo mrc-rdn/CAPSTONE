@@ -276,6 +276,22 @@ app.post("/admin/course/addchapter", async(req, res)=>{
     res.status(400).json({ message: `unable to insert you data:  ${error}`, })
   }
 });
+//edit chapter index order
+app.put('/admin/chapter/reorder', async (req, res) => {
+  const { orderedChapters } = req.body; // array of {id, order_index}
+  try {
+    for (const chapter of orderedChapters) {
+      await db.query(
+        'UPDATE chapters SET order_index = $1 WHERE id = $2',
+        [chapter.order_index, chapter.id]
+      );
+    }
+    res.json({ message: 'Chapters reordered successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update chapter order' });
+  }
+});
 
 //delete chapter
 app.delete("/admin/course/deletechapter", async(req, res)=>{
@@ -423,6 +439,7 @@ app.post("/admin/chapter/chapteritems", async(req, res)=>{
   }
 });
 
+// fetching the first data inside the chapter so if you open the course it will appear automatically 
 app.post("/admin/chapter/chapterfirstitem", async(req, res)=>{
   try {
     const {courseId} = req.body
@@ -447,6 +464,36 @@ app.post("/admin/chapter/chapterfirstitem", async(req, res)=>{
   }
 });
 
+
+
+
+//error
+//error
+//error
+
+//enroll your trainer into the course
+app.post("/admin/course/enroll", async(req, res)=>{
+  
+  try {
+    const {courseId, studentId, studentName} = req.body;
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "SUPERADMIN"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+    const query = 'INSERT INTO enrollments (course_id, student_id, batch) VALUES ($1, $2, $3)'
+    const values = [courseId, studentId, studentName]
+    const result = await db.query(query, values)
+    
+    res.json({success: true, message: 'success enrollment', data: result.rows})
+    
+    
+  } catch (error) {
+    res.status(400).json({success: false ,messsage: 'failed enrollment please check', error: error })
+  }
+})
 
 
 app.post("/admin/dashboard/logout", (req, res, next) => {
