@@ -4,6 +4,7 @@ import axios from 'axios'
 import Navbar from './components/Navbar'
 import Header from "./components/Header"
 import Content from "./components/DContent"
+import CalendarTodo from './components/CalendarTodo'
 
 
 const API_URL = "http://localhost:3000/trainer/dashboard"
@@ -37,6 +38,7 @@ export default function TrainerDashboard() {
         <Header title="Dashboard"/>
         <div>
           <Content  name={first_name} surname={surname} role={role} traineeCount={traineeCount}/>
+          <CalendarTodo />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import Comments from "./Comments";
 
 export default function CustomVideoPlayer(props) {
   const videoRef = useRef(null);
@@ -94,11 +95,9 @@ export default function CustomVideoPlayer(props) {
   }, []);
 
   return (
-  <div className=" w-full flex justify-center">
-    <div
-      className="relative bg-black overflow-hidden mb-auto w-full h-130"
-
-    >
+  <div className="w-full h-full flex flex-col justify-center ">
+   <div className="overflow-y-scroll">
+    <div className="relative bg-black w-full h-130 ">
       <video
         ref={videoRef}
         src={props.videoURL}
@@ -150,6 +149,10 @@ export default function CustomVideoPlayer(props) {
         </div>
       </div>
     </div>
+    <div className="w-full p-5">
+      <Comments videoId={props.videoId} />
+    </div>
+   </div> 
   </div>
   );
 }

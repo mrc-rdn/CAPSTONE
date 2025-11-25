@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import CloseIcon from '@mui/icons-material/Close';
 import axios from "axios";
 
-export default function VideoUpload(props) {
+export default function VideoUploadModal(props) {
+  const exit = false
   const [video, setVideo] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [isUploadingDone, setUploadingDone] = useState(false)
   const [title, setTitle] = useState("");
 
   async function uploadVideo(e) {
@@ -31,8 +34,10 @@ export default function VideoUpload(props) {
       );
 
       console.log("✅ Upload success:", response.data);
+      setUploadingDone(true)
     } catch (error) {
       console.error("❌ Upload failed:", error);
+      setUploading(false)
     } finally {
       setUploading(false);
       
@@ -40,26 +45,32 @@ export default function VideoUpload(props) {
   }
 
   return (
-    <div>
-      <form onSubmit={uploadVideo}>
-        <input
-          type="text"
-          placeholder="Video Title"
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+    <div className='w-full h-full bg-gray-500/40 absolute grid place-items-center'>
+      <div className='w-130 h-90 bg-white p-3 rounded'>
+        <button onClick={()=>{props.onExit(exit), props.onRefresh(props.chapter_details.id)}}><CloseIcon /></button>
+        {isUploadingDone?<p>success Uploading</p>
+        :<form onSubmit={uploadVideo}>
+          <input
+            type="text"
+            placeholder="Video Title"
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-        <input
-          type="file"
-          accept="video/*"
-          onChange={(e) => setVideo(e.target.files[0])}
-          required
-        />
+          <input
+            type="file"
+            accept="video/*"
+            onChange={(e) => setVideo(e.target.files[0])}
+            required
+          />
 
-        <button type="submit" disabled={uploading}>
-          {uploading ? "Uploading..." : "Upload"}
-        </button>
-      </form>
+          <button type="submit" disabled={uploading}>
+            {uploading ? "Uploading..." : "Upload"}
+          </button>
+        </form>}
+        
+
+      </div> 
     </div>
   );
 }

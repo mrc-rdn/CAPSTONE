@@ -16,7 +16,7 @@ export default function AddChapterModal(props) {
     async function handleSubmit(e){
       e.preventDefault();
         try {
-          const response = await axios.post('http://localhost:3000/admin/course/addchapter',
+          const response = await axios.post('http://localhost:3000/trainer/course/addchapter',
             {course_id: props.course_id, chapter_name: chapterTitle, description: description, chapter_no: props.chapter_no + 1},
             {withCredentials:true}
           )  

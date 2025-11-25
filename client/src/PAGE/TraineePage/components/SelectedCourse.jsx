@@ -1,83 +1,173 @@
 import React, {useState, useEffect} from 'react'
-
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+// import AddChapterModal from './AddChapterModal';
+// import AddTraineeModal from './AddTraineeModal';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
 import Chapter from './chapter';
-import ChapterItemsContent from './ChapterItemsContent';
+// import VideoUploadModal from './VideoUploadModal';
+import MediaPlayer from './MediaPlayer';
+// import CreateQuiz from './CreateQuizModal';
+import QuizList from './QuizList';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+// import EditChapterModal from './EditChapterModal';
+// import DeleteContent from './DeleteContent';
+// import UploadImages from './uploadImagesModal';
+import ImagePlayer from './ImagePlayer';
+
 
 export default function SelectedCourse(props) {
     const exit = false; 
     const [course, setCourse] = useState(props.data_course)
     const {id, title, description } = course
-    const [chapter, setChapter] = useState([]);
-    const [chapterLength, setChapterLength] = useState([])
-    const [chapterDetails , setChapterDetails] = useState({id: null, chapter_index: null})
-    const [videoData, setVideoData] = useState("")
-    
-  
     const [isVideo, setVideo] = useState(false);
+    const [videoData, setVideoData] = useState("")
+    const [videoId, setVideoId] = useState("")
+    const [isQuiz, setQuiz] = useState(false)
+    const [isLessonUploaded, setLessonUpload] = useState(false)
+    const [quizData, setQuizData] = useState([]);
+    const [chapterDetails , setChapterDetails] = useState({id: null, chapter_index: null})
+    
+    
+    
+    async function handleShowChapter(id, chapter_index){
+      setRefresh(prev => prev + 1)
+      setChapterDetails({id: id, index_chapter: chapter_index})
+      try {
+        const [video, quiz] = await Promise.all([
+          axios.post('http://localhost:3000/trainee/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true}),
+          axios.post('http://localhost:3000/trainee/chapter/quiz', {chapterId: id  }, {withCredentials: true})
 
-    function handleShowChapter(){
-      
+        ])
+          if(video.data.success){
+            console.log(video.data.data)
+            setVideo(video.data.success)
+            setVideoData(video.data.data[0])
+            setQuiz(false)
+            setLessonUpload(false)
+            setVideoId(video.data.data[0].id)
+            console.log(video)
+          }else{
+            console.log(quiz.data.data.length)
+            setVideo(false)
+            setQuiz(quiz.data.success)
+            setQuizData(quiz.data.data)
+            setLessonUpload(false)
+          }
+        //if(video.data)
+        
+      } catch (error) {
+        console.log('there is error or your not yet uploaded any videos or quiz',error)
+        setVideo(false)
+        setQuiz(false)
+        setLessonUpload(true)
+      }
+
     }
 
-    
-   
+
+    const [chapter, setChapter] = useState([]);
+    const [chapterLength, setChapterLength] = useState([])
+    const [refresh, setRefresh]= useState(0);
     useEffect(()=>{
       async function fetchData(){
-      
+       // console.log(course)
         try {
-          const result = await axios.post('http://localhost:3000/trainee/course/chapter', {course_Id: id }, {withCredentials: true})
           
-          setChapter(result.data.data)
+          const [response, chapterItems] = await Promise.all([
+            axios.post('http://localhost:3000/trainee/course/chapter', {course_Id: course.id}, {withCredentials: true}),
+            axios.post('http://localhost:3000/trainee/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
+
+          ]) ;
+          
+          setChapter(response.data.data)
+          setChapterLength(response.data.chapterLength)
+          setVideo(chapterItems.data.success)
+          setVideoData(chapterItems.data.data[0])
+          
+          if(chapterItems.data.success)setLessonUpload(false), setQuiz(false);
+          
         } catch (error) {
-          
+          console.log(error)
+          setLessonUpload(true)
         }
       }
       
       fetchData()
       
     }, [])
-    console.log(chapter)
 
+    const [activeChapterId, setActiveChapterId] = useState(null);
+    
+  
+    
 
   return (
     
-    <div className='w-full h-full bg-white absolute '>
+    <div className={`w-full h-full bg-white absolute `}>
       <div className='flex w-full h-full bg-gray-200 flex flex-col'>
-        <div className='flex w-full h-15 bg-green-700 items-center text-white'>
+        {/* {HEADER} */}
+        <div className='flex w-full h-1/12 bg-green-700 items-center text-white'>
           <button 
             onClick={()=>{props.handleBack(exit)}}
             className='ml-5 text-large' >
             <ArrowBackIcon/> Back to Course
           </button>
           <h1 className="text-xl font-medium ml-20">{title}</h1>
-
           
 
-          
         </div>
+        
 
-        <div className='flex h-full w-full flex '>
-          {isVideo? <ChapterItemsContent videoURL={videoData} />:<p>no module uploaded yet</p>}
-          
-          <div className='ml-auto h-full w-100 bg-white'>
-            <div className='h-10 bg-white flex items-center'>
-              <h1 className='text-large ml-3 font-bold'>Course content</h1>
+        {/* {this section the main content & the upload section} */}
+        <div className='flex h-11/12 w-full flex '>
+        {/* video & quiz upload and video and quiz  */}
+          <div className='w-10/12 h-full relative'>
+            
+
+            {isQuiz?<QuizList quizData={quizData} chapterDetails={chapterDetails} courseDetails={course} refresh={refresh} /> : null }
+            {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoId} videoData={videoData} />:null}
+            {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData}/>:null}
+            
+
+            {isLessonUploaded?<p>There is no content yet</p>:null}
+          </div>
+            
+          {/* chapter section navigation */}
+
+          <div className="ml-auto h-full w-4/12 bg-white overflow-y-scroll relative">
+            
+            <div className="h-10 w-full bg-white flex items-center sticky top-0">
+              <h1 className="text-large ml-3 font-bold ">Course content</h1>
+            
             </div>
-            {chapter.map((chapter)=>{
-              return(<Chapter 
-                id={chapter.id}
-                key={chapter.id}
-                title={chapter.title} 
-                chapter_no={chapter.order_index}
-                description={chapter.description} 
-                handleOpenChapter={handleShowChapter} />)
-              })
-            }
+            
+            
+            
+            <div>
+              {chapter.map((item, index) => (
+              
+                <Chapter
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  chapter_no={item.order_index}
+                  description={item.description}
+                  handleOpenChapter={handleShowChapter}
+                  handleActiveChapter={()=>setActiveChapterId(item.id)}
+                  isActive={activeChapterId === item.id} 
+                />
+              ))
+              }
+            </div>
+            
           </div>
         </div>
-              
+
+
+          
+          
+
       </div>
     </div>
     

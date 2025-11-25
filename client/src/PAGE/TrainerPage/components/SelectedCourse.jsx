@@ -4,7 +4,7 @@ import AddChapterModal from './AddChapterModal';
 import AddTraineeModal from './AddTraineeModal';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
-import Chapter from './chapter';
+import Chapter from './Chapter';
 import VideoUploadModal from './VideoUploadModal';
 import MediaPlayer from './MediaPlayer';
 import CreateQuiz from './CreateQuizModal';
@@ -22,8 +22,6 @@ export default function SelectedCourse(props) {
     const {id, title, description } = course
     const [isChapterModal, setChapterModal] = useState(false);
     const [isEnrollModal, setEnrollModal] = useState(false);
-    const [isQiuzModal, setQiuzModal] =  useState(false);
-    
     
     const [isQuizUpload, setQuizUpload] = useState(false);
     const [isUploadVideo, setUploadvideo] = useState(false);
@@ -73,8 +71,8 @@ export default function SelectedCourse(props) {
       setChapterDetails({id: id, index_chapter: chapter_index})
       try {
         const [video, quiz] = await Promise.all([
-          axios.post('http://localhost:3000/admin/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true}),
-          axios.post('http://localhost:3000/admin/chapter/quiz', {chapterId: id  }, {withCredentials: true})
+          axios.post('http://localhost:3000/trainer/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true}),
+          axios.post('http://localhost:3000/trainer/chapter/quiz', {chapterId: id  }, {withCredentials: true})
 
         ])
           if(video.data.success){
@@ -113,8 +111,8 @@ export default function SelectedCourse(props) {
         try {
           
           const [response, chapterItems] = await Promise.all([
-            axios.post('http://localhost:3000/admin/course/chapter', {course_Id: course.id}, {withCredentials: true}),
-            axios.post('http://localhost:3000/admin/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
+            axios.post('http://localhost:3000/trainer/course/chapter', {course_Id: course.id}, {withCredentials: true}),
+            axios.post('http://localhost:3000/trainer/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
 
           ]) ;
           

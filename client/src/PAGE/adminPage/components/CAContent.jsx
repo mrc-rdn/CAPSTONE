@@ -14,18 +14,20 @@ export default function CAContent() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
+  const [isAccountCreated, setAccountCreated] = useState(false)
 
   async function fetchData(e){
     
-    
+    e.preventDefault();
     try{
       const response = await axios.post('http://localhost:3000/admin/registeraccount',
         { firstName: firstName, surname: surname, contactNo:contactNo , username: username , password: password, role: role },
         {withCredentials: true})
-      
         
-      console.log(response.data);
+      setAccountCreated(response.data.success)
+      
     } catch (error) {
+      setAccountCreated(false)
       console.log(error)
     }
   }
@@ -33,7 +35,7 @@ export default function CAContent() {
     <div className='grid place-items-center m-3 '>
       <div className='w-260 h-150 bg-green-500'>
         <div className='grid place-items-center m-10 '>
-            <form action="" className=' flex  flex-wrap '>
+          {isAccountCreated?<p>Account Created</p>:<form action="" className=' flex  flex-wrap '>
                 <label htmlFor="">First Name</label>
                 <input 
                 className='Email w-100 h-6 border-b-2 text-2xl focus:outline-none mb-5 '
@@ -96,7 +98,7 @@ export default function CAContent() {
                 className='w-100 h-10 bg-white font-bold mb-5'
                 onClick={fetchData}>SUBMIT</button>
                 
-            </form>
+            </form>}
         </div>
       </div>
     </div>

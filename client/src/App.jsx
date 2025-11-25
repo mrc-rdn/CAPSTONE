@@ -16,7 +16,7 @@ import CreateAcoount from './PAGE/adminPage/CreateAcoount'
 //this is a protect route
 import TRAINERProtectedRoute from './PAGE/TrainerPage/components/TRAINERProtectedRoute'
 import TrainerDashboard from './PAGE/TrainerPage/TrainerDashboard'
-import TrainerMyBatch from "./PAGE/TrainerPage/TrainerMyBatch"
+import TrainerCourse from "./PAGE/TrainerPage/TrainerCourse"
 import TrainerMessages from "./PAGE/TrainerPage/TrainerMessages"
 import TrainerProfile from "./PAGE/TrainerPage/TrainerProfile"
 
@@ -38,7 +38,7 @@ export default function App() {
 
         
         <Route path="/trainer/dashboard" element={<TRAINERProtectedRoute><TrainerDashboard/></TRAINERProtectedRoute>} />
-        <Route path="/trainer/mybatch" element={<TRAINERProtectedRoute><TrainerMyBatch/></TRAINERProtectedRoute>}/>
+        <Route path="/trainer/mybatch" element={<TRAINERProtectedRoute><TrainerCourse/></TRAINERProtectedRoute>}/>
         <Route path="/trainer/messages" element={<TRAINERProtectedRoute><TrainerMessages/></TRAINERProtectedRoute>}/>
         <Route path="/trainer/profile" element={<TRAINERProtectedRoute><TrainerProfile /></TRAINERProtectedRoute>}/>
 
