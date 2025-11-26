@@ -14,6 +14,8 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 // import DeleteContent from './DeleteContent';
 // import UploadImages from './uploadImagesModal';
 import ImagePlayer from './ImagePlayer';
+import { API_URL } from '../../../api';
+import Certificate from './Certificate';
 
 
 export default function SelectedCourse(props) {
@@ -27,6 +29,7 @@ export default function SelectedCourse(props) {
     const [isLessonUploaded, setLessonUpload] = useState(false)
     const [quizData, setQuizData] = useState([]);
     const [chapterDetails , setChapterDetails] = useState({id: null, chapter_index: null})
+    const [isCertificate, setIsCertificate] = useState(false)
     
     
     
@@ -34,33 +37,48 @@ export default function SelectedCourse(props) {
       setRefresh(prev => prev + 1)
       setChapterDetails({id: id, index_chapter: chapter_index})
       try {
-        const [video, quiz] = await Promise.all([
-          axios.post('http://localhost:3000/trainee/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true}),
-          axios.post('http://localhost:3000/trainee/chapter/quiz', {chapterId: id  }, {withCredentials: true})
+        const [video, quiz, certificate] = await Promise.all([
+          axios.post(`${API_URL}/trainee/chapter/videoitems`, {courseId: course.id, chapterId: id  }, {withCredentials: true}),
+          axios.post(`${API_URL}/trainee/chapter/quiz`, {chapterId: id  }, {withCredentials: true}),
+          axios.post(`${API_URL}/trainee/chapter/getcertificate`, {courseId: course.id, chapterId: id  }, {withCredentials: true})
 
         ])
-          if(video.data.success){
-            console.log(video.data.data)
-            setVideo(video.data.success)
-            setVideoData(video.data.data[0])
-            setQuiz(false)
-            setLessonUpload(false)
-            setVideoId(video.data.data[0].id)
-            console.log(video)
-          }else{
-            console.log(quiz.data.data.length)
-            setVideo(false)
-            setQuiz(quiz.data.success)
-            setQuizData(quiz.data.data)
-            setLessonUpload(false)
-          }
-        //if(video.data)
-        
+       // reset state
+        setVideo(false);
+        setQuiz(false);
+        setIsCertificate(false);
+        setLessonUpload(false);
+
+        // VIDEO EXISTS
+        if (video.data.success && video.data.data.length > 0) {
+          setVideo(true);
+          setVideoData(video.data.data[0]);
+          setVideoId(video.data.data[0].id);
+          return; // stop here
+        }
+
+        // QUIZ EXISTS
+        if (quiz.data.success && quiz.data.data.length > 0) {
+          setQuiz(true);
+          setQuizData(quiz.data.data);
+          return;
+        }
+
+        // CERTIFICATE EXISTS
+        if (certificate.data.success) {
+          setIsCertificate(true);
+          return;
+        }
+
+        // NOTHING EXISTS
+        setLessonUpload(true);
+
       } catch (error) {
-        console.log('there is error or your not yet uploaded any videos or quiz',error)
-        setVideo(false)
-        setQuiz(false)
-        setLessonUpload(true)
+        console.log('Error loading chapter contents:', error);
+        setVideo(false);
+        setQuiz(false);
+        setIsCertificate(false);
+        setLessonUpload(true);
       }
 
     }
@@ -75,8 +93,8 @@ export default function SelectedCourse(props) {
         try {
           
           const [response, chapterItems] = await Promise.all([
-            axios.post('http://localhost:3000/trainee/course/chapter', {course_Id: course.id}, {withCredentials: true}),
-            axios.post('http://localhost:3000/trainee/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
+            axios.post(`${API_URL}/trainee/course/chapter`, {course_Id: course.id}, {withCredentials: true}),
+            axios.post(`${API_URL}/trainee/chapter/chapterfirstitem`, {courseId: course.id}, {withCredentials: true})
 
           ]) ;
           
@@ -127,8 +145,8 @@ export default function SelectedCourse(props) {
 
             {isQuiz?<QuizList quizData={quizData} chapterDetails={chapterDetails} courseDetails={course} refresh={refresh} /> : null }
             {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoId} videoData={videoData} />:null}
-            {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData}/>:null}
-            
+            {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData} videoType={videoData.item_type} videoId={videoId}/>:null}
+            {isCertificate?<Certificate />:null }
 
             {isLessonUploaded?<p>There is no content yet</p>:null}
           </div>

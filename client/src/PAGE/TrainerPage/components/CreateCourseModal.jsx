@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 import CloseIcon from '@mui/icons-material/Close';
+import { API_URL } from '../../../api';
 
 export default function CourseModal(props) {
     const exit = false; 
@@ -11,7 +12,7 @@ export default function CourseModal(props) {
     async function handleSubmit(){
         try {
             const response = await axios.post(
-                'http://localhost:3000/trainer/course/createcourse', 
+                `${API_URL}/trainer/course/createcourse`, 
                 {title: title, description: description},
                 {withCredentials: true}
             )

@@ -5,6 +5,7 @@ import Header from './components/Header'
 import Course from './components/Course'
 import CreateCourseModal from './components/CreateCourseModal'
 import SelectedCourse from './components/SelectedCourse'
+import { API_URL } from '../../api'
 
 
 export default function My_Batch() {
@@ -31,10 +32,10 @@ export default function My_Batch() {
     useEffect(()=>{
       async function fetchData(){
         try {
-          const response = await axios.get('http://localhost:3000/trainer/course', {withCredentials: true})
+          const response = await axios.get(`${API_URL}/trainer/course`, {withCredentials: true})
           setData(response.data.data)
          
-          
+          console.log(response)
         } catch (error) {
           console.log(error)
         }

@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios'
+import { API_URL } from '../../../api';
+
 
 export default function AddTraineeModal(props) {
     const exit = false
@@ -10,7 +12,7 @@ export default function AddTraineeModal(props) {
     async function handleEnroll(e){
       e.preventDefault()
       try {
-        const response = await axios.post('http://localhost:3000/trainer/course/enroll',{courseId: props.courseId, studentId: studentId}, {withCredentials: true});
+        const response = await axios.post(`${API_URL}/trainer/course/enroll`,{courseId: props.courseId, studentId: studentId}, {withCredentials: true});
         setEnrolled(response.data.success)
         console.log(response)
       } catch (error) {

@@ -14,6 +14,8 @@ import EditChapterModal from './EditChapterModal';
 import DeleteContent from './DeleteContent';
 import UploadImages from './uploadImagesModal';
 import ImagePlayer from './ImagePlayer';
+import { API_URL } from '../../../api';
+
 
 
 export default function SelectedCourse(props) {
@@ -73,8 +75,8 @@ export default function SelectedCourse(props) {
       setChapterDetails({id: id, index_chapter: chapter_index})
       try {
         const [video, quiz] = await Promise.all([
-          axios.post('http://localhost:3000/admin/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true}),
-          axios.post('http://localhost:3000/admin/chapter/quiz', {chapterId: id  }, {withCredentials: true})
+          axios.post(`${API_URL}/admin/chapter/chapteritems`, {courseId: course.id, chapterId: id  }, {withCredentials: true}),
+          axios.post(`${API_URL}/admin/chapter/quiz`, {chapterId: id  }, {withCredentials: true})
 
         ])
           if(video.data.success){
@@ -113,8 +115,8 @@ export default function SelectedCourse(props) {
         try {
           
           const [response, chapterItems] = await Promise.all([
-            axios.post('http://localhost:3000/admin/course/chapter', {course_Id: course.id}, {withCredentials: true}),
-            axios.post('http://localhost:3000/admin/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
+            axios.post(`${API_URL}/admin/course/chapter`, {course_Id: course.id}, {withCredentials: true}),
+            axios.post(`${API_URL}/admin/chapter/chapterfirstitem`, {courseId: course.id}, {withCredentials: true})
 
           ]) ;
           
@@ -165,7 +167,7 @@ export default function SelectedCourse(props) {
       }));
 
       try {
-        await axios.put('http://localhost:3000/admin/chapter/reorder', { orderedChapters });
+        await axios.put(`${API_URL}/admin/chapter/reorder`, { orderedChapters });
         console.log('Chapter order saved!');
       } catch (err) {
         console.error('Failed to save chapter order', err);

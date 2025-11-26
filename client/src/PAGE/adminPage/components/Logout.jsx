@@ -1,8 +1,8 @@
 import React from 'react'
 import {Link, useNavigate} from "react-router-dom"
 import axios from 'axios';
+import { API_URL } from '../../../api';
 
-const API_URL = "http://localhost:3000/admin/dashboard/logout"
 
 export default function Logout() {
     const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function Logout() {
     async function handleLogout(event){
         event.preventDefault();
         try {
-            const res = await axios.post(API_URL, {}, { withCredentials: true })
+            const res = await axios.post(`${API_URL}/admin/dashboard/logout`, {}, { withCredentials: true })
            console.log(res.data)
             
           if (res.data.message === "Successfully logged out") {

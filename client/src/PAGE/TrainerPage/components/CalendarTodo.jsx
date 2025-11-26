@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-
+import { API_URL } from "../../../api";
 // In-memory storage
 let demoCalendarEvents = [];
+
 
 export default function GoogleCalendarUI() {
   const [currentViewDate, setCurrentViewDate] = useState(new Date());
@@ -92,7 +93,7 @@ export default function GoogleCalendarUI() {
     console.log("Sending date:", dateString);
 
     const result = await axios.post(
-      'http://localhost:3000/trainer/calendar/events',
+      `${API_URL}/trainer/calendar/events`,
       {
         text: eventInputText,
         color: generateRandomColor(),
@@ -115,7 +116,7 @@ export default function GoogleCalendarUI() {
   useEffect(()=>{
    async function fetchEvents() {
     try {
-      const res = await axios.get("http://localhost:3000/trainer/calendar/events", {
+      const res = await axios.get(`${API_URL}/trainer/calendar/events`, {
         withCredentials: true
       });
 
@@ -143,7 +144,7 @@ console.log(calendarEvents)
 
   const deleteEvent = async (id) => {
     try {
-      const res = await axios.delete(`http://localhost:3000/trainer/calendar/events/${id}` , {withCredentials:true})
+      const res = await axios.delete(`${API_URL}/trainer/calendar/events/${id}` , {withCredentials:true})
       console.log(res)
       handleRefresh()
     } catch (error) {

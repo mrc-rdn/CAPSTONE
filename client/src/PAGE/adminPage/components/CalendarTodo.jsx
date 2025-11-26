@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { API_URL } from "../../../api";
 
 // In-memory storage
 let demoCalendarEvents = [];
@@ -92,7 +93,7 @@ export default function GoogleCalendarUI() {
     console.log("Sending date:", dateString);
 
     const result = await axios.post(
-      'http://localhost:3000/admin/calendar/events',
+      `${API_URL}/admin/calendar/events`,
       {
         text: eventInputText,
         color: generateRandomColor(),
@@ -115,7 +116,7 @@ export default function GoogleCalendarUI() {
   useEffect(()=>{
    async function fetchEvents() {
     try {
-      const res = await axios.get("http://localhost:3000/admin/calendar/events", {
+      const res = await axios.get(`${API_URL}/admin/calendar/events`, {
         withCredentials: true
       });
 

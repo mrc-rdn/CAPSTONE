@@ -2,8 +2,8 @@ import React, {useState} from 'react'
 import {Link , useNavigate} from "react-router-dom"
 import '/public/styles.css'
 import axios from "axios"
+import { API_URL } from '../../api'
 
-const API_URL = "http://localhost:3000/trainer/login"
 
 export default function TrainerLoginPage() {
   const [email , setEmail] = useState("")
@@ -16,7 +16,7 @@ export default function TrainerLoginPage() {
   async function handleLogin(event){
     event.preventDefault();
     try {
-      const response = await axios.post(API_URL, {
+      const response = await axios.post(`${API_URL}/trainer/login`, {
         username: email, 
         password: password,
       }, { withCredentials: true })

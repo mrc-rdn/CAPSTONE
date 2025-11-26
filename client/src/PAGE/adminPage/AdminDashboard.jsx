@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Dcontent from './components/DContent'
 import CalendarTodo from './components/CalendarTodo'
 import axios from 'axios'
+import { API_URL } from '../../api'
 
 export default function AdminDashboard() {
   const [data , setData]= useState([])
@@ -11,7 +12,7 @@ export default function AdminDashboard() {
   useEffect(()=>{
     async function fetchData(){
       try {
-        const response = await axios.get('http://localhost:3000/admin/dashboard', {withCredentials: true});
+        const response = await axios.get(`${API_URL}/admin/dashboard`, {withCredentials: true});
         setData(response.data)
      
       } catch (error) {

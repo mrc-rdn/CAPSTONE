@@ -14,6 +14,9 @@ import EditChapterModal from './EditChapterModal';
 import DeleteContent from './DeleteContent';
 import UploadImages from './uploadImagesModal';
 import ImagePlayer from './ImagePlayer';
+import TraineeProgressModal from './TraineeProgressModal'
+import { API_URL } from '../../../api';
+import Certificate from './Certificate';
 
 
 export default function SelectedCourse(props) {
@@ -22,10 +25,12 @@ export default function SelectedCourse(props) {
     const {id, title, description } = course
     const [isChapterModal, setChapterModal] = useState(false);
     const [isEnrollModal, setEnrollModal] = useState(false);
+    const [isTraineeProgressModal, setTraineePorgressModal] = useState(false)
     
     const [isQuizUpload, setQuizUpload] = useState(false);
     const [isUploadVideo, setUploadvideo] = useState(false);
-    const [isUploadImage, setUploadImage] = useState(false)
+    const [isUploadImage, setUploadImage] = useState(false);
+    const [isUplaodCertificate, setUplaodCertificate] = useState(false);
 
     const [isVideo, setVideo] = useState(false);
     const [videoData, setVideoData] = useState("")
@@ -34,6 +39,7 @@ export default function SelectedCourse(props) {
     const [isLessonUploaded, setLessonUpload] = useState(false)
     const [quizData, setQuizData] = useState([]);
     const [chapterDetails , setChapterDetails] = useState({id: null, chapter_index: null})
+    const [isCertificate, setIsCertificate] = useState(false)
     
 
     function handleOpenChapterModal(){
@@ -63,6 +69,13 @@ export default function SelectedCourse(props) {
     function handleExitImageUploadModal(exit){
       setUploadImage(exit)
     }
+
+    const handleOpenTraineeProgressModal = () =>{
+      setTraineePorgressModal(true)
+    }
+    const handleExitTraineeProgressModal = (exit) =>{
+      setTraineePorgressModal(exit)
+    }
     
     
     
@@ -70,34 +83,49 @@ export default function SelectedCourse(props) {
       
       setChapterDetails({id: id, index_chapter: chapter_index})
       try {
-        const [video, quiz] = await Promise.all([
-          axios.post('http://localhost:3000/trainer/chapter/chapteritems', {courseId: course.id, chapterId: id  }, {withCredentials: true}),
-          axios.post('http://localhost:3000/trainer/chapter/quiz', {chapterId: id  }, {withCredentials: true})
-
+        const [video, quiz, certificate] = await Promise.all([
+          axios.post(`${API_URL}/trainer/chapter/videoitems`, {courseId: course.id, chapterId: id  }, {withCredentials: true}),
+          axios.post(`${API_URL}/trainer/chapter/quiz`, {chapterId: id  }, {withCredentials: true}),
+          axios.post(`${API_URL}/trainer/chapter/getcertificate`, {courseId: course.id, chapterId: id  }, {withCredentials: true})
         ])
-          if(video.data.success){
-            console.log(video.data.data)
-            setVideo(video.data.success)
-            setVideoData(video.data.data[0])
-            setQuiz(false)
-            setLessonUpload(false)
-            setVideoId(video.data.data[0].id)
-            console.log(video)
-          }else{
-            console.log(quiz.data.data.length)
-            setVideo(false)
-            setQuiz(quiz.data.success)
-            setQuizData(quiz.data.data)
-            setLessonUpload(false)
-          }
-        //if(video.data)
-        
+        // reset state
+        setVideo(false);
+        setQuiz(false);
+        setIsCertificate(false);
+        setLessonUpload(false);
+
+        // VIDEO EXISTS
+        if (video.data.success && video.data.data.length > 0) {
+          setVideo(true);
+          setVideoData(video.data.data[0]);
+          setVideoId(video.data.data[0].id);
+          return; // stop here
+        }
+
+        // QUIZ EXISTS
+        if (quiz.data.success && quiz.data.data.length > 0) {
+          setQuiz(true);
+          setQuizData(quiz.data.data);
+          return;
+        }
+
+        // CERTIFICATE EXISTS
+        if (certificate.data.success) {
+          setIsCertificate(true);
+          return;
+        }
+
+        // NOTHING EXISTS
+        setLessonUpload(true);
+
       } catch (error) {
-        console.log('there is error or your not yet uploaded any videos or quiz',error)
-        setVideo(false)
-        setQuiz(false)
-        setLessonUpload(true)
+        console.log('Error loading chapter contents:', error);
+        setVideo(false);
+        setQuiz(false);
+        setIsCertificate(false);
+        setLessonUpload(true);
       }
+
 
     }
 
@@ -111,8 +139,8 @@ export default function SelectedCourse(props) {
         try {
           
           const [response, chapterItems] = await Promise.all([
-            axios.post('http://localhost:3000/trainer/course/chapter', {course_Id: course.id}, {withCredentials: true}),
-            axios.post('http://localhost:3000/trainer/chapter/chapterfirstitem', {courseId: course.id}, {withCredentials: true})
+            axios.post(`${API_URL}/trainer/course/chapter`, {course_Id: course.id}, {withCredentials: true}),
+            axios.post(`${API_URL}/trainer/chapter/chapterfirstitem`, {courseId: course.id}, {withCredentials: true})
 
           ]) ;
           
@@ -163,7 +191,7 @@ export default function SelectedCourse(props) {
       }));
 
       try {
-        await axios.put('http://localhost:3000/admin/chapter/reorder', { orderedChapters });
+        await axios.put(`${API_URL}/admin/chapter/reorder`, { orderedChapters });
         console.log('Chapter order saved!');
       } catch (err) {
         console.error('Failed to save chapter order', err);
@@ -182,7 +210,19 @@ export default function SelectedCourse(props) {
       setEditChapterModal(true)
       setEditChapterData({chapterId:chapterId, chapter_index: chapter_index, chapter_title:chapter_title, chapter_description: chapter_description})
     }
+
     
+    async function handleUploadCertificate(){
+      console.log(id,chapterDetails.id)
+      try {
+        const res = await axios.post(`${API_URL}/trainer/chapter/addcertificate`, 
+          {courseId:id, chapterId:chapterDetails.id}, 
+          {withCredentials:true})
+          console.log(res)
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
   return (
     
@@ -197,6 +237,7 @@ export default function SelectedCourse(props) {
           </button>
           <h1 className="text-xl font-medium ml-20">{title}</h1>
           <button
+            onClick={handleOpenTraineeProgressModal}
             className='h-full ml-auto m-3 hover:border-b-5 ransition-colors duration-50 ease-in-out p-3'>
               Trainee Progress
           </button>
@@ -225,6 +266,7 @@ export default function SelectedCourse(props) {
             {isQuiz?<QuizList quizData={quizData} /> : null }
             {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoId} videoData={videoData} />:null}
             {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData}/>:null}
+            {isCertificate?<Certificate />:null }
             
 
             {isLessonUploaded?<div className='h-full w-full grid place-items-center'>
@@ -235,7 +277,8 @@ export default function SelectedCourse(props) {
                     e.preventDefault(); 
                     setQuizUpload(true)
                     setUploadvideo(false)
-                    setUploadImage(false)}}>
+                    setUploadImage(false)
+                    setUplaodCertificate(false)}}>
                       Create Quiz
               </button>
 
@@ -245,7 +288,8 @@ export default function SelectedCourse(props) {
                   e.preventDefault(); 
                   setQuizUpload(false) 
                   setUploadvideo(true)
-                  setUploadImage(false)}}>
+                  setUploadImage(false)
+                  setUplaodCertificate(false)}}>
                     Upload Video
               </button>
 
@@ -256,9 +300,21 @@ export default function SelectedCourse(props) {
                     setQuizUpload(false)
                     setUploadvideo(false)
                     setUploadImage(true)
-                    
+                    setUplaodCertificate(false)
                   }}>
                 Upload Image
+              </button>
+              <button
+                  className= {isUplaodCertificate? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
+                  onClick={(e)=>{
+                    e.preventDefault()
+                    setQuizUpload(false)
+                    setUploadvideo(false)
+                    setUploadImage(false)
+                    setUplaodCertificate(true)
+                    handleUploadCertificate()
+                  }}>
+                Add Certificate
               </button>
 
 
@@ -350,6 +406,7 @@ export default function SelectedCourse(props) {
           {isUploadVideo? <VideoUploadModal onExit={handleExitVideoUploadModal} onRefresh={handleRefresh} course_id={id} chapter_details={chapterDetails}/> :null} 
           {isUploadImage? <UploadImages onExit={handleExitImageUploadModal} onRefresh={handleRefresh} course_id={id} chapter_details={chapterDetails} /> : null}       
           {isEditChapterModal? <EditChapterModal onExit={handleExitChapterEditModal} onRefresh={handleRefresh} chapter_Details={chapterDetails} chapterData={EditChapterData} courseId={id} isVideo={isVideo} isQuiz={isQuiz} />: null}
+          {isTraineeProgressModal? <TraineeProgressModal onExit={handleExitTraineeProgressModal} chapter={chapter} course_id={id} chapter_details={chapterDetails}  /> :null} 
 
       </div>
     </div>

@@ -14,16 +14,13 @@ import { CloudinaryStorage } from "multer-storage-cloudinary"
 
 import db from './db/connection.js'
 
-
 const app = express();
 const port = 3000;
 const saltRounds = parseInt(process.env.SALTED_ROUNDS);
 
 env.config();
 
-
 db.connect();
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -1034,10 +1031,58 @@ app.delete("/trainer/chapter/deletechapter/:chapterId", async(req, res)=>{
   }
 })
 
+//certificate upload
+app.post("/trainer/chapter/addcertificate", async(req, res)=>{
+  
+  try {
+    const {courseId, chapterId} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINER"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+    const query = `INSERT INTO certificate ( is_certificate,chapter_id,course_id) VALUES ($1, $2, $3) RETURNING*`
+    const value = [true, chapterId, courseId]
+    const result = await db.query(query, value);
+    
+    if (result.rows.length === 1){
+      res.json({success: true, message: 'success gathering your data', data: result.rows})
+    }else{
+      res.json({success: false ,messsage: 'there no video or quiz added yet', data: result.rows})
+    }
+    
+  } catch (error) {
+    res.json({success: false ,messsage: 'there no video or quiz added yet' })
+  }
+});
+app.post("/trainer/chapter/getcertificate", async(req, res)=>{
+  
+  try {
+    const {courseId, chapterId} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINER"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+    const query = `SELECT * FROM certificate WHERE course_id = $1 AND chapter_id = $2`
+    const value = [ courseId, chapterId]
+    const result = await db.query(query, value);
+    console.log(result.rows.length)
+    if (result.rows.length > 0){
+      res.json({success: true, message: 'success gathering your data', data: result.rows})
+    }else{
+      res.json({success: false ,messsage: 'there no video or quiz added yet', data: result.rows})
+    }
+    
+  } catch (error) {
+    res.json({success: false ,messsage: 'there no video or quiz added yet' })
+  }
+});
 
 
-
-app.post("/trainer/chapter/chapteritems", async(req, res)=>{
+app.post("/trainer/chapter/videoitems", async(req, res)=>{
   
   try {
     const {courseId, chapterId} = req.body
@@ -1105,7 +1150,7 @@ app.post("/trainer/chapter/uploadvideo", uploadVideo.single("video"), async (req
     
 
     const query = 'INSERT INTO video_items ( title, source_url, order_index, required,created_at, course_id, chapter_id , item_type) VALUES ($1, $2, $3, $4, now(), $5, $6, $7) RETURNING*'
-    const values = [ title, req.file.path, order_index , true, course_id, chapter_id, 'VIDEO'  ]
+    const values = [ title, req.file.path, order_index , false, course_id, chapter_id, 'VIDEO'  ]
     //const response = await db.query("INSERT INTO video_items ( title, item_type, source_url, order_index, required,created_at, course_id, chapter_id) VALUES ('title', 'VIDEO', 'dfasdfasdf', 1, True, now(), 2, 25)")
     const response = await db.query(query, values)
     res.json({success: true,  message: `File received successfully` , data: response})
@@ -1413,6 +1458,184 @@ app.delete("/trainer/calendar/events/:id", async (req, res) => {
   
 });
 
+//trainee Progress
+app.post('/trainer/course/traineeprogress', async(req, res)=>{
+  try {
+    const {course_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINER"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+    const result = await db.query(`SELECT * FROM enrollments
+    JOIN users_info
+    ON users_info.id = enrollments.student_id
+    WHERE course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id])
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//video progress
+app.post('/trainer/course/traineevideoprogress', async(req, res)=>{
+  try {
+    const {course_id, chapter_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINER"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+    const result = await db.query(`SELECT 
+      enrollments.*,
+      users_info.*,
+      video_progress.*
+    FROM enrollments
+    LEFT JOIN users_info
+      ON users_info.id = enrollments.student_id
+    LEFT JOIN video_progress
+      ON video_progress.user_id = enrollments.student_id
+      AND video_progress.course_id = $1
+      AND video_progress.chapter_id = $2
+    WHERE enrollments.course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//quizprogress
+app.post('/trainer/course/traineequizprogress', async(req, res)=>{
+  try {
+    const {course_id, chapter_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINER"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+        const result = await db.query(`
+        SELECT 
+          enrollments.*,
+          users_info.*,
+          quiz_progress.*
+          
+        FROM enrollments
+        LEFT JOIN users_info
+          ON users_info.id = enrollments.student_id
+        LEFT JOIN quiz_progress
+          ON quiz_progress.user_id = enrollments.student_id 
+          AND quiz_progress.chapter_id = $1
+        WHERE enrollments.course_id = $2
+        ORDER BY users_info.surname ASC;`, [chapter_id, course_id])
+    const quizLength = await db.query(`SELECT * FROM quizzes
+      JOIN questions
+      ON questions.quiz_id = quizzes.id
+      WHERE quizzes.chapter_id = $1`, [chapter_id])
+    
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows, quizLength: quizLength.rows.length})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//iamgeprogress
+app.post('/trainer/course/traineeimageprogress', async(req, res)=>{
+  try {
+    const {course_id, chapter_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINER"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+    const result = await db.query(`SELECT 
+      enrollments.*,
+      users_info.*,
+      image_progress.*
+    FROM enrollments
+    LEFT JOIN users_info
+      ON users_info.id = enrollments.student_id
+    LEFT JOIN image_progress
+      ON image_progress.user_id = enrollments.student_id
+      AND image_progress.course_id = $1
+      AND image_progress.chapter_id = $2
+    WHERE enrollments.course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//render the data in to excel
+app.post('/trainer/:course/excelrender', async (req, res)=>{
+    try {
+      const {course} = req.params
+      if(!req.isAuthenticated()){
+        res.status(401).json({success: false, messsage: 'unauthorized access' })
+      }
+      if(req.user.role !== "TRAINER"){
+        res.status(401).json({success: false, message: 'invalid role'})
+      }
+        
+        const chapter = await db.query(`SELECT * FROM chapters
+            WHERE course_id = $1
+            ORDER BY order_index ASC`, [course]);
+        const trainee = await db.query(`SELECT 
+            enrollments.*,
+            users_info.*
+            FROM enrollments
+            LEFT JOIN users_info
+            ON users_info.id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+
+        const videoProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                video_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            JOIN video_progress
+                ON video_progress.user_id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+        const quizProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                quiz_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            JOIN quiz_progress
+                ON quiz_progress.user_id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+        const imageProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                image_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            LEFT JOIN image_progress
+                ON image_progress.user_id = enrollments.student_id
+                
+            WHERE enrollments.course_id = $1`, [course])
+        
+            res.json({chapter: chapter.rows, trainee:trainee.rows,  video_progress:videoProgress.rows, quiz_progress: quizProgress.rows, image_progress: imageProgress.rows })
+    } catch (error) {
+        res.json({success: false, error})
+    }
+})
+
+
 //log out trainer side
 app.post("/trainer/dashboard/logout", (req, res, next) => {
 
@@ -1458,6 +1681,31 @@ app.post("/trainee/login",passport.authenticate('local'), (req, res)=>{
   }
   
 })
+//certificate upload
+app.post("/trainee/chapter/getcertificate", async(req, res)=>{
+  
+  try {
+    const {courseId, chapterId} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINEE"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+    const query = `SELECT * FROM certificate WHERE course_id = $1 AND chapter_id = $2`
+    const value = [ courseId, chapterId]
+    const result = await db.query(query, value);
+    console.log(result.rows.length)
+    if (result.rows.length > 0){
+      res.json({success: true, message: 'success gathering your data', data: result.rows})
+    }else{
+      res.json({success: false ,messsage: 'there no video or quiz added yet', data: result.rows})
+    }
+    
+  } catch (error) {
+    res.json({success: false ,messsage: 'there no video or quiz added yet' })
+  }
+});
 
 
 // //getting a certain data of users
@@ -1525,7 +1773,7 @@ app.post("/trainee/course/chapter", async(req, res)=>{
   }
 }); 
 // fetch the first item
-app.post("/trainee/chapter/chapteritems", async(req, res)=>{
+app.post("/trainee/chapter/videoitems", async(req, res)=>{
   
   try {
     const {courseId, chapterId} = req.body
@@ -1675,6 +1923,211 @@ app.post("/trainee/quiz/quizprogress", async (req, res) => {
   }
 });
 
+app.post("/trainee/:videoId/completed", async(req,res)=>{
+  try {
+    const {is_completed,} = req.body
+    const {videoId} = req.params
+    await db.query(
+        'UPDATE video_progress SET is_completed = $1 WHERE user_id = $2 AND video_id = $3',
+        [is_completed, req.user.id , videoId, ]
+      );
+      res.status(200).json({success: true, message: 'success updating the is completed'})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'unsuccess updating the is completed'})
+  }
+});
+app.post("/trainee/:imageId/progressimage", async (req, res) => {
+  try {
+    const { chapterId, courseId } = req.body;
+    const { imageId } = req.params;
+
+    // Authentication check
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, message: "unauthorized access" });
+    }
+
+    if (req.user.role !== "TRAINEE") {
+      return res.status(401).json({ success: false, message: "invalid role" });
+    }
+
+    // Insert or update (one record per user/image)
+    const result = await db.query(
+      `INSERT INTO image_progress (user_id, chapter_id, course_id, video_id, is_completed)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (user_id, video_id)
+       DO UPDATE SET is_completed = EXCLUDED.is_completed
+       RETURNING *;`,
+      [req.user.id, chapterId, courseId, imageId, true]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully updated image progress",
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ success: false, message: "Failed to update image progress" });
+  }
+});
+
+
+
+
+//SAVE VIDEO PROGRESS
+app.post("/trainee/:videoId/progress", async (req, res) => {
+  
+  try {
+    const { videoId } = req.params;
+    const { duration_seconds, chapter_id, course_id, is_completed } = req.body;
+
+    // AUTH CHECK
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, message: 'unauthorized access' });
+    }
+
+    if (req.user.role !== "TRAINEE") {
+      return res.status(401).json({ success: false, message: 'invalid role' });
+    }
+
+    const userId = req.user.id;
+
+    // UPSERT (insert/update)
+    const query = `
+      INSERT INTO video_progress (user_id, video_id, chapter_id, course_id, duration_seconds, is_completed)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (user_id, video_id)
+      DO UPDATE SET duration_seconds = EXCLUDED.duration_seconds, updated_at = NOW()
+      RETURNING *;
+    `;
+
+    const result = await db.query(query, [
+      userId,
+      videoId,
+      chapter_id,
+      course_id,
+      duration_seconds,
+      is_completed
+    ]);
+
+    res.json({ success: true, data: result.rows[0] });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "DB error" });
+  }
+});
+
+
+// GET VIDEO PROGRESS
+app.get("/trainee/:videoId/progress", async (req, res) => {
+  try {
+    const { videoId } = req.params;
+
+    // AUTH CHECK
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, message: 'unauthorized access' });
+    }
+
+    if (req.user.role !== "TRAINEE") {
+      return res.status(401).json({ success: false, message: 'invalid role' });
+    }
+
+    const userId = req.user.id;
+
+    const query = `
+      SELECT duration_seconds, is_completed
+      FROM video_progress 
+      WHERE user_id = $1 AND video_id = $2;
+    `;
+
+    const result = await db.query(query, [userId, videoId]);
+    console.log(result.rows)
+    res.json({
+      duration_seconds: result.rows.length > 0 ? result.rows[0].duration_seconds : 0, is_completed: result.rows[0].is_completed
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ duration_seconds: 0 });
+  }
+});
+
+// app.post("/trainee/:videoId/progress", async (req, res) => {
+//   try {
+//     const { videoId } = req.params;
+//     const { duration_seconds, chapter_id, course_id } = req.body;
+
+//     if (!req.isAuthenticated()) {
+//       return res.status(401).json({ success: false, message: "unauthorized access" });
+//     }
+
+//     if (req.user.role !== "TRAINEE") {
+//       return res.status(401).json({ success: false, message: "invalid role" });
+//     }
+
+//     const userId = req.user.id;
+
+//     // 1. Get total video duration
+//     const videoData = await db.query(
+//       "SELECT duration_total_seconds FROM video_items WHERE id = $1",
+//       [videoId]
+//     );
+
+//     if (videoData.rows.length === 0) {
+//       return res.status(404).json({ success: false, message: "Video not found" });
+//     }
+
+//     const totalDuration = videoData.rows[0].duration_total_seconds;
+
+//     // 2. Check if already completed (so it becomes permanent)
+//     const existing = await db.query(
+//       "SELECT is_completed FROM video_progress WHERE user_id = $1 AND video_id = $2",
+//       [userId, videoId]
+//     );
+
+//     let isCompleted = false;
+
+//     if (existing.rows.length > 0 && existing.rows[0].is_completed === true) {
+//       // Already completed → permanent, keep TRUE
+//       isCompleted = true;
+//     } else {
+//       // Not completed before → calculate
+//       isCompleted = duration_seconds >= totalDuration;
+//     }
+
+//     // 3. UPSERT with permanent completion
+//     const query = `
+//       INSERT INTO video_progress (user_id, video_id, chapter_id, course_id, duration_seconds, is_completed)
+//       VALUES ($1, $2, $3, $4, $5, $6)
+//       ON CONFLICT (user_id, video_id)
+//       DO UPDATE SET
+//         duration_seconds = EXCLUDED.duration_seconds,
+//         is_completed = video_progress.is_completed OR EXCLUDED.is_completed,
+//         updated_at = NOW()
+//       RETURNING *;
+//     `;
+
+//     const result = await db.query(query, [
+//       userId,
+//       videoId,
+//       chapter_id,
+//       course_id,
+//       duration_seconds,
+//       isCompleted
+//     ]);
+
+//     res.json({ success: true, data: result.rows[0] });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, message: "DB error" });
+//   }
+// });
+
+
+
+
 
 
 //comments
@@ -1782,6 +2235,7 @@ app.post("/trainee/dashboard/logout", (req, res, next) => {
     });
   });
 });
+
 
 
 

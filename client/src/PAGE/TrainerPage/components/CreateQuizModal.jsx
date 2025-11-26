@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios'
+import { API_URL } from '../../../api';
 
 export default function CreateQuiz(props) {
   const exit = false
@@ -42,7 +43,7 @@ export default function CreateQuiz(props) {
 
   const saveQuiz = async () => {
     try {
-      await axios.post("http://localhost:3000/trainer/chapter/createquiz", {
+      await axios.post(`${API_URL}/trainer/chapter/createquiz`, {
       chapter_id: props.chapterId,
       title,
       questions,

@@ -2,6 +2,7 @@ import React,{useEffect, useState} from 'react'
 import {Link, useNavigate} from "react-router-dom"
 import '/public/styles.css'
 import axios from "axios";
+import { API_URL } from '../../api';
 
 export default function TraineeLoginPage() {
   const [username, setUsername] = useState("");
@@ -16,7 +17,7 @@ export default function TraineeLoginPage() {
   async function handleLogin (event){
     event.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3000/trainee/login", {
+      const res = await axios.post(`${API_URL}/trainee/login`, {
         username: username,
         password: password,
       }, { withCredentials: true })

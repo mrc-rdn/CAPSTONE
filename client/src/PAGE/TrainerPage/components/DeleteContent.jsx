@@ -1,13 +1,14 @@
 import React, {useState} from 'react'
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
+import { API_URL } from '../../../api';
 
 export default function DeleteContent(props) {
     const {isVideo, isQuiz, quizData, videoData} = props
     const handleDelete = async() => {
         props.onRefresh();
         try {
-            const res = await axios.delete('http://localhost:3000/trainer/course/deletecontent', {
+            const res = await axios.delete(`${API_URL}/trainer/course/deletecontent`, {
                 data: {
                     isVideo,
                     isQuiz,

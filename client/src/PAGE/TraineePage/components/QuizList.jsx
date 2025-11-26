@@ -3,6 +3,7 @@ import axios from 'axios'
 import QuizFillBlank from './QuizFillBlank';
 import QuizMultipleChoice from './QuizMultipleChoice';
 import CheckedAnswers from './CheckedAnswers';
+import { API_URL } from '../../../api';
 
 function groupQuizzes(quizData) {
 
@@ -103,7 +104,7 @@ export default function QuizList(props) {
     console.log(score) 
     
     try {
-      const res = await axios.post('http://localhost:3000/trainee/quiz/answer', {
+      const res = await axios.post(`${API_URL}/trainee/quiz/answer`, {
         user_id: props.courseDetails.student_id, 
         quiz_id: groupedQuizzes[0].quiz_id, 
         chapter_id: props.chapterDetails.id, 
@@ -125,7 +126,7 @@ export default function QuizList(props) {
     const isAnswered = async () => {
       try {
         const res = await axios.post(
-          "http://localhost:3000/trainee/quiz/quizprogress",
+          `${API_URL}/trainee/quiz/quizprogress`,
           { chapter_id: props.chapterDetails.id },
           { withCredentials: true }
         );
@@ -154,8 +155,7 @@ export default function QuizList(props) {
   return (
   <div className='w-full h-full flex flex-col items-center overflow-y-scroll p-5'>
     
-    <h2 className="text-lg font-bold ">Available Quizzes</h2>
-
+    <h2 className="text-lg font-bold ">{isAnswer?'Quiz Result':'Available Quizzes'}</h2>
     
     {isAnswer?null
     :<div className='w-full flex flex-col '>

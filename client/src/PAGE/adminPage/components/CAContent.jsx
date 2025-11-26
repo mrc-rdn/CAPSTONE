@@ -5,6 +5,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import axios from 'axios'
+import { API_URL } from '../../../api';
 
 export default function CAContent() {
 
@@ -20,7 +21,7 @@ export default function CAContent() {
     
     e.preventDefault();
     try{
-      const response = await axios.post('http://localhost:3000/admin/registeraccount',
+      const response = await axios.post(`${API_URL}/admin/registeraccount`,
         { firstName: firstName, surname: surname, contactNo:contactNo , username: username , password: password, role: role },
         {withCredentials: true})
         

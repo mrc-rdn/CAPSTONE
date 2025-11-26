@@ -5,6 +5,7 @@ import Header from './components/Header'
 import CourseModal from './components/CourseModal'
 import Course from './components/Course'
 import SelectedCourse from './components/SelectedCourse'
+import { API_URL } from '../../api';
 
 export default function AdminModules() {
   const [isModal, setIsModal] = useState(false)
@@ -32,7 +33,7 @@ export default function AdminModules() {
      useEffect(()=>{
       async function fetchData(){
         try {
-          const response = await axios.get('http://localhost:3000/admin/course', {withCredentials: true})
+          const response = await axios.get(`${API_URL}/admin/course`, {withCredentials: true})
           setData(response.data.data)
          
           

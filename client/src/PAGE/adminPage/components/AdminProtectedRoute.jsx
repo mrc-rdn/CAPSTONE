@@ -1,6 +1,7 @@
 import React,{useState, useEffect} from 'react'
 import { Navigate } from 'react-router-dom'
 import axios from "axios"
+import { API_URL } from '../../../api'
 
 
 export default function AdminProtectedRoute({children}) {
@@ -9,7 +10,7 @@ export default function AdminProtectedRoute({children}) {
     useEffect(()=>{
         async function fetchAuth(){
             try {
-                const res = await axios.get("http://localhost:3000/admin/protectedroute", {withCredentials: true}) 
+                const res = await axios.get(`${API_URL}/admin/protectedroute`, {withCredentials: true}) 
                 setAuth(res.data.success)
                 console.log(res)
             } catch (error) {

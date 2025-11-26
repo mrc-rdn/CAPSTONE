@@ -2,6 +2,8 @@ import React, {useState} from 'react'
 import {Link, Navigate} from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import { API_URL } from '../../../api';
+
 
 
 export default function AddChapterModal(props) {
@@ -16,7 +18,7 @@ export default function AddChapterModal(props) {
     async function handleSubmit(e){
       e.preventDefault();
         try {
-          const response = await axios.post('http://localhost:3000/trainer/course/addchapter',
+          const response = await axios.post(`${API_URL}/trainer/course/addchapter`,
             {course_id: props.course_id, chapter_name: chapterTitle, description: description, chapter_no: props.chapter_no + 1},
             {withCredentials:true}
           )  

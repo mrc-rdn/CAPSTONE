@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import CloseIcon from '@mui/icons-material/Close';
+import { API_URL } from "../../../api";
 export default function UploadImages(props) {
   const exit = false
   const [video, setVideo] = useState(null);
@@ -8,6 +9,7 @@ export default function UploadImages(props) {
   const [uploading, setUploading] = useState(false);
   const [isUploadingDone, setUploadingDone] = useState(false)
   const [title, setTitle] = useState("")
+
   
 
 
@@ -23,7 +25,7 @@ export default function UploadImages(props) {
     console.log(props.course_id,props.chapter_details.index_chapter, props.chapter_details.id)
     try {
       setUploading(true);
-      const res = await axios.post("http://localhost:3000/trainer/chapter/upload-image", formData, {withCredentials:true});
+      const res = await axios.post(`${API_URL}/trainer/chapter/upload-image`, formData, {withCredentials:true});
       
       
       console.log("✅ Upload success:", res.data);

@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Comments from "./Comments";
+import { API_URL } from "../../../api";
 
 export default function CustomVideoPlayer(props) {
   const videoRef = useRef(null);
@@ -12,6 +13,7 @@ export default function CustomVideoPlayer(props) {
   const [showControls, setShowControls] = useState(true);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+
 
   // Toggle play/pause
   const togglePlay = () => {

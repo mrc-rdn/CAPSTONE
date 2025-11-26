@@ -5,9 +5,8 @@ import Navbar from './components/Navbar'
 import Header from "./components/Header"
 import Content from "./components/DContent"
 import CalendarTodo from './components/CalendarTodo'
+import { API_URL } from '../../api'
 
-
-const API_URL = "http://localhost:3000/trainer/dashboard"
 
 export default function TrainerDashboard() {
 
@@ -18,7 +17,7 @@ export default function TrainerDashboard() {
   useEffect(()=>{
     async function fetchdata(){
       try {
-        const response = await axios.get(API_URL, {withCredentials: true})
+        const response = await axios.get(`${API_URL}/trainer/dashboard`, {withCredentials: true})
         setData(response.data.user)
         setTraineeCount(response.data.totalTrainee)
         
@@ -32,11 +31,11 @@ export default function TrainerDashboard() {
   console.log(traineeCount)
  
   return (
-    <div className="flex w-screen h-screen ">
+    <div className="flex w-full h-full">
       <Navbar />
-      <div className='w-full bg-gray-200'>
+      <div className='w-full h- full bg-gray-200'>
         <Header title="Dashboard"/>
-        <div>
+        <div className=' w-full h-11/12 overflow-y-scroll flex flex-col items-center'>
           <Content  name={first_name} surname={surname} role={role} traineeCount={traineeCount}/>
           <CalendarTodo />
         </div>

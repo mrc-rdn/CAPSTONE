@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { API_URL } from '../../../api';
 
 export default function EditChapterModal(props) {
     const exit = false
@@ -19,7 +20,7 @@ export default function EditChapterModal(props) {
       e.preventDefault();
       
       try {
-        const result = axios.put('http://localhost:3000/trainer/course/editchapter', 
+        const result = axios.put(`${API_URL}/trainer/course/editchapter`, 
             {title: chapterTitle, description: chapterDescription, courseId: props.courseId, chapterId:chapterId},
             {withCredentials: true})
         setChapterAdded(true)
@@ -33,7 +34,7 @@ export default function EditChapterModal(props) {
     const handleDelete = async (e) =>{
       e.preventDefault();
       try {
-        const res = await axios.delete(`http://localhost:3000/trainer/chapter/deletechapter/${props.chapter_Details.id}`,{
+        const res = await axios.delete(`${API_URL}/trainer/chapter/deletechapter/${props.chapter_Details.id}`,{
           withCredentials: true
           })
           console.log(res)

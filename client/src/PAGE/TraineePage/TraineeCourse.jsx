@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Header from './components/Header'
 import Course from './components/Course';
 import SelectedCourse from './components/SelectedCourse';
+import { API_URL } from '../../api';
 
 export default function TraineeCourse() {
   const [id, setId] = useState()
@@ -25,7 +26,7 @@ export default function TraineeCourse() {
    useEffect(()=>{
         async function fetchData(){
           try {
-            const response = await axios.get('http://localhost:3000/trainee/course', {withCredentials: true})
+            const response = await axios.get(`${API_URL}/trainee/course`, {withCredentials: true})
             setData(response.data.data)
            
             
@@ -36,7 +37,7 @@ export default function TraineeCourse() {
         }
         fetchData();
        },[])
-console.log(data)
+
   return (
     <div className="flex w-screen h-screen">
             
