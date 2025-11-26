@@ -1,18 +1,14 @@
 import React, {useState, useEffect} from 'react'
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-// import AddChapterModal from './AddChapterModal';
-// import AddTraineeModal from './AddTraineeModal';
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
 import Chapter from './chapter';
-// import VideoUploadModal from './VideoUploadModal';
+
 import MediaPlayer from './MediaPlayer';
-// import CreateQuiz from './CreateQuizModal';
 import QuizList from './QuizList';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-// import EditChapterModal from './EditChapterModal';
-// import DeleteContent from './DeleteContent';
-// import UploadImages from './uploadImagesModal';
+
 import ImagePlayer from './ImagePlayer';
 import { API_URL } from '../../../api';
 import Certificate from './Certificate';
