@@ -1,31 +1,31 @@
 import React from 'react'
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
-import LandingPage from "./PAGE/homePage/landingPage"
-import TraineeLoginPage from "./PAGE/homePage/TraineeLoginPage"
-import TrainerLoginPage from "./PAGE/homePage/TrainerLoginPage"
-import RoleChoicePage from './PAGE/homePage/RoleChoicePage'
+import LandingPage from "./PAGE/homePage/landingPage.jsx"
+import TraineeLoginPage from "./PAGE/homePage/TraineeLoginPage.jsx"
+import TrainerLoginPage from "./PAGE/homePage/TrainerLoginPage.jsx"
+import RoleChoicePage from './PAGE/homePage/RoleChoicePage.jsx'
 
 //this is for admin
-import AdminProtectedRoute from "./PAGE/adminPage/components/AdminProtectedRoute"
-import AdminDashboard from './PAGE/adminPage/AdminDashboard'
-import AdminCourse from './PAGE/adminPage/AdminCourse'
-import AdminMessages from './PAGE/adminPage/AdminMessages'
-import CreateAcoount from './PAGE/adminPage/CreateAcoount'
+import AdminProtectedRoute from "./PAGE/adminPage/components/AdminProtectedRoute.jsx"
+import AdminDashboard from './PAGE/adminPage/AdminDashboard.jsx'
+import AdminCourse from './PAGE/adminPage/AdminCourse.jsx'
+import AdminMessages from './PAGE/adminPage/AdminMessages.jsx'
+import CreateAcoount from './PAGE/adminPage/CreateAcoount.jsx'
 
 
 //this is a protect route
-import TRAINERProtectedRoute from './PAGE/TrainerPage/components/TRAINERProtectedRoute'
-import TrainerDashboard from './PAGE/TrainerPage/TrainerDashboard'
-import TrainerCourse from "./PAGE/TrainerPage/TrainerCourse"
-import TrainerMessages from "./PAGE/TrainerPage/TrainerMessages"
-import TrainerProfile from "./PAGE/TrainerPage/TrainerProfile"
+import TRAINERProtectedRoute from './PAGE/TrainerPage/components/TRAINERProtectedRoute.jsx'
+import TrainerDashboard from './PAGE/TrainerPage/TrainerDashboard.jsx'
+import TrainerCourse from "./PAGE/TrainerPage/TrainerCourse.jsx"
+import TrainerMessages from "./PAGE/TrainerPage/TrainerMessages.jsx"
+import TrainerProfile from "./PAGE/TrainerPage/TrainerProfile.jsx"
 
 //this for trainee
-import TraineeDashboard from "./PAGE/TraineePage/TraineeDashboard"
-import TRAINEEProtectedRoute from "./PAGE/TraineePage/components/TRAINEEProtectedRoute"
-import TraineeCourse from "./PAGE/TraineePage/TraineeCourse";
-import TraineeMessages from "./PAGE/TraineePage/TraineeMessages";
-import TraineeProfile from "./PAGE/TraineePage/TraineeProfile";
+import TraineeDashboard from "./PAGE/TraineePage/TraineeDashboard.jsx"
+import TRAINEEProtectedRoute from "./PAGE/TraineePage/components/TRAINEEProtectedRoute.jsx"
+import TraineeCourse from "./PAGE/TraineePage/TraineeCourse.jsx";
+import TraineeMessages from "./PAGE/TraineePage/TraineeMessages.jsx";
+import TraineeProfile from "./PAGE/TraineePage/TraineeProfile.jsx";
 
 export default function App() {
   return (
