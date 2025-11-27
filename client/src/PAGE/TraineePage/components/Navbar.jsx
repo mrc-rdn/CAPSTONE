@@ -1,7 +1,7 @@
 import React, {useState , useEffect} from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 //components
-import Logout from "./Logout"
+import Logout from "./Logout.jsx"
 
 
 //icons

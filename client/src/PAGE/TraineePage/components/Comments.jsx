@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { API_URL } from "../../../api";
+import { API_URL } from "../../../api.js";
 
 function Comments({ videoId }) {
   const [comments, setComments] = useState([]);

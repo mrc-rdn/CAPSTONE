@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
-import Navbar from './components/Navbar'
-import Header from './components/Header'
-import Course from './components/Course';
+import Navbar from './components/Navbar.jsx'
+import Header from './components/Header.jsx'
+import Course from './components/Course.jsx';
 import SelectedCourse from './components/SelectedCourse';
-import { API_URL } from '../../api';
+import { API_URL } from '../../api.js';
 
 export default function TraineeCourse() {
   const [id, setId] = useState()

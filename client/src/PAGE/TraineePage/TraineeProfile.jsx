@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react'
-import Navbar from './components/Navbar'
-import Header from './components/Header'
+import Navbar from './components/Navbar.jsx'
+import Header from './components/Header.jsx'
 import { useState } from 'react'
 import axios from 'axios'
-import { API_URL } from '../../api'
+import { API_URL } from '../../api.js'
 
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 

@@ -20,7 +20,7 @@ export default function TrainerLoginPage() {
         username: email, 
         password: password,
       }, { withCredentials: true })
-
+console.log(res.data)
       if(response.data.redirectTo){
         Navigate(response.data.redirectTo)
       }
