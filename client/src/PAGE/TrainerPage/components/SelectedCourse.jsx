@@ -9,7 +9,7 @@ import VideoUploadModal from './VideoUploadModal.jsx';
 import MediaPlayer from './MediaPlayer.jsx';
 import CreateQuiz from './CreateQuizModal.jsx';
 import QuizList from './QuizList.jsx';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz.jsx';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import EditChapterModal from './EditChapterModal.jsx';
 import DeleteContent from './DeleteContent.jsx';
 import UploadImages from './uploadImagesModal.jsx';
