@@ -58,7 +58,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // your React app's URL
+    origin: "https://e-kabuhayanlmsfe.onrender.com", // your React app's URL
     credentials: true,               // allow cookies to be sent
   })
 );
