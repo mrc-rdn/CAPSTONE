@@ -4,7 +4,7 @@ import AddChapterModal from './AddChapterModal';
 import AddTraineeModal from './AddTraineeModal';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
-import Chapter from './chapter';
+import Chapter from './Chapter';
 import VideoUploadModal from './VideoUploadModal';
 import MediaPlayer from './MediaPlayer';
 import CreateQuiz from './CreateQuizModal';
