@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import { API_URL } from '../../../api'
+import { API_URL } from '../../../api.js'
 import axios from 'axios'
 
 export default function Certificate() {

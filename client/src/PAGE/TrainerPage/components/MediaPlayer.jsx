@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import Comments from "./Comments";
+import Comments from "./Comments.jsx";
 
 export default function CustomVideoPlayer(props) {
   const videoRef = useRef(null);

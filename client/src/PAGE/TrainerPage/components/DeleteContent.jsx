@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
-import { API_URL } from '../../../api';
+import { API_URL } from '../../../api.js';
 
 export default function DeleteContent(props) {
     const {isVideo, isQuiz, quizData, videoData} = props

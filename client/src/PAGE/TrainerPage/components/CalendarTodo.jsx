@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { API_URL } from "../../../api";
+import { API_URL } from "../../../api.js";
 // In-memory storage
 let demoCalendarEvents = [];
 

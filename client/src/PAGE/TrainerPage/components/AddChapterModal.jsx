@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {Link, Navigate} from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-import { API_URL } from '../../../api';
+import { API_URL } from '../../../api.js';
 
 
 

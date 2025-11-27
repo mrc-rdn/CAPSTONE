@@ -3,7 +3,7 @@ import { saveAs } from "file-saver";
 import axios from "axios";
 import { useState } from "react";
 import { useEffect } from "react";
-import { API_URL } from "../../../api";
+import { API_URL } from "../../../api.js";
 
 export default function ExcelGenerator(props) {
   const [chapters, setChapters] = useState([]);
