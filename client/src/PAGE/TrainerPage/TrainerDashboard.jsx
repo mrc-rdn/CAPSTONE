@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 
-import Navbar from './components/Navbar'
-import Header from "./components/Header"
-import Content from "./components/DContent"
-import CalendarTodo from './components/CalendarTodo'
-import { API_URL } from '../../api'
+import Navbar from './components/Navbar.jsx'
+import Header from "./components/Header.jsx"
+import Content from "./components/DContent.jsx"
+import CalendarTodo from './components/CalendarTodo.jsx'
+import { API_URL } from '../../api.js'
 
 
 export default function TrainerDashboard() {

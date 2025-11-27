@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
-import Navbar from './components/Navbar'
-import Header from './components/Header'
-import Course from './components/Course'
-import CreateCourseModal from './components/CreateCourseModal'
-import SelectedCourse from './components/SelectedCourse'
-import { API_URL } from '../../api'
+import Navbar from './components/Navbar.jsx'
+import Header from './components/Header.jsx'
+import Course from './components/Course.jsx'
+import CreateCourseModal from './components/CreateCourseModal.jsx'
+import SelectedCourse from './components/SelectedCourse.jsx'
+import { API_URL } from '../../api.js'
 
 
 export default function My_Batch() {
