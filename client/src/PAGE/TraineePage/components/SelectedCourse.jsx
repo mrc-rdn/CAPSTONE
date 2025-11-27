@@ -3,15 +3,15 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
-import Chapter from './chapter';
+import Chapter from './Chapter.jsx';
 
-import MediaPlayer from './MediaPlayer';
-import QuizList from './QuizList';
+import MediaPlayer from './MediaPlayer.jsx';
+import QuizList from './QuizList.jsx';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
-import ImagePlayer from './ImagePlayer';
-import { API_URL } from '../../../api';
-import Certificate from './Certificate';
+import ImagePlayer from './ImagePlayer.jsx';
+import { API_URL } from '../../../api.js';
+import Certificate from './Certificate.jsx';
 
 
 export default function SelectedCourse(props) {
