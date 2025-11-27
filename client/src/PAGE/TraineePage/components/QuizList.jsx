@@ -1,9 +1,9 @@
 import React,{useState, useEffect} from 'react'
 import axios from 'axios'
-import QuizFillBlank from './QuizFillBlank';
-import QuizMultipleChoice from './QuizMultipleChoice';
-import CheckedAnswers from './CheckedAnswers';
-import { API_URL } from '../../../api';
+import QuizFillBlank from './QuizFillBlank.jsx';
+import QuizMultipleChoice from './QuizMultipleChoice.jsx';
+import CheckedAnswers from './CheckedAnswers.jsx';
+import { API_URL } from '../../../api.js';
 
 function groupQuizzes(quizData) {
 

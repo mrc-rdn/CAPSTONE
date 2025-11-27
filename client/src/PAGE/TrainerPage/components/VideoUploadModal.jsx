@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import axios from "axios";
-import { API_URL } from "../../../api";
+import { API_URL } from "../../../api.js";
 
 export default function VideoUploadModal(props) {
   const exit = false

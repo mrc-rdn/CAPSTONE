@@ -1,22 +1,22 @@
 import React, {useState, useEffect} from 'react'
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import AddChapterModal from './AddChapterModal';
-import AddTraineeModal from './AddTraineeModal';
+import AddChapterModal from './AddChapterModal.jsx';
+import AddTraineeModal from './AddTraineeModal.jsx';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios'
-import Chapter from './Chapter';
-import VideoUploadModal from './VideoUploadModal';
-import MediaPlayer from './MediaPlayer';
-import CreateQuiz from './CreateQuizModal';
-import QuizList from './QuizList';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import EditChapterModal from './EditChapterModal';
-import DeleteContent from './DeleteContent';
-import UploadImages from './uploadImagesModal';
-import ImagePlayer from './ImagePlayer';
-import TraineeProgressModal from './TraineeProgressModal'
-import { API_URL } from '../../../api';
-import Certificate from './Certificate';
+import Chapter from './Chapter.jsx';
+import VideoUploadModal from './VideoUploadModal.jsx';
+import MediaPlayer from './MediaPlayer.jsx';
+import CreateQuiz from './CreateQuizModal.jsx';
+import QuizList from './QuizList.jsx';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz.jsx';
+import EditChapterModal from './EditChapterModal.jsx';
+import DeleteContent from './DeleteContent.jsx';
+import UploadImages from './uploadImagesModal.jsx';
+import ImagePlayer from './ImagePlayer.jsx';
+import TraineeProgressModal from './TraineeProgressModal.jsx'
+import { API_URL } from '../../../api.js';
+import Certificate from './Certificate.jsx';
 
 
 export default function SelectedCourse(props) {
