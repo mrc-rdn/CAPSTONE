@@ -20,7 +20,7 @@ export default function TrainerLoginPage() {
         username: email, 
         password: password,
       }, { withCredentials: true })
-console.log(res.data)
+    
       if(response.data.redirectTo){
         Navigate(response.data.redirectTo)
       }
@@ -33,8 +33,9 @@ console.log(res.data)
   }
 
   return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <div className='w-130 h-150 bg-green-700 flex flex-col items-center justify-center'>
+    <div className="w-full h-screen flex justify-center items-center"><div></div>
+      
+      <div className='w-130 h-150 bg-green-600 flex flex-col items-center justify-center rounded'>
         <p>{error}</p>
         <h1 className='text-4xl mb-10 text-white'>Welcome Trainer</h1>
 
@@ -57,7 +58,7 @@ console.log(res.data)
 
           <button 
           onClick={handleLogin} 
-          className='w-100 h-10 font-bold mb-5 border-green-400 border-2 text-white'>
+          className='w-100 h-10 font-bold mb-5 border-green-800 border-2 text-white rounded-xl text-lg'>
           Login
           </button>
         </form>

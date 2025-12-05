@@ -8,7 +8,7 @@ export default function Chapter(props) {
   
   function handleClick(){
     props.handleOpenChapter(props.id, props.chapter_no)
-    props.handleActiveChapter()
+    props.handleActiveChapter(props.id)
     console.log()
   }
 
@@ -23,7 +23,9 @@ export default function Chapter(props) {
         {props.isEditChapter?
         <div className='ml-auto flex flex-row'>
           <div className=' m-3'>
-            <button onClick={()=>{props.isEditChapter?(props.handleShowEditChapterModal(props.id, props.chapter_no, props.title, props.description), props.onRefresh(props.chapter_no)):null}}>
+            <button onClick={()=>{props.isEditChapter
+              ?(props.handleShowEditChapterModal(props.id, props.chapter_no, props.title, props.description), props.onRefresh())
+              :null}}>
               <EditIcon />
             </button>
           </div>

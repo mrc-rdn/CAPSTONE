@@ -22,7 +22,7 @@ export default function Content(props) {
                     <p className='text-4xl font-bold m-2'>4</p>
                     <p className='font-medium'>Active Courses</p>
                 </section>
-                <section className='h-40 w-35  bg-white/10 border border-emerald-500/30 text-white rounded-xl border-white border flex justify-center items-center flex-col'>
+                {/* <section className='h-40 w-35  bg-white/10 border border-emerald-500/30 text-white rounded-xl border-white border flex justify-center items-center flex-col'>
                     <div className='w-13 h-13 grid place-items-center bg-white/20 rounded-full '><BarChartIcon /></div>
                     <p className='text-4xl font-bold m-2'>70%</p>
                     <p className='font-medium'>AVG Progress</p>
@@ -31,7 +31,7 @@ export default function Content(props) {
                     <div className='w-13 h-13 grid place-items-center bg-white/20 rounded-full '><EmojiEventsIcon /></div>
                     <p className='text-4xl font-bold m-2'>19</p>
                     <p className='font-medium'>Completed</p>
-                </section>
+                </section> */}
             </div>
             
             

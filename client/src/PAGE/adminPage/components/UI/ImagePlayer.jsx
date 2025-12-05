@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { API_URL } from "../../../api";
 
 export default function ImagePlayer(props) {
   const [zoom, setZoom] = useState(false);

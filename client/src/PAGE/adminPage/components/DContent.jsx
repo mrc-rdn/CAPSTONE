@@ -6,7 +6,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 
 export default function Content(props) {
   return (
-    <div className='w-11/12 h-70 flex justify-center items-center'>
+    <div className='w-11/12 h-70 flex justify-center items-center '>
         <div className='w-11/12 h-50 bg-green-700 rounded-3xl flex p-5'>
             <div className='w-full h-full flex justify-center items-center p-5 font-bold text-white'>
                 <h1 className='text-5xl '>Good morning, <span className='text-yellow-300'>PLRMO</span> Admin</h1>

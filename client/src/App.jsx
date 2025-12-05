@@ -6,9 +6,10 @@ import TrainerLoginPage from "./PAGE/homePage/TrainerLoginPage.jsx"
 import RoleChoicePage from './PAGE/homePage/RoleChoicePage.jsx'
 
 //this is for admin
-import AdminProtectedRoute from "./PAGE/adminPage/components/AdminProtectedRoute.jsx"
+import AdminProtectedRoute from "./PAGE/adminPage/components/routes/AdminProtectedRoute.jsx"
 import AdminDashboard from './PAGE/adminPage/AdminDashboard.jsx'
 import AdminCourse from './PAGE/adminPage/AdminCourse.jsx'
+import CourseOverview from './PAGE/adminPage/CourseOverview.jsx'
 import AdminMessages from './PAGE/adminPage/AdminMessages.jsx'
 import CreateAcoount from './PAGE/adminPage/CreateAcoount.jsx'
 
@@ -44,14 +45,15 @@ export default function App() {
 
 
         <Route path="/trainee/dashboard" element={<TRAINEEProtectedRoute><TraineeDashboard /></TRAINEEProtectedRoute>}/>
-        <Route path="/trainee/mybatch" element={<TRAINEEProtectedRoute><TraineeCourse/></TRAINEEProtectedRoute>}/>
+        <Route path="/trainee/Course" element={<TRAINEEProtectedRoute><TraineeCourse/></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/messages" element={<TRAINEEProtectedRoute><TraineeMessages/></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/profile" element={<TRAINEEProtectedRoute><TraineeProfile /></TRAINEEProtectedRoute>}/>
 
         <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
-        <Route path="/admin/modules" element={<AdminProtectedRoute><AdminCourse /></AdminProtectedRoute>} />
+        <Route path="/admin/course" element={<AdminProtectedRoute><AdminCourse /></AdminProtectedRoute>} />
         <Route path="/admin/messages" element={<AdminProtectedRoute><AdminMessages /></AdminProtectedRoute>} />
         <Route path="/admin/createaccount" element={<AdminProtectedRoute><CreateAcoount /></AdminProtectedRoute>} />
+        <Route path="/admin/course/:id/:courseTitle" element={<AdminProtectedRoute> <CourseOverview /> </AdminProtectedRoute>}/>
       </Routes>
     </Router>
   )

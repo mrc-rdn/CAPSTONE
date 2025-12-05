@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import axios from "axios";
-import { API_URL } from "../../../api";
+import { API_URL } from "../../../../../api";
 
 export default function VideoUploadModal(props) {
   const exit = false
@@ -12,7 +12,7 @@ export default function VideoUploadModal(props) {
 
   async function uploadVideo(e) {
     e.preventDefault();
-    console.log(props.chapter_details)
+   
     if (!video) {
       alert("Please select a video file first.");
       return;
@@ -21,9 +21,8 @@ export default function VideoUploadModal(props) {
     const formData = new FormData();
     formData.append("video", video);
     formData.append("title", title);
-    formData.append("course_id", props.course_id);
-    formData.append("order_index", props.chapter_details.index_chapter);
-    formData.append("chapter_id", props.chapter_details.id);
+    formData.append("course_id", props.courseId);
+    formData.append("chapter_id", props.chapterInfo.chapterId);
 
     try {
       setUploading(true);
@@ -48,7 +47,7 @@ export default function VideoUploadModal(props) {
   return (
     <div className='w-full h-full bg-gray-500/40 absolute grid place-items-center'>
       <div className='w-130 h-90 bg-white p-3 rounded'>
-        <button onClick={()=>{props.onExit(exit), props.onRefresh(props.chapter_details.id)}}><CloseIcon /></button>
+        <button onClick={()=>{props.onExit(exit)}}><CloseIcon /></button>
         {isUploadingDone?<p>success Uploading</p>
         :<form onSubmit={uploadVideo}>
           <input

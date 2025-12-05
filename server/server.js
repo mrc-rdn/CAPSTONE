@@ -58,7 +58,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://e-kabuhayanlmsfe.onrender.com", // your React app's URL
+    origin: "http://localhost:5173", // your React app's URL https://e-kabuhayanlmsfe.onrender.com
     credentials: true,               // allow cookies to be sent
   })
 );
@@ -214,16 +214,24 @@ app.post("/admin/course/createcourse", async(req, res)=>{
 });
 
 //delete course
-app.delete("/admin/coursedelete", async(req, res)=>{
+app.delete("/admin/coursedelete/:courseId", async(req, res)=>{
   try {
-    
+    const {courseId} = req.params
+    if(!req.isAuthenticated()){
+      res.status(401).json({succes: false, message: "Unauthorized"})
+    }
+    if(req.user.role !== "SUPERADMIN"){
+        res.status(403).json({succes: false, messsage:"invalid role"})
+    }
+    const result = await db.query('DELETE FROM courses WHERE id = $1', [courseId])
+    res.status(200).json({succes: true, messsage: 'success deleting the course' })
   } catch (error) {
-    
+    res.status(400).json({ message: `unable to delete the course:  ${error}`, })
   }
 })
 
 
-//fethcing data for courses to appear to main
+//fethcing data for courses to appear to course admin page
 app.get("/admin/course", async(req, res)=>{
 
   try {
@@ -236,17 +244,21 @@ app.get("/admin/course", async(req, res)=>{
 
       const query = `SELECT * FROM courses `
       const response = await db.query(query)  
+
+
       res.status(200).json({data: response.rows})
     
   } catch (error) {
-    res.status(400).json({success: error})
+    res.status(400).json({success: false, message: 'having error in the query',error})
   }
 });
 
 
-//fetching chapter data to appear according to your course
-app.post("/admin/course/chapter", async(req, res)=>{
-  const {course_Id} = req.body
+
+
+//fetching chapters data to appear according to your course
+app.get("/admin/course/:courseId", async(req, res)=>{
+  const {courseId} = req.params
   try {
     if(!req.isAuthenticated()){
       res.status(401).json({success: false, message: 'unauthorized access'})
@@ -254,8 +266,8 @@ app.post("/admin/course/chapter", async(req, res)=>{
     if(req.user.role !== "SUPERADMIN"){
       res.status(401).json({success: false, message: 'invalid role'})
     }
-    const query = 'SELECT * FROM courses JOIN chapters ON courses.id = chapters.course_id WHERE courses.id = $1'
-    const response = await db.query(query,[course_Id]);
+    const query = 'SELECT * FROM courses JOIN chapters ON courses.id = chapters.course_id WHERE courses.id = $1 ORDER BY order_index ASC'
+    const response = await db.query(query,[courseId]);
     res.status(200).json({success: true, data: response.rows, chapterLength: response.rows.length})
 
   } catch (error) {
@@ -266,7 +278,7 @@ app.post("/admin/course/chapter", async(req, res)=>{
 
 //create chapter
 app.post("/admin/course/addchapter", async(req, res)=>{
-  const {course_id, chapter_name, description, chapter_no} = req.body
+  const {courseId, chapterName, description, chapterIndex} = req.body
   try {
     if(!req.isAuthenticated()){
       res.status(401).json({success: false, message: 'unauthorized access'})
@@ -281,7 +293,7 @@ app.post("/admin/course/addchapter", async(req, res)=>{
     const time = date.toLocaleTimeString();
     const response = await db.query(
       "INSERT INTO chapters (course_id, title, description, order_index, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING * ",
-      [course_id, chapter_name, description, chapter_no, time ]
+      [courseId, chapterName, description, chapterIndex, time ]
     )
     res.status(200).json({success: true, data: response.rows[0]})
      
@@ -290,6 +302,7 @@ app.post("/admin/course/addchapter", async(req, res)=>{
     res.status(400).json({ message: `unable to insert you data:  ${error}`, })
   }
 });
+
 //edit the title and description of chapter
 app.put("/admin/course/editchapter", async (req, res) => {
   try {
@@ -354,7 +367,7 @@ app.delete("/admin/chapter/deletechapter/:chapterId", async(req, res)=>{
 app.post("/admin/chapter/uploadvideo", uploadVideo.single("video"), async (req, res) => {
   //const activityNumber = req.params;
  try {
-    const {title, course_id, order_index, chapter_id} = req.body;
+    const {title, course_id, chapter_id} = req.body;
     if(!req.isAuthenticated()){
       return res.status(401).json({success: false, messsage: 'unauthorized access' })
     }
@@ -367,8 +380,8 @@ app.post("/admin/chapter/uploadvideo", uploadVideo.single("video"), async (req, 
     
     
 
-    const query = 'INSERT INTO video_items ( title, source_url, order_index, required,created_at, course_id, chapter_id , item_type) VALUES ($1, $2, $3, $4, now(), $5, $6, $7) RETURNING*'
-    const values = [ title, req.file.path, order_index , true, course_id, chapter_id, 'VIDEO'  ]
+    const query = 'INSERT INTO video_items ( title, source_url, required,created_at, course_id, chapter_id , item_type) VALUES ($1, $2, $3, now(), $4, $5, $6) RETURNING*'
+    const values = [ title, req.file.path , true, course_id, chapter_id, 'VIDEO'  ]
     //const response = await db.query("INSERT INTO video_items ( title, item_type, source_url, order_index, required,created_at, course_id, chapter_id) VALUES ('title', 'VIDEO', 'dfasdfasdf', 1, True, now(), 2, 25)")
     const response = await db.query(query, values)
     res.json({success: true,  message: `File received successfully` , data: response})
@@ -379,7 +392,7 @@ app.post("/admin/chapter/uploadvideo", uploadVideo.single("video"), async (req, 
 
 app.post('/admin/chapter/upload-image', uploadImage.single('image'), async (req, res) => {
   try {
-    const {title, course_id, order_index, chapter_id} = req.body;
+    const {title, course_id, chapter_id} = req.body;
     if(!req.isAuthenticated()){
       return res.status(401).json({success: false, messsage: 'unauthorized access' })
     }
@@ -389,8 +402,8 @@ app.post('/admin/chapter/upload-image', uploadImage.single('image'), async (req,
     if(!req.file){
       return res.status(400).json({succes: false, message: "No file uploaded"})
     }
-    const query = 'INSERT INTO video_items ( title, source_url, order_index, required,created_at, course_id, chapter_id, item_type) VALUES ($1, $2, $3, $4, now(), $5, $6, $7) RETURNING*'
-    const values = [ title, req.file.path, order_index , true, course_id, chapter_id, "IMAGE"  ]
+    const query = 'INSERT INTO video_items ( title, source_url, required,created_at, course_id, chapter_id, item_type) VALUES ($1, $2, $3, now(), $4, $5, $6) RETURNING*'
+    const values = [ title, req.file.path , true, course_id, chapter_id, "IMAGE"  ]
     const response = await db.query(query, values)
     res.json({success: true,  message: `File received successfully` , data: response.rows})
     console.log(response)
@@ -610,7 +623,7 @@ app.delete("/admin/chapter/deletequiz", async (req, res)=>{
 
 
 // this part is for getting the chapteritems to retrieve the video
-app.post("/admin/chapter/chapteritems", async(req, res)=>{
+app.post("/admin/chapter/mediaitems", async(req, res)=>{
   
   try {
     const {courseId, chapterId} = req.body
@@ -627,7 +640,7 @@ app.post("/admin/chapter/chapteritems", async(req, res)=>{
     if (result.rows.length === 1){
       res.json({success: true, message: 'success gathering your data', data: result.rows})
     }else{
-      res.json({success: false ,messsage: 'there no video or quiz added yet', data: result.rows})
+      res.json({success: false ,messsage: 'there no video added yet', data: result.rows})
     }
     
   } catch (error) {
@@ -635,25 +648,61 @@ app.post("/admin/chapter/chapteritems", async(req, res)=>{
   }
 });
 
-// fetching the first data inside the chapter so if you open the course it will appear automatically 
-app.post("/admin/chapter/chapterfirstitem", async(req, res)=>{
+// fetching the data inside the chapter so if you open or click the course it will appear automatically 
+//course chapters.jsx
+app.get("/admin/course/:chapterindex/:courseId", async(req, res)=>{
   try {
-    const {courseId} = req.body
+    const {chapterindex, courseId} = req.params
     if(!req.isAuthenticated()){
       res.status(401).json({success: false, messsage: 'unauthorized access' })
     }
     if(req.user.role !== "SUPERADMIN"){
       res.status(401).json({success: false, message: 'invalid role'})
     }
-    const query = `SELECT * FROM chapters JOIN video_items ON chapters.id = video_items.chapter_id WHERE chapters.course_id = $1 AND video_items.order_index = $2`
-    const value = [courseId, 1]
-    const result = await db.query(query, value);
     
-    if (result.rows.length === 1){
-      res.json({success: true, message: 'success gathering your data', data: result.rows})
-    }else{
-      res.json({success: false ,messsage: 'there no video or quiz added yet', data: result.rows})
+    
+    const query1 = `SELECT * FROM chapters 
+      JOIN quizzes
+      ON quizzes.chapter_id = chapters.id
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+    const value1 = [courseId, chapterindex]
+    const quizItems = await db.query(query1,value1)
+
+    const query2 = `SELECT * FROM chapters 
+      JOIN video_items 
+      ON chapters.id = video_items.chapter_id 
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+      const value2 = [courseId, chapterindex]
+      const videoItems = await db.query(query2, value2);
+    
+    const query3 = `SELECT *FROM chapters
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+      const value3 = [courseId, chapterindex]
+      const chapterInfo = await db.query(query3, value3);
+
+      console.log(quizItems.rows.length, videoItems.rows.length)
+    if (quizItems.rows.length === 0 && videoItems.rows.length === 0) {
+      return res.json({
+        success: false,
+        message: "No video or quiz added yet.",
+        chapterInfo: chapterInfo.rows,
+        data: {
+          quiz: quizItems.rows,
+          video: videoItems.rows
+        }
+      });
     }
+    // Success
+    return res.json({
+      success: true,
+      message: "Success gathering your data",
+      chapterInfo: chapterInfo.rows,
+      data: {
+        quiz: quizItems.rows,
+        video: videoItems.rows
+      }
+    });
+
     
   } catch (error) {
     res.json({success: false ,messsage: 'there no video or quiz added yet' })
@@ -723,7 +772,7 @@ app.post("/admin/calendar/events", async (req, res) => {
   }
   
 });
-
+//fetch the data inside the calendar
 app.get("/admin/calendar/events", async (req, res) => {
   try {
 
@@ -744,7 +793,7 @@ app.get("/admin/calendar/events", async (req, res) => {
   }
   
 });
-
+//delete the data inside the chapter
 app.delete("/admin/calendar/events/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -1911,7 +1960,7 @@ app.post("/trainee/quiz/quizprogress", async (req, res) => {
       WHERE quiz_progress.chapter_id = $1 AND quiz_progress.user_id = $2 `,
       [chapter_id, req.user.id]   // use logged-in user
     );
-
+console.log(result.rows)
     res.status(200).json({
       success: true,
       message: 'quiz progress fetched',
@@ -2158,7 +2207,7 @@ app.get("/trainee/:videoId/comments", async (req, res) => {
       [videoId]
     );
     
-    if(result.rows.length < 0){
+    if(result.rows.length > 0){
       res.json({success:true, message: 'there is a comment',data:result.rows});
     }else{
       res.json({success:false, message: 'there is no comment yet',data:result.rows});

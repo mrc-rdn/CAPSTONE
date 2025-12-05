@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { API_URL } from "../../../api.js";
+import { API_URL } from "../../../api";
 
 function Comments({ videoId }) {
   const [comments, setComments] = useState([]);
@@ -14,7 +14,7 @@ function Comments({ videoId }) {
         const fetchComments = async () => {
             
         try {
-            const res = await axios.get(`${API_URL}/${videoId}/comments`, {withCredentials:true});
+            const res = await axios.get(`${API_URL}/trainee/${videoId}/comments`, {withCredentials:true});
             setComments(res.data.data);
             setIsComments(res.data.success)
         } catch (error) {

@@ -2,11 +2,11 @@ import React, {useState} from 'react'
 import {Link, Navigate} from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-import Chapter from './Chapter';
-import { API_URL } from '../../../api';
+import Chapter from './Chapter.jsx';
+import { API_URL } from '../../../api.js';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
-import ExcelGenerator from './ExcelGenerator';
+import ExcelGenerator from './ExcelGenerator.jsx';
 
 export default function AddChapterModal(props) {
     const exit = false

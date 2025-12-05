@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Comments from "./Comments";
-import { API_URL } from "../../../api";
+
 
 export default function CustomVideoPlayer(props) {
   const videoRef = useRef(null);
@@ -152,7 +152,7 @@ export default function CustomVideoPlayer(props) {
       </div>
     </div>
     <div className="w-full p-5">
-      <Comments videoId={props.videoId} />
+      <Comments videoId={props.videoId}  />
     </div>
    </div> 
   </div>

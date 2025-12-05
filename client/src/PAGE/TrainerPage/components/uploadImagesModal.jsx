@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import CloseIcon from '@mui/icons-material/Close';
-import { API_URL } from "../../../api";
+import { API_URL } from "../../../api.js";
 export default function UploadImages(props) {
   const exit = false
   const [video, setVideo] = useState(null);

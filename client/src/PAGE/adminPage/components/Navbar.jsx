@@ -31,7 +31,7 @@ export default function Navrbar(props) {
         <Link to="/admin/dashboard" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <DashboardIcon /> Dashboard
         </Link>
-        <Link to="/admin/modules" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
+        <Link to="/admin/course" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <GroupsIcon /> Course
         </Link>
         <Link to="/admin/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">

@@ -16,6 +16,7 @@ export default function TraineeLoginPage() {
 
   async function handleLogin (event){
     event.preventDefault();
+    console.log(API_URL)
     try {
       const res = await axios.post(`${API_URL}/trainee/login`, {
         username: username,
@@ -35,7 +36,7 @@ export default function TraineeLoginPage() {
 
   return (
          <div className="w-full h-screen flex justify-center items-center">
-              <div className='w-130 h-150 bg-green-700 flex flex-col items-center justify-center'>
+              <div className='w-130 h-150 bg-green-500 flex flex-col items-center justify-center rounded'>
                 <h1 className='text-4xl mb-10 text-white'>Welcome Trainee</h1>
                 <form action="" className=' flex flex-col '> 
                   <label className='mb-3'>Email</label>

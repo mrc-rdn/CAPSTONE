@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 import CloseIcon from '@mui/icons-material/Close';
-import { API_URL } from '../../../api';
+import { API_URL } from '../../../../../api';
 export default function CourseModal(props) {
     const exit = false; 
     const [title, setTitle] = useState("");

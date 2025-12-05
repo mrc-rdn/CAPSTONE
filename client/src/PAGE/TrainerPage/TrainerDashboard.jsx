@@ -31,13 +31,15 @@ export default function TrainerDashboard() {
   console.log(traineeCount)
  
   return (
-    <div className="flex w-full h-full">
+    <div className="flex w-screen h-screen">
       <Navbar />
-      <div className='w-full h- full bg-gray-200'>
+      <div className='w-full h-full bg-gray-200'>
         <Header title="Dashboard"/>
         <div className=' w-full h-11/12 overflow-y-scroll flex flex-col items-center'>
           <Content  name={first_name} surname={surname} role={role} traineeCount={traineeCount}/>
-          <CalendarTodo />
+          <div className='m-3'>
+            <CalendarTodo />
+          </div>
         </div>
       </div>
     </div>

@@ -71,7 +71,7 @@ export default function Profile() {
                         >{course.title}
                           
                         </li>)}))
-                         : (<p>No Courses Found You are not currently enrolled in any courses</p>)
+                         : (<p>You are not currently enrolled in any courses</p>)
 }
                     </ul>
                 </div>

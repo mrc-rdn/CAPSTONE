@@ -45,6 +45,7 @@ export default function QuizList(props) {
   // FINAL SCORE
   const handleCheck = async () => {
     //console.log(props.chapterDetails, props.courseDetails)
+    setCheckedAnswers(false)
     let score = 0;
     let tempResults = [];
 
@@ -140,7 +141,8 @@ export default function QuizList(props) {
         } else {
           setCheckedAnswers(false)
           setAnswer(true);
-          setResultFecth(res.data.data)    // user already answered this chapter
+          setResultFecth(res.data.data)
+          //console.log(res.data.data)    // user already answered this chapter
         }
       } catch (error) {
         console.log(error);
@@ -149,7 +151,7 @@ export default function QuizList(props) {
     };
 
     isAnswered();
-  }, [props.refresh]);
+  }, []);
 
 
   return (
@@ -195,8 +197,8 @@ export default function QuizList(props) {
     <div className="w-full mt-5 p-3 bg-gray-100 rounded">
       <h2 className="font-bold text-lg mb-2">Results</h2>
 
-      {resultFetch.map(item => (
-        <CheckedAnswers item={item} />
+      {resultFetch.map((item,index) => (
+        <CheckedAnswers  key={index} item={item} />
       ))}
     </div>
   )}

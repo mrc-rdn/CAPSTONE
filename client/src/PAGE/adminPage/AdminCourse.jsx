@@ -2,18 +2,15 @@ import React, {useState, useEffect} from 'react'
 import axios from 'axios';
 import Navbar from './components/Navbar'
 import Header from './components/Header'
-import CourseModal from './components/CourseModal'
-import Course from './components/Course'
-import SelectedCourse from './components/SelectedCourse'
+import CourseModal from './components/UI/modal/CourseModal'
+import Course from './components/course/Course'
+
 import { API_URL } from '../../api';
 
 export default function AdminModules() {
   const [isModal, setIsModal] = useState(false)
-  const [isSelectedCourse, setSelectedCourse] = useState(false)
-  const [id, setId] = useState()
-  const [data, setData] = useState([]);
-  const courses = data;
-  
+  const [courseData, setCourseData] = useState([]);
+  const courses = courseData
   
      function handleExit(exit){
        setIsModal(exit)
@@ -21,20 +18,13 @@ export default function AdminModules() {
      function handleModal(){
       setIsModal(true)
      }
-
-     function handleSelectedCourse(id, open){
-      
-        setId(id)
-        setSelectedCourse(open)
-     }
-     function handleExitSelectedCourse(exit){
-      setSelectedCourse(exit)
-     }
+         
+     
      useEffect(()=>{
       async function fetchData(){
         try {
           const response = await axios.get(`${API_URL}/admin/course`, {withCredentials: true})
-          setData(response.data.data)
+          setCourseData(response.data.data)
          
           
         } catch (error) {
@@ -66,7 +56,7 @@ export default function AdminModules() {
               key={course.id}
               title={course.title} 
               description={course.description} 
-              handleOpen={handleSelectedCourse}
+              
               />
               
               )
@@ -79,7 +69,7 @@ export default function AdminModules() {
           
           
         </div>
-        { isSelectedCourse? <SelectedCourse handleBack={handleExitSelectedCourse} data_course={data.find((course)=> {return course.id === id})} />: null }
+        
         { isModal?<CourseModal onExit={handleExit} />: null}
         
     </div>

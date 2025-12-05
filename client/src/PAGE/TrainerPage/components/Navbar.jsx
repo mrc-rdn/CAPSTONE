@@ -34,9 +34,9 @@ export default function Navrbar(props) {
         <Link to="/trainer/mybatch" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <GroupsIcon /> My Batch
         </Link>
-        <Link to="/trainer/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
+        {/* <Link to="/trainer/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <MessageIcon /> Messages
-        </Link>
+        </Link> */}
         <Link to="/trainer/profile" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <PersonIcon /> Profile
         </Link>
