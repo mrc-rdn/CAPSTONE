@@ -1131,7 +1131,7 @@ app.post("/trainer/chapter/getcertificate", async(req, res)=>{
 });
 
 
-app.post("/trainer/chapter/videoitems", async(req, res)=>{
+app.post("/trainer/chapter/mediaitems", async(req, res)=>{
   
   try {
     const {courseId, chapterId} = req.body
@@ -1822,7 +1822,7 @@ app.post("/trainee/course/chapter", async(req, res)=>{
   }
 }); 
 // fetch the first item
-app.post("/trainee/chapter/videoitems", async(req, res)=>{
+app.post("/trainee/chapter/mediaitems", async(req, res)=>{
   
   try {
     const {courseId, chapterId} = req.body

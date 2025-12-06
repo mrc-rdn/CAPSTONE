@@ -21,7 +21,7 @@ export default function AddTraineeModal(props) {
 
 
   return (
-    <div className='w-full h-full bg-gray-500/80 absolute grid place-items-center z-200'>
+    <div className='w-full h-full bg-gray-500/80 fixed inset-0 grid place-items-center z-200'>
       <div className='w-150 h-100 bg-white p-3'>
         <button onClick={()=>{props.onExit(exit)}}><CloseIcon /></button>   
         {isEnrolled?<p>success enrollment</p>:

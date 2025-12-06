@@ -21,7 +21,7 @@ export default function Navrbar(props) {
   }
 
   return (
-     <div className="h-screen w-1/5 bg-green-700 flex flex-col">
+     <div className="h-screen w-1/5 bg-green-700 flex flex-col ">
       <div className="flex items-center w-full h-20 bg-green-800 border-b border-white p-4">
         <img src="../public/images/logo2.gif" alt="" className="h-12 mr-4" />
         <h1 className="text-2xl font-bold text-white">E-Kabuhayan</h1>

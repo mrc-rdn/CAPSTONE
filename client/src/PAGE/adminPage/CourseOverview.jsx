@@ -9,13 +9,16 @@ import CourseAddContent from "./components/course/CourseAddContent.jsx"
 import QuizList from './components/UI/QuizList.jsx'
 import MediaPlayer from './components/UI/MediaPlayer.jsx'
 import ImagePlayer from './components/UI/ImagePlayer.jsx'
-
+import AddTraineeModal from './components/UI/modal/AddTraineeModal.jsx'
+import TraineeProgressModal from "./components/UI/TraineeProgressModal.jsx"
 
 
 
 export default function CourseOverview() {
     const { id, courseTitle } = useParams();
-    const [isChapterModal, setChapterModal] = useState(false);
+    const [isChapterModal, setIsChapterModal] = useState(false);
+    const [isAddTraineeModal, setIsAddTraineeModal] = useState(false);
+    const [isTraineeProgressModal, setIsTraineeProgressModal] = useState(false)
     const [chapterLength, setChapterLength] = useState(0);
     const [refresh, setRefresh] = useState(0)
     const [chapterInfo, setChapterInfo] = useState({chapterId: "", chapterIndex: ""})
@@ -29,11 +32,22 @@ export default function CourseOverview() {
     const [videoData, setVideoData] = useState([])
 
     const handleOpenChapterAddModal = async()=>{
-      setChapterModal(true) 
+      setIsChapterModal(true) 
     }
-    function handleExitChapterModal(exit){
-      setChapterModal(exit)
+    const handleExitChapterModal = (exit) => {
+      setIsChapterModal(exit)
       setRefresh(prev => prev + 1)
+    }
+    const handleOpenAddTraineeModal = () =>{
+      setIsAddTraineeModal(true)
+    }
+
+   const handleExitaddTraineeModal = () =>{
+    setIsAddTraineeModal(false)
+   }
+
+    const handleOpenTraineeProgress = () =>{
+      setIsTraineeProgressModal(true)
     }
     function handleRefresh(){
        setRefresh(prev => prev + 1)
@@ -80,7 +94,7 @@ export default function CourseOverview() {
   return (
     <div className='w-screen h-screen'>
         <div className='h-1/12'>
-          <Header courseTitle={courseTitle}  handleOpenChapterAddModal={handleOpenChapterAddModal} />
+          <Header courseTitle={courseTitle}  handleOpenChapterAddModal={handleOpenChapterAddModal} handleOpenAddTraineeModal={handleOpenAddTraineeModal} handleOpenTrianeeProgress={handleOpenTraineeProgress} />
         </div>
         
         <div className='h-11/12 w-full flex'>
@@ -92,7 +106,8 @@ export default function CourseOverview() {
 
             <CourseChapters  courseId={id} refresh={refresh} handleChaptersInfo={handleChaptersInfo} />
         </div>
-        
+        {isAddTraineeModal?<TraineeProgressModal /> :null}
+        {isAddTraineeModal?<AddTraineeModal onExit={handleExitaddTraineeModal} />: null}
         {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} courseId={id} chapterlength1={chapterLength}/>: null}
     </div>
 
