@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Link, Navigate} from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
@@ -19,56 +19,71 @@ export default function AddChapterModal(props) {
     const [quizData, setQuizData] = useState([]);
     const [questionLength, setQuestionLength] = useState()
     const [imageData, setImageData] = useState([])
-    
+
+    const [chapters, setChapters] = useState([])
+    useEffect(()=>{
+        const fetchChapter = async()=>{
+            try {
+                const result = await axios.get(`${API_URL}/admin/course/${props.courseId}`, { withCredentials: true })
+                 
+                setChapters(result.data.data)
+            } catch (error) {
+                console.log('error')
+            }
+          
+          
+        }
+        fetchChapter()
+    },[])
 
     
     async function handleShowChapter(id){
         
-        // try {
-        //     const [video, quiz, info, image] = await Promise.all([
-        //         axios.post(`${API_URL}/admin/chapter/mediaitems`, {courseId: props.course_id, chapterId: id  }, {withCredentials: true}),
-        //         axios.post(`${API_URL}/trainer/chapter/quiz`, {chapterId: id  }, {withCredentials: true}),
-        //         axios.post(`${API_URL}/trainer/course/traineeprogress`, {course_id: props.course_id}, {withCredentials: true}),
-        //         axios.post(`${API_URL}/trainer/course/traineeimageprogress`, {course_id: props.course_id, chapter_id: id  }, {withCredentials: true})
-        //     ])
-        //     //console.log(quiz.data.success, video.data.success, info.data.data, image.data.data)
-        //     setTraineeDetailes(info.data.data)
-        //     setQuiz(quiz.data.success)
-        //     setVideo(video.data.success)
+        try {
+            const [video, quiz, info, image] = await Promise.all([
+                axios.post(`${API_URL}/admin/chapter/mediaitems`, {courseId: props.courseId, chapterId: id  }, {withCredentials: true}),
+                axios.post(`${API_URL}/admin/chapter/quiz`, {chapterId: id  }, {withCredentials: true}),
+                axios.post(`${API_URL}/admin/course/traineeprogress`, {course_id: props.courseId}, {withCredentials: true}),
+                axios.post(`${API_URL}/admin/course/traineeimageprogress`, {course_id: props.courseId, chapter_id: id  }, {withCredentials: true})
+            ])
+            console.log(quiz.data.success, video.data.success, info.data.data, image.data.data)
+            setTraineeDetailes(info.data.data)
+            setQuiz(quiz.data.success)
+            setVideo(video.data.success)
             
-        //    console.log(video, quiz, info, image)
-        //     if(video.data.success){
-        //         setVideoType(video.data.data[0].item_type)
-        //         if(video.data.data[0].item_type === 'IMAGE'){
-        //             setImageData(image.data.data)
+           console.log(video, quiz, info, image)
+            if(video.data.success){
+                setVideoType(video.data.data[0].item_type)
+                if(video.data.data[0].item_type === 'IMAGE'){
+                    setImageData(image.data.data)
                     
-        //         }
-        //         try {
-        //             const result = await axios.post(`${API_URL}/trainer/course/traineevideoprogress`, {chapter_id: id, course_id: props.course_id,  }, {withCredentials: true})
-        //             setVideoData(result.data.data)
-        //         } catch (error) {
-        //             console.error("Error fetching video progress:", videoErr);
-        //         }
-        //     }
-        //     if(quiz.data.success){
-        //         try {
-        //             const result = await axios.post(`${API_URL}/trainer/course/traineequizprogress`, {chapter_id: id, course_id: props.course_id,  }, {withCredentials: true})
-        //             setQuizData(result.data.data)
-        //             setQuestionLength(result.data.quizLength)
-        //         } catch (error) {
-        //             console.error("Error fetching video progress:", videoErr);
-        //         }
-        //     }
+                }
+                try {
+                    const result = await axios.post(`${API_URL}/admin/course/traineevideoprogress`, {chapter_id: id, course_id: props.courseId,  }, {withCredentials: true})
+                    setVideoData(result.data.data)
+                } catch (error) {
+                    console.error("Error fetching video progress:", videoErr);
+                }
+            }
+            if(quiz.data.success){
+                try {
+                    const result = await axios.post(`${API_URL}/admin/course/traineequizprogress`, {chapter_id: id, course_id: props.courseId,  }, {withCredentials: true})
+                    setQuizData(result.data.data)
+                    setQuestionLength(result.data.quizLength)
+                } catch (error) {
+                    console.error("Error fetching video progress:", videoErr);
+                }
+            }
             
-        // } catch (err) {
-        //    console.log(err)
-        // }
+        } catch (err) {
+           console.log(err)
+        }
        
     }
     
 
   return (
-    <div className='w-full h-full bg-gray-500/40 absolute grid place-items-center z-200'>
+    <div className='w-full h-full bg-gray-500/40 fixed inset-0 grid place-items-center z-200'>
       <div className='w-10/12 h-11/12 bg-white p-3 rounded overflow-y-scroll'>
 
 
@@ -141,7 +156,7 @@ export default function AddChapterModal(props) {
                 <div className="h-10 w-full bg-white flex items-center sticky top-0">
                     <h1 className="text-large ml-3 font-bold ">Chapter</h1>
                 </div>
-                {props.chapter.map((item, index) => (
+                {chapters.map((item, index) => (
                     
                     <Chapter
                     key={item.id}

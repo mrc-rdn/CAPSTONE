@@ -10,6 +10,7 @@ export default function AddTraineeModal(props) {
 
     async function handleEnroll(e){
       e.preventDefault()
+      
       try {
         const response = await axios.post(`${API_URL}/admin/course/enroll`,{courseId: props.courseId, studentId: studentId}, {withCredentials: true});
         setEnrolled(response.data.success)

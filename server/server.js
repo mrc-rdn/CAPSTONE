@@ -816,6 +816,182 @@ app.delete("/admin/calendar/events/:id", async (req, res) => {
   
 });
 
+//trainee progress 
+app.post('/admin/course/traineeprogress', async(req, res)=>{
+  try {
+    const {course_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "SUPERADMIN"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+    const result = await db.query(`SELECT * FROM enrollments
+    JOIN users_info
+    ON users_info.id = enrollments.student_id
+    WHERE course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id])
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//video progress
+app.post('/admin/course/traineevideoprogress', async(req, res)=>{
+  try {
+    const {course_id, chapter_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "SUPERADMIN"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+    const result = await db.query(`SELECT 
+      enrollments.*,
+      users_info.*,
+      video_progress.*
+    FROM enrollments
+    LEFT JOIN users_info
+      ON users_info.id = enrollments.student_id
+    LEFT JOIN video_progress
+      ON video_progress.user_id = enrollments.student_id
+      AND video_progress.course_id = $1
+      AND video_progress.chapter_id = $2
+    WHERE enrollments.course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//quizprogress
+app.post('/admin/course/traineequizprogress', async(req, res)=>{
+  try {
+    const {course_id, chapter_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "SUPERADMIN"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+        const result = await db.query(`
+        SELECT 
+          enrollments.*,
+          users_info.*,
+          quiz_progress.*
+          
+        FROM enrollments
+        LEFT JOIN users_info
+          ON users_info.id = enrollments.student_id
+        LEFT JOIN quiz_progress
+          ON quiz_progress.user_id = enrollments.student_id 
+          AND quiz_progress.chapter_id = $1
+        WHERE enrollments.course_id = $2
+        ORDER BY users_info.surname ASC;`, [chapter_id, course_id])
+    const quizLength = await db.query(`SELECT * FROM quizzes
+      JOIN questions
+      ON questions.quiz_id = quizzes.id
+      WHERE quizzes.chapter_id = $1`, [chapter_id])
+    
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows, quizLength: quizLength.rows.length})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//iamgeprogress
+app.post('/admin/course/traineeimageprogress', async(req, res)=>{
+  try {
+    const {course_id, chapter_id} = req.body
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "SUPERADMIN"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+
+    const result = await db.query(`SELECT 
+      enrollments.*,
+      users_info.*,
+      image_progress.*
+    FROM enrollments
+    LEFT JOIN users_info
+      ON users_info.id = enrollments.student_id
+    LEFT JOIN image_progress
+      ON image_progress.user_id = enrollments.student_id
+      AND image_progress.course_id = $1
+      AND image_progress.chapter_id = $2
+    WHERE enrollments.course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    res.status(200).json({success: true, message: 'succesful query', data: result.rows})
+  } catch (error) {
+    res.status(400).json({success: false, message: 'error query'})
+  }
+});
+//render the data in to excel
+app.post('/admin/:course/excelrender', async (req, res)=>{
+    try {
+      const {course} = req.params
+      if(!req.isAuthenticated()){
+        res.status(401).json({success: false, messsage: 'unauthorized access' })
+      }
+      if(req.user.role !== "SUPERADMIN"){
+        res.status(401).json({success: false, message: 'invalid role'})
+      }
+        
+        const chapter = await db.query(`SELECT * FROM chapters
+            WHERE course_id = $1
+            ORDER BY order_index ASC`, [course]);
+        const trainee = await db.query(`SELECT 
+            enrollments.*,
+            users_info.*
+            FROM enrollments
+            LEFT JOIN users_info
+            ON users_info.id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+
+        const videoProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                video_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            JOIN video_progress
+                ON video_progress.user_id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+        const quizProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                quiz_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            JOIN quiz_progress
+                ON quiz_progress.user_id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+        const imageProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                image_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            LEFT JOIN image_progress
+                ON image_progress.user_id = enrollments.student_id
+                
+            WHERE enrollments.course_id = $1`, [course])
+        
+            res.json({chapter: chapter.rows, trainee:trainee.rows,  video_progress:videoProgress.rows, quiz_progress: quizProgress.rows, image_progress: imageProgress.rows })
+    } catch (error) {
+        res.json({success: false, error})
+    }
+})
 
 
 app.post("/admin/dashboard/logout", (req, res, next) => {

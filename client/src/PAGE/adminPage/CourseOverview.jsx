@@ -49,6 +49,9 @@ export default function CourseOverview() {
     const handleOpenTraineeProgress = () =>{
       setIsTraineeProgressModal(true)
     }
+    const handleExitTraineeProgressModal = () =>{
+      setIsTraineeProgressModal(false)
+    }
     function handleRefresh(){
        setRefresh(prev => prev + 1)
        console.log('hello')
@@ -88,13 +91,13 @@ export default function CourseOverview() {
         }
       setChapterInfo({chapterId: chaptersId, chapterIndex: chapterIndex})
     }
-
+console.log(id)
 
     
   return (
     <div className='w-screen h-screen'>
         <div className='h-1/12'>
-          <Header courseTitle={courseTitle}  handleOpenChapterAddModal={handleOpenChapterAddModal} handleOpenAddTraineeModal={handleOpenAddTraineeModal} handleOpenTrianeeProgress={handleOpenTraineeProgress} />
+          <Header courseTitle={courseTitle}  handleOpenChapterAddModal={handleOpenChapterAddModal} handleOpenAddTraineeModal={handleOpenAddTraineeModal} handleOpenTrianeeProgressModal={handleOpenTraineeProgress} />
         </div>
         
         <div className='h-11/12 w-full flex'>
@@ -106,8 +109,8 @@ export default function CourseOverview() {
 
             <CourseChapters  courseId={id} refresh={refresh} handleChaptersInfo={handleChaptersInfo} />
         </div>
-        {isAddTraineeModal?<TraineeProgressModal /> :null}
-        {isAddTraineeModal?<AddTraineeModal onExit={handleExitaddTraineeModal} />: null}
+        {isTraineeProgressModal?<TraineeProgressModal   onExit={handleExitTraineeProgressModal} courseId={id}  /> :null}
+        {isAddTraineeModal?<AddTraineeModal onExit={handleExitaddTraineeModal}  courseId={id}/>: null}
         {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} courseId={id} chapterlength1={chapterLength}/>: null}
     </div>
 

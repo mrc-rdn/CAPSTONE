@@ -13,7 +13,7 @@ export default function ExcelGenerator(props) {
   const [imageProgress, setImageProgress] = useState([]);
   useEffect(()=>{
     const fetchdata =async()=>{try {
-      const result = await axios.post(`${API_URL}/trainer/${props.course_id}/excelrender`,
+      const result = await axios.post(`${API_URL}/admin/${props.course_id}/excelrender`,
         {},
         {withCredentials:true}); // replace with your endpoint
         console.log(result)

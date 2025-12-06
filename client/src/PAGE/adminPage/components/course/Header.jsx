@@ -25,7 +25,7 @@ export default function Header(props) {
         <h1 className="text-xl font-medium ml-20">{deslugify(props.courseTitle)}</h1>
 
         <button
-        onClick={() => {props.handleOpenTraineeProgressmodal()}}
+        onClick={() => {props.handleOpenTrianeeProgressModal()}}
         className="ml-auto m-3 p-3  m-3 hover:border-b-3 p-3 transition-all duration-80 ease-in-out"
         >
         Trainee Progress

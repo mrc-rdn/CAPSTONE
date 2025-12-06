@@ -59,7 +59,6 @@ export default function CourseChapters(props) {
  
 
   async function handleShowChapter(id, chapter_index) {
-    // code mo dito
     
     props.handleChaptersInfo(id, chapter_index)
     try {
