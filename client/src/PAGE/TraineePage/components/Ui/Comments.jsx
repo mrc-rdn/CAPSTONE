@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { API_URL } from "../../../api";
+import { API_URL } from "../../../../api.js";
 
 function Comments({ videoId }) {
   const [comments, setComments] = useState([]);
@@ -14,7 +14,7 @@ function Comments({ videoId }) {
         const fetchComments = async () => {
             
         try {
-            const res = await axios.get(`${API_URL}/trainee/${videoId}/comments`, {withCredentials:true});
+            const res = await axios.get(`${API_URL}/videos/${videoId}/comments`, {withCredentials:true});
             setComments(res.data.data);
             setIsComments(res.data.success)
         } catch (error) {
@@ -23,13 +23,13 @@ function Comments({ videoId }) {
         };
 
         fetchComments();
-    }, [videoId]);
+    }, []);
     
   // Add new comment
     const addComment = async () => {
         if (!input.trim()) return;
         try {
-        const res = await axios.post(`${API_URL}/trainee/${videoId}/comments`, {
+        const res = await axios.post(`${API_URL}/videos/${videoId}/comments`, {
             content: input,
         },{withCredentials: true});
 
@@ -41,7 +41,7 @@ function Comments({ videoId }) {
     };
     const deleteComment = async (id) => {
         try {
-            const res = await axios.post(`${API_URL}/trainee/video/deletecomment`, {
+            const res = await axios.post(`${API_URL}/video/deletecomment`, {
             commentId: id
             }, { withCredentials: true });
 

@@ -2,8 +2,7 @@ import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import Navbar from './components/Navbar.jsx'
 import Header from './components/Header.jsx'
-import Course from './components/Course.jsx';
-import SelectedCourse from './components/SelectedCourse';
+import Course from './components/course/Course.jsx';
 import { API_URL } from '../../api.js';
 
 export default function TraineeCourse() {
@@ -64,7 +63,7 @@ export default function TraineeCourse() {
         </div>
         
       </div>      
-      { isSelectedCourse? <SelectedCourse handleBack={handleExitSelectedCourse} data_course={data.find((course)=> {return course.id === id})} />: null }
+      
     </div>
       
   )

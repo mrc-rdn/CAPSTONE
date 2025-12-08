@@ -1,8 +1,8 @@
 import React, {useState , useEffect} from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 //components
-import Logout from "./Logout.jsx"
 
+import Logout from './Logout';
 
 //icons
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -15,13 +15,13 @@ export default function Navrbar(props) {
   const [viewData , setViewData] = useState(null)
 
   function handleNavigation(routes){
-     console.log(routes)
+    console.log(routes)
     setNavigation(routes)
    
   }
 
   return (
-     <div className="h-screen w-1/5 bg-green-700 flex flex-col">
+     <div className="h-screen w-1/5 bg-green-700 flex flex-col ">
       <div className="flex items-center w-full h-20 bg-green-800 border-b border-white p-4">
         <img src="../public/images/logo2.gif" alt="" className="h-12 mr-4" />
         <h1 className="text-2xl font-bold text-white">E-Kabuhayan</h1>
@@ -31,18 +31,17 @@ export default function Navrbar(props) {
         <Link to="/trainee/dashboard" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <DashboardIcon /> Dashboard
         </Link>
-        <Link to="/trainee/mybatch" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
+        <Link to="/trainee/course" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <GroupsIcon /> Course
         </Link>
-        {/* <Link to="/trainee/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
+        <Link to="/trainee/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <MessageIcon /> Messages
-        </Link> */}
+        </Link>
         <Link to="/trainee/profile" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
           <PersonIcon /> Profile
         </Link>
       </nav>
       <Logout />
     </div>
-    
   )
 }

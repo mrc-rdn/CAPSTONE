@@ -1980,8 +1980,8 @@ app.get("/trainee/course", async(req, res)=>{
 });
 
 //to fetch show the available chapter in the course
-app.post("/trainee/course/chapter", async(req, res)=>{
-  const {course_Id} = req.body
+app.get("/trainee/course/:courseId", async(req, res)=>{
+  const {courseId} = req.params
   try {
     if(!req.isAuthenticated()){
       res.status(401).json({success: false, message: 'unauthorized access'})
@@ -1990,13 +1990,76 @@ app.post("/trainee/course/chapter", async(req, res)=>{
       res.status(401).json({success: false, message: 'invalid role'})
     }
     const query = 'SELECT * FROM courses JOIN chapters ON courses.id = chapters.course_id WHERE courses.id = $1'
-    const response = await db.query(query,[course_Id]);
+    const response = await db.query(query,[courseId]);
     res.status(200).json({success: true, data: response.rows, chapterLength: response.rows.length})
 
   } catch (error) {
     res.status(400).json({ message: `unable to insert you data:  ${error}`, })
   }
 }); 
+
+// fetching the data inside the chapter so if you open or click the course it will appear automatically 
+//course chapters.jsx
+app.get("/trainee/course/:chapterindex/:courseId", async(req, res)=>{
+  try {
+    const {chapterindex, courseId} = req.params
+    if(!req.isAuthenticated()){
+      res.status(401).json({success: false, messsage: 'unauthorized access' })
+    }
+    if(req.user.role !== "TRAINEE"){
+      res.status(401).json({success: false, message: 'invalid role'})
+    }
+    
+    
+    const query1 = `SELECT * FROM chapters 
+      JOIN quizzes
+      ON quizzes.chapter_id = chapters.id
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+    const value1 = [courseId, chapterindex]
+    const quizItems = await db.query(query1,value1)
+
+    const query2 = `SELECT * FROM chapters 
+      JOIN video_items 
+      ON chapters.id = video_items.chapter_id 
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+      const value2 = [courseId, chapterindex]
+      const videoItems = await db.query(query2, value2);
+    
+    const query3 = `SELECT *FROM chapters
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+      const value3 = [courseId, chapterindex]
+      const chapterInfo = await db.query(query3, value3);
+
+      console.log(quizItems.rows.length, videoItems.rows.length)
+    if (quizItems.rows.length === 0 && videoItems.rows.length === 0) {
+      return res.json({
+        success: false,
+        message: "No video or quiz added yet.",
+        chapterInfo: chapterInfo.rows,
+        data: {
+          quiz: quizItems.rows,
+          video: videoItems.rows
+        }
+      });
+    }
+    // Success
+    return res.json({
+      success: true,
+      message: "Success gathering your data",
+      chapterInfo: chapterInfo.rows,
+      data: {
+        quiz: quizItems.rows,
+        video: videoItems.rows
+      }
+    });
+
+    
+  } catch (error) {
+    res.json({success: false ,messsage: 'there no video or quiz added yet' })
+  }
+});
+
+
 // fetch the first item
 app.post("/trainee/chapter/mediaitems", async(req, res)=>{
   
@@ -2058,7 +2121,18 @@ app.post("/trainee/chapter/quiz", async (req, res) => {
       return res.status(401).json({success: false, message: 'invalid role'})
     }
     const quizzes = await db.query(
-      "SELECT quizzes.id AS quiz_id, quizzes.chapter_id, questions.id AS question_id, questions.question_text, questions.type, questions.correct_answer, choices.id AS choice_id, choices.choice_text, choices.is_correct FROM quizzes JOIN questions ON quizzes.id = questions.quiz_id LEFT JOIN choices ON questions.id = choices.question_id WHERE quizzes.chapter_id = $1 ORDER BY questions.id, choices.id",
+      `SELECT 
+        quizzes.id AS quiz_id, 
+        quizzes.chapter_id, 
+        questions.id AS question_id, 
+        questions.question_text, questions.type, 
+        questions.correct_answer, choices.id AS choice_id, 
+        choices.choice_text, choices.is_correct 
+      FROM quizzes 
+        JOIN questions 
+        ON quizzes.id = questions.quiz_id 
+        LEFT JOIN choices ON questions.id = choices.question_id 
+      WHERE quizzes.chapter_id = $1 ORDER BY questions.id, choices.id`,
       [chapterId]
     );
 
@@ -2076,7 +2150,7 @@ app.post("/trainee/chapter/quiz", async (req, res) => {
 //send data into database
 app.post("/trainee/quiz/answer", async (req, res) => {
   try {
-    const { user_id, quiz_id, chapter_id, course_id, score, percentage, tempResults } = req.body;
+    const { quiz_id, chapter_id, course_id, score, percentage, tempResults } = req.body;
 
     if (!req.isAuthenticated()) {
       return res.status(401).json({ success: false, message: 'unauthorized access' });
@@ -2088,7 +2162,7 @@ app.post("/trainee/quiz/answer", async (req, res) => {
     console.log(tempResults)
     const query = `INSERT INTO quiz_progress (user_id, quiz_id, chapter_id, course_id, score, percentage, created_at) 
                   VALUES($1, $2, $3, $4, $5, $6, now()) RETURNING *`;
-    const values = [user_id, quiz_id, chapter_id, course_id, score, percentage];
+    const values = [req.user.id, quiz_id, chapter_id, course_id, score, percentage];
     const result = await db.query(query, values);
 
     for (const item of tempResults) {
@@ -2103,7 +2177,7 @@ app.post("/trainee/quiz/answer", async (req, res) => {
         item.isCorrect,
         item.question,
         item.correctAnswer,
-        user_id
+        req.user.id
       ];
 
       await db.query(query1, values2);
@@ -2130,13 +2204,11 @@ app.post("/trainee/quiz/quizprogress", async (req, res) => {
     }
 
     const result = await db.query(
-      `SELECT * FROM quiz_progress
-      JOIN quiz_progress_answers
-      ON quiz_progress.chapter_id = quiz_progress_answers.chapter_id
-      WHERE quiz_progress.chapter_id = $1 AND quiz_progress.user_id = $2 `,
+      `SELECT * FROM quiz_progress_answers
+      WHERE chapter_id = $1 AND user_id = $2  `,
       [chapter_id, req.user.id]   // use logged-in user
     );
-console.log(result.rows)
+
     res.status(200).json({
       success: true,
       message: 'quiz progress fetched',
@@ -2447,6 +2519,9 @@ app.post("/trainee/dashboard/logout", (req, res, next) => {
 
   if (!req.isAuthenticated()) {
     return res.status(400).json({ message: "No active session found" });
+  }
+  if (req.user.role !== "TRAINEE") {
+    return res.status(401).json({ success: false, message: "invalid role" });
   }
 
   req.logout( (err) => {

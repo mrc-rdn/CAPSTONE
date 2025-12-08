@@ -3,7 +3,7 @@ import axios from 'axios'
 import QuizFillBlank from './QuizFillBlank.jsx';
 import QuizMultipleChoice from './QuizMultipleChoice.jsx';
 import CheckedAnswers from './CheckedAnswers.jsx';
-import { API_URL } from '../../../api.js';
+import { API_URL } from '../../../../api.js';
 
 function groupQuizzes(quizData) {
 
@@ -29,7 +29,7 @@ export default function QuizList(props) {
   const [resultFetch, setResultFecth] = useState([])
   const [isAnswer, setAnswer] = useState(false)
   const [checkedAnswers, setCheckedAnswers] = useState(false)
-
+  const [refresh, setRefresh] = useState(0);
   const groupedQuizzes = groupQuizzes(props.quizData)
 
   // STORE USER ANSWERS
@@ -97,25 +97,24 @@ export default function QuizList(props) {
 
     console.log("DETAILED RESULTS:", tempResults);
 
-    console.log(props.courseDetails.student_id)
-    console.log(groupedQuizzes[0].quiz_id) 
-    console.log(props.chapterDetails.id) 
-    console.log(props.courseDetails.course_id,) 
-    console.log(percent) 
-    console.log(score) 
+    
+    console.log(props.quizData) 
+    console.log(props.quizData[0].quiz_id) 
+    console.log(props.quizData[0].chapter_id) 
+    console.log(props.courseId) 
+    console.log(tempResults) 
     
     try {
       const res = await axios.post(`${API_URL}/trainee/quiz/answer`, {
-        user_id: props.courseDetails.student_id, 
-        quiz_id: groupedQuizzes[0].quiz_id, 
-        chapter_id: props.chapterDetails.id, 
-        course_id:  props.courseDetails.course_id, 
+        quiz_id: props.quizData[0].quiz_id, 
+        chapter_id: props.quizData[0].chapter_id, 
+        course_id:  props.courseId, 
         score: score , 
         percentage: percent,
         tempResults
       }, {withCredentials: true})
       
-      console.log(res)
+      setRefresh(prev => prev + 1)
     } catch (error) {
       console.log('errorposting your asnwer', error)
     }
@@ -128,7 +127,7 @@ export default function QuizList(props) {
       try {
         const res = await axios.post(
           `${API_URL}/trainee/quiz/quizprogress`,
-          { chapter_id: props.chapterDetails.id },
+          { chapter_id: props.quizData[0].chapter_id },
           { withCredentials: true }
         );
 
@@ -151,7 +150,7 @@ export default function QuizList(props) {
     };
 
     isAnswered();
-  }, []);
+  }, [refresh]);
 
 
   return (
