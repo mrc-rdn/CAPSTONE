@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import PersonIcon from '@mui/icons-material/Person';
-import DeleteIcon from '@mui/icons-material/Delete';
+
 import { API_URL } from "../../../../api.js";
+import CommentList from "./CommentList.jsx";
 
 function Comments({ videoId }) {
   const [comments, setComments] = useState([]);
   const [input, setInput] = useState("");
   const [isCommeting, setCommenting] = useState(false)
   const [isComments, setIsComments] = useState(false)
+  const [refresh , setRefresh] = useState(0)
+  const [userId, setUserId] = useState()
+  const [openReply, setOpenReply] = useState(0)
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -16,6 +19,8 @@ function Comments({ videoId }) {
         try {
             const res = await axios.get(`${API_URL}/videos/${videoId}/comments`, {withCredentials:true});
             setComments(res.data.data);
+            console.log(res.data.data)
+            setUserId(res.data.userId)
             setIsComments(res.data.success)
         } catch (error) {
             console.error("Error fetching comments:", error);
@@ -23,7 +28,7 @@ function Comments({ videoId }) {
         };
 
         fetchComments();
-    }, []);
+    }, [refresh]);
     
   // Add new comment
     const addComment = async () => {
@@ -32,8 +37,7 @@ function Comments({ videoId }) {
         const res = await axios.post(`${API_URL}/videos/${videoId}/comments`, {
             content: input,
         },{withCredentials: true});
-
-        setComments([res.data, ...comments]);
+        setRefresh(prev => prev + 1)
         setInput("");
         } catch (error) {
         console.error("Error posting comment:", error);
@@ -44,6 +48,7 @@ function Comments({ videoId }) {
             const res = await axios.post(`${API_URL}/video/deletecomment`, {
             commentId: id
             }, { withCredentials: true });
+            setRefresh(prev => prev + 1)
 
             if (res.data.success) {
             setComments(comments.filter((c) => c.id !== id));
@@ -53,6 +58,13 @@ function Comments({ videoId }) {
             console.log("Error deleting comment:", error);
         }
     };
+    const handleOpenReply = (id)=>{
+      console.log(id)
+      setOpenReply(id)
+    }
+    const handleExitReply = () =>{
+      setOpenReply(0)
+    }
   return (
     <div className=" w-full h-full relative">
       <h3 className="text-lg font-bold mb-3">
@@ -76,6 +88,7 @@ function Comments({ videoId }) {
             onClick={()=>{setInput(""), setCommenting(false);}}>
                 Cancel
             </button>
+
             <button
             onClick={addComment}
             className="w-20 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg m-3 " 
@@ -92,24 +105,16 @@ function Comments({ videoId }) {
             <ul>
             {comments.map((comment, index) => {
                 return (
-                <li key={index}>
-                    <div className="flex flex-col m-3 border-1 rounded p-3 ">
-                        <div className="flex flex-row ">
-                            <PersonIcon fontSize="large" className="border-2 rounded-full "/>
-                            <h1 className="mt-auto mb-auto ml-3">{comment.first_name} {comment.surname}</h1>
-                            
-                            <button className="ml-auto"
-                            onClick={()=>deleteComment(comment.id)} >
-                                <DeleteIcon />
-                            </button>
-                        </div>
-                        
-                        <p className="ml-12">
-                            {comment.content}
-                        </p>
-                        
-                    </div>
-                </li>)
+                    <CommentList 
+                        key={index} 
+                        comment={comment} 
+                        userId={userId} 
+                        deleteComment={deleteComment} 
+                        handleOpenReply={handleOpenReply} 
+                        handleExitReply={handleExitReply}
+                        openReply={openReply}
+                    />
+                )
             })}
             </ul>
         </div>

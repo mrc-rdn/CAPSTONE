@@ -19,6 +19,7 @@ export default function AddChapterModal(props) {
     const [quizData, setQuizData] = useState([]);
     const [questionLength, setQuestionLength] = useState()
     const [imageData, setImageData] = useState([])
+    const [isData, setIsData] = useState(null)
 
     const [chapters, setChapters] = useState([])
     useEffect(()=>{
@@ -46,33 +47,41 @@ export default function AddChapterModal(props) {
                 axios.post(`${API_URL}/admin/course/traineeprogress`, {course_id: props.courseId}, {withCredentials: true}),
                 axios.post(`${API_URL}/admin/course/traineeimageprogress`, {course_id: props.courseId, chapter_id: id  }, {withCredentials: true})
             ])
-            console.log(quiz.data.success, video.data.success, info.data.data, image.data.data)
+            
             setTraineeDetailes(info.data.data)
             setQuiz(quiz.data.success)
             setVideo(video.data.success)
             
-           console.log(video, quiz, info, image)
+           console.log(video.data, quiz.data, info.data, image.data)
             if(video.data.success){
                 setVideoType(video.data.data[0].item_type)
+
                 if(video.data.data[0].item_type === 'IMAGE'){
                     setImageData(image.data.data)
+                    setIsData(true)
                     
                 }
                 try {
                     const result = await axios.post(`${API_URL}/admin/course/traineevideoprogress`, {chapter_id: id, course_id: props.courseId,  }, {withCredentials: true})
                     setVideoData(result.data.data)
+                    setIsData(true)
                 } catch (error) {
                     console.error("Error fetching video progress:", videoErr);
                 }
-            }
-            if(quiz.data.success){
+
+            }else if(quiz.data.success){
+
                 try {
                     const result = await axios.post(`${API_URL}/admin/course/traineequizprogress`, {chapter_id: id, course_id: props.courseId,  }, {withCredentials: true})
                     setQuizData(result.data.data)
                     setQuestionLength(result.data.quizLength)
+                    setIsData(true)
                 } catch (error) {
                     console.error("Error fetching video progress:", videoErr);
                 }
+                
+            }else{
+                setIsData(false)
             }
             
         } catch (err) {
@@ -83,19 +92,19 @@ export default function AddChapterModal(props) {
     
 
   return (
-    <div className='w-full h-full bg-gray-500/40 fixed inset-0 grid place-items-center z-200'>
-      <div className='w-10/12 h-11/12 bg-white p-3 rounded overflow-y-scroll'>
+    <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex justify-center items-center z-200'>
+      <div className='w-10/12 h-11/12 bg-white p-3 rounded'>
 
 
         <button onClick={()=>{props.onExit(exit); props.onRefresh(props.chapter_Details.id);}}><CloseIcon /></button>
         <h1  className='text-2xl mt-3 mb-3 '>Trainee Progress</h1>
-        <ExcelGenerator course_id={props.course_id}/>
-        <div className='w-full h-10/12 flex'>
+        <ExcelGenerator course_id={props.courseId}/>
+        <div className='w-full h-9/12 flex'>
         
         
             <div className='w-full h-full bg-white'>
                 <div className='flex '>
-                    <table class="w-full bg-white shadow-md rounded-lg overflow-hidden border-1">
+                {isData?<table class="w-full bg-white shadow-md rounded-lg overflow-hidden border-1">
                     <thead class="bg-green-600 text-white">
                         <tr>
                         <th class="py-3 px-6 text-left">ID</th>
@@ -149,14 +158,15 @@ export default function AddChapterModal(props) {
                     
 
                     </tbody>
-                    </table>  
+                    </table>: <p>no record yet</p>  }
                 </div>
             </div>
-            <div className='w-100 h-full ml-auto'>
+            <div className='w-100 h-full ml-auto overflow-y-scroll'>
                 <div className="h-10 w-full bg-white flex items-center sticky top-0">
                     <h1 className="text-large ml-3 font-bold ">Chapter</h1>
                 </div>
-                {chapters.map((item, index) => (
+                <div className=''>
+                    {chapters.map((item, index) => (
                     
                     <Chapter
                     key={item.id}
@@ -170,6 +180,8 @@ export default function AddChapterModal(props) {
                     />
                 ))
                 }
+                </div>
+                
             </div>
         </div>
 

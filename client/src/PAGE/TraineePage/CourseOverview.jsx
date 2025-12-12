@@ -82,7 +82,7 @@ console.log(id)
             {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoData.id} videoData={videoData}  />:null}
             {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData} />:null}
 
-            {isLesson? <p>there is no content</p>: null}
+            {isLesson?<div className='w-full'> <p>there is no content</p> </div> : null}
 
             <CourseChapters  courseId={id} refresh={refresh} handleChaptersInfo={handleChaptersInfo} />
         </div>

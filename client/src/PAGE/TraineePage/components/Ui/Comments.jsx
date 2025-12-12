@@ -2,20 +2,27 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteIcon from '@mui/icons-material/Delete';
+//import Reply from './Reply.jsx'
 import { API_URL } from "../../../../api.js";
+
 
 function Comments({ videoId }) {
   const [comments, setComments] = useState([]);
   const [input, setInput] = useState("");
   const [isCommeting, setCommenting] = useState(false)
   const [isComments, setIsComments] = useState(false)
+  const [refresh , setRefresh] = useState(0)
+  const [UserId, setUserId] = useState()
+  const [OpenReply, setOpenReply] = useState(false)
 
     useEffect(() => {
         const fetchComments = async () => {
             
         try {
-            const res = await axios.get(`${API_URL}/videos/${videoId}/comments`, {withCredentials:true});
+            const res = await axios.get(`${API_URL}/trainee/${videoId}/comments`, {withCredentials:true});
             setComments(res.data.data);
+            setUserId(res.data.userId)
+            console.log(res.data)
             setIsComments(res.data.success)
         } catch (error) {
             console.error("Error fetching comments:", error);
@@ -23,17 +30,18 @@ function Comments({ videoId }) {
         };
 
         fetchComments();
-    }, []);
+    }, [refresh]);
     
   // Add new comment
     const addComment = async () => {
         if (!input.trim()) return;
+        
         try {
-        const res = await axios.post(`${API_URL}/videos/${videoId}/comments`, {
+        const res = await axios.post(`${API_URL}/trainee/${videoId}/comments`, {
             content: input,
         },{withCredentials: true});
-
-        setComments([res.data, ...comments]);
+        console.log(res)
+        setRefresh(prev => prev + 1)
         setInput("");
         } catch (error) {
         console.error("Error posting comment:", error);
@@ -41,9 +49,10 @@ function Comments({ videoId }) {
     };
     const deleteComment = async (id) => {
         try {
-            const res = await axios.post(`${API_URL}/video/deletecomment`, {
+            const res = await axios.post(`${API_URL}/trainee/video/deletecomment`, {
             commentId: id
             }, { withCredentials: true });
+            setRefresh(prev => prev + 1)
 
             if (res.data.success) {
             setComments(comments.filter((c) => c.id !== id));
@@ -53,6 +62,12 @@ function Comments({ videoId }) {
             console.log("Error deleting comment:", error);
         }
     };
+
+    const handleOpenReply = () =>{
+        console.log('hello')
+        setOpenReply(true)
+
+    }
   return (
     <div className=" w-full h-full relative">
       <h3 className="text-lg font-bold mb-3">
@@ -65,6 +80,7 @@ function Comments({ videoId }) {
           value={input}
           onClick={()=>{setCommenting(true)}}
           onChange={(e) => setInput(e.target.value)}
+          required
           placeholder="Write a comment..."
           className="flex-1 px-3 py-2 focus:outline-none focus:outline-none focus:ring-blue-500 border-b-2 m-2"
         />
@@ -98,15 +114,19 @@ function Comments({ videoId }) {
                             <PersonIcon fontSize="large" className="border-2 rounded-full "/>
                             <h1 className="mt-auto mb-auto ml-3">{comment.first_name} {comment.surname}</h1>
                             
-                            <button className="ml-auto"
+                            {comment.user_id === UserId?<button className="ml-auto"
                             onClick={()=>deleteComment(comment.id)} >
                                 <DeleteIcon />
-                            </button>
+                            </button>: null}
                         </div>
                         
                         <p className="ml-12">
                             {comment.content}
                         </p>
+                        <div>
+                            
+                        </div>
+                        
                         
                     </div>
                 </li>)

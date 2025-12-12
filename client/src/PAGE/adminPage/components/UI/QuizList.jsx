@@ -32,7 +32,7 @@ export default function QuizList(props) {
       <h2 className="text-lg font-bold ">Available Quizzes</h2>
 
       {groupedQuizzes.map((quiz , index ) => (
-        <>
+        <div className='w-full' key={index}>
           {quiz.type === "fill_blank" && (
             <QuizFillBlank
               key={index}
@@ -51,7 +51,7 @@ export default function QuizList(props) {
               choices={quiz.choices}
             />
           )}
-        </>
+        </div>
       ))}
   </div>
 

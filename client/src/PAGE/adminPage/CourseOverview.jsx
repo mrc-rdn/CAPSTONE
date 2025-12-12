@@ -91,7 +91,7 @@ export default function CourseOverview() {
         }
       setChapterInfo({chapterId: chaptersId, chapterIndex: chapterIndex})
     }
-console.log(id)
+
 
     
   return (

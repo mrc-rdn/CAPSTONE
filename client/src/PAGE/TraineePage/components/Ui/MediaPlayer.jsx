@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import Comments from './Comments.jsx'
 
 import { API_URL } from "../../../../api.js";
 
@@ -207,7 +208,7 @@ export default function CustomVideoPlayer(props) {
           </div>
         </div>
         <div className="w-full p-5">
-          {/* <Comments videoId={videoId} /> */}
+          <Comments videoId={videoId} />
         </div>
       </div>
     </div>

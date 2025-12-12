@@ -3,7 +3,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 export default function QuizMultipleChoice({ type_question, question, choices,  no }) {
   return (
-    <div className='w-11/12 h-50 bg-green-700 text-white p-2 mt-2 mb-2 p-3 rounded-md'>
+    <div className='w-full h-50 bg-green-700 text-white p-2 mt-2 mb-2 p-3 rounded-md'>
         <h1>{type_question==="multiple_choice"&& "Multiple Choice"}</h1>
         <div className='flex'>
             <h1>{no}.</h1>
