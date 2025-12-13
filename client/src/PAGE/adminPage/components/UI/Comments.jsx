@@ -14,18 +14,18 @@ function Comments({ videoId }) {
   const [openReply, setOpenReply] = useState(0)
 
     useEffect(() => {
-        const fetchComments = async () => {
+      const fetchComments = async () => {
             
         try {
             const res = await axios.get(`${API_URL}/videos/${videoId}/comments`, {withCredentials:true});
             setComments(res.data.data);
-            console.log(res.data.data)
+            
             setUserId(res.data.userId)
             setIsComments(res.data.success)
         } catch (error) {
             console.error("Error fetching comments:", error);
         }
-        };
+      };
 
         fetchComments();
     }, [refresh]);
@@ -65,6 +65,8 @@ function Comments({ videoId }) {
     const handleExitReply = () =>{
       setOpenReply(0)
     }
+
+    
   return (
     <div className=" w-full h-full relative">
       <h3 className="text-lg font-bold mb-3">

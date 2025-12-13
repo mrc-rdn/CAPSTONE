@@ -532,6 +532,58 @@ app.post("/video/deletecomment", async (req, res) => {
   }
 });
 
+app.get("/admin/:commentsId/reply", async(req, res)=>{
+  try {
+    const {commentsId} = req.params;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `SELECT 
+        replies.id,
+        replies.comments_id,
+        replies.user_id,
+        replies.content,
+        replies.created_at,
+        users_info.first_name,
+        users_info.surname
+      FROM replies
+      JOIN users_info 
+      ON users_info.id = replies.user_id
+      WHERE replies.comments_id = $1
+      ORDER BY replies.created_at DESC`,
+      [commentsId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    res.json({ success: false, error });
+  }
+})
+app.post("/admin/:commentsId/reply", async (req, res) => {
+  try {
+    const { commentsId } = req.params;
+    const { content  } = req.body;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `INSERT INTO replies (comments_id, content, created_at, user_id)
+      VALUES ($1, $2,now(), $3)
+      RETURNING *`, 
+      [commentsId, content, req.user.id])
+
+     res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    req.json(error)
+  }
+});
+
 //to create a quiz
 app.post("/admin/chapter/createquiz", async (req, res) => {
   const { chapter_id, title, questions } = req.body;
