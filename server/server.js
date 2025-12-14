@@ -700,6 +700,57 @@ app.post("/admin/chapter/mediaitems", async (req, res) => {
   }
 });
 
+//certificate upload
+app.post("/admin/chapter/addcertificate", async (req, res) => {
+
+  try {
+    const { courseId, chapterId } = req.body
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `INSERT INTO certificate ( is_certificate,chapter_id,course_id) VALUES ($1, $2, $3) RETURNING*`
+    const value = [true, chapterId, courseId]
+    const result = await db.query(query, value);
+
+    if (result.rows.length === 1) {
+      res.json({ success: true, message: 'success gathering your data', data: result.rows })
+    } else {
+      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
+    }
+
+  } catch (error) {
+    res.json({ success: false, messsage: 'there no video or quiz added yet' })
+  }
+});
+app.post("/trainer/chapter/getcertificate", async (req, res) => {
+
+  try {
+    const { courseId, chapterId } = req.body
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `SELECT * FROM certificate WHERE course_id = $1 AND chapter_id = $2`
+    const value = [courseId, chapterId]
+    const result = await db.query(query, value);
+    console.log(result.rows.length)
+    if (result.rows.length > 0) {
+      res.json({ success: true, message: 'success gathering your data', data: result.rows })
+    } else {
+      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
+    }
+
+  } catch (error) {
+    res.json({ success: false, messsage: 'there no video or quiz added yet' })
+  }
+});
+
+
 // fetching the data inside the chapter so if you open or click the course it will appear automatically 
 //course chapters.jsx
 app.get("/admin/course/:chapterindex/:courseId", async (req, res) => {

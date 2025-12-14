@@ -22,7 +22,18 @@ export default function CourseAddContent(props) {
       setUploadImage(exit)
       props.onRefresh()
     }
-    console.log()
+    
+    async function handleUploadCertificate(){
+      console.log(id,chapterDetails.id)
+      try {
+        const res = await axios.post(`${API_URL}/admin/chapter/addcertificate`, 
+          {courseId:id, chapterId:chapterDetails.id}, 
+          {withCredentials:true})
+          console.log(res)
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
   return (
     <div className='w-full h-full relative'>
@@ -76,7 +87,7 @@ export default function CourseAddContent(props) {
                 setUploadvideo(false)
                 setUploadImage(false)
                 setUplaodCertificate(true)
-                
+                handleUploadCertificate()
               }}>
             Add Certificate
           </button>
