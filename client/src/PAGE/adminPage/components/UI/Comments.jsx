@@ -17,7 +17,7 @@ function Comments({ videoId }) {
       const fetchComments = async () => {
             
         try {
-            const res = await axios.get(`${API_URL}/videos/${videoId}/comments`, {withCredentials:true});
+            const res = await axios.get(`${API_URL}/admin/${videoId}/comments`, {withCredentials:true});
             setComments(res.data.data);
             
             setUserId(res.data.userId)
@@ -34,7 +34,7 @@ function Comments({ videoId }) {
     const addComment = async () => {
         if (!input.trim()) return;
         try {
-        const res = await axios.post(`${API_URL}/videos/${videoId}/comments`, {
+        const res = await axios.post(`${API_URL}/admin/${videoId}/comments`, {
             content: input,
         },{withCredentials: true});
         setRefresh(prev => prev + 1)
@@ -45,7 +45,7 @@ function Comments({ videoId }) {
     };
     const deleteComment = async (id) => {
         try {
-            const res = await axios.post(`${API_URL}/video/deletecomment`, {
+            const res = await axios.post(`${API_URL}/admin/deletecomment`, {
             commentId: id
             }, { withCredentials: true });
             setRefresh(prev => prev + 1)

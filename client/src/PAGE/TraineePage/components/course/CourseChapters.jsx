@@ -26,7 +26,7 @@ export default function CourseChapters(props) {
           axios.get(`${API_URL}/trainee/course/${props.courseId}`, { withCredentials: true }),// this to fetch all the chapters
           axios.get(`${API_URL}/trainee/course/1/${props.courseId}`, { withCredentials: true })
         ]);
-        console.log(chapterInfo.data)
+
         const chapterId = chapterItems.data.chapterInfo[0].id
         const chapterIndex = chapterItems.data.chapterInfo[0].order_index
         props.handleChaptersInfo(chapterId, chapterIndex) 

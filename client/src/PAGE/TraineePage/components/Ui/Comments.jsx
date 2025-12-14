@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import PersonIcon from '@mui/icons-material/Person';
-import DeleteIcon from '@mui/icons-material/Delete';
-//import Reply from './Reply.jsx'
-import { API_URL } from "../../../../api.js";
 
+import { API_URL } from "../../../../api.js";
+import CommentList from "./CommentList.jsx";
 
 function Comments({ videoId }) {
   const [comments, setComments] = useState([]);
@@ -12,22 +10,22 @@ function Comments({ videoId }) {
   const [isCommeting, setCommenting] = useState(false)
   const [isComments, setIsComments] = useState(false)
   const [refresh , setRefresh] = useState(0)
-  const [UserId, setUserId] = useState()
-  const [OpenReply, setOpenReply] = useState(false)
+  const [userId, setUserId] = useState()
+  const [openReply, setOpenReply] = useState(0)
 
     useEffect(() => {
-        const fetchComments = async () => {
+      const fetchComments = async () => {
             
         try {
             const res = await axios.get(`${API_URL}/trainee/${videoId}/comments`, {withCredentials:true});
             setComments(res.data.data);
+            
             setUserId(res.data.userId)
-            console.log(res.data)
             setIsComments(res.data.success)
         } catch (error) {
             console.error("Error fetching comments:", error);
         }
-        };
+      };
 
         fetchComments();
     }, [refresh]);
@@ -35,12 +33,10 @@ function Comments({ videoId }) {
   // Add new comment
     const addComment = async () => {
         if (!input.trim()) return;
-        
         try {
         const res = await axios.post(`${API_URL}/trainee/${videoId}/comments`, {
             content: input,
         },{withCredentials: true});
-        console.log(res)
         setRefresh(prev => prev + 1)
         setInput("");
         } catch (error) {
@@ -49,7 +45,7 @@ function Comments({ videoId }) {
     };
     const deleteComment = async (id) => {
         try {
-            const res = await axios.post(`${API_URL}/trainee/video/deletecomment`, {
+            const res = await axios.post(`${API_URL}/trainee/deletecomment`, {
             commentId: id
             }, { withCredentials: true });
             setRefresh(prev => prev + 1)
@@ -62,12 +58,15 @@ function Comments({ videoId }) {
             console.log("Error deleting comment:", error);
         }
     };
-
-    const handleOpenReply = () =>{
-        console.log('hello')
-        setOpenReply(true)
-
+    const handleOpenReply = (id)=>{
+      console.log(id)
+      setOpenReply(id)
     }
+    const handleExitReply = () =>{
+      setOpenReply(0)
+    }
+
+    
   return (
     <div className=" w-full h-full relative">
       <h3 className="text-lg font-bold mb-3">
@@ -80,7 +79,6 @@ function Comments({ videoId }) {
           value={input}
           onClick={()=>{setCommenting(true)}}
           onChange={(e) => setInput(e.target.value)}
-          required
           placeholder="Write a comment..."
           className="flex-1 px-3 py-2 focus:outline-none focus:outline-none focus:ring-blue-500 border-b-2 m-2"
         />
@@ -92,6 +90,7 @@ function Comments({ videoId }) {
             onClick={()=>{setInput(""), setCommenting(false);}}>
                 Cancel
             </button>
+
             <button
             onClick={addComment}
             className="w-20 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg m-3 " 
@@ -108,28 +107,16 @@ function Comments({ videoId }) {
             <ul>
             {comments.map((comment, index) => {
                 return (
-                <li key={index}>
-                    <div className="flex flex-col m-3 border-1 rounded p-3 ">
-                        <div className="flex flex-row ">
-                            <PersonIcon fontSize="large" className="border-2 rounded-full "/>
-                            <h1 className="mt-auto mb-auto ml-3">{comment.first_name} {comment.surname}</h1>
-                            
-                            {comment.user_id === UserId?<button className="ml-auto"
-                            onClick={()=>deleteComment(comment.id)} >
-                                <DeleteIcon />
-                            </button>: null}
-                        </div>
-                        
-                        <p className="ml-12">
-                            {comment.content}
-                        </p>
-                        <div>
-                            
-                        </div>
-                        
-                        
-                    </div>
-                </li>)
+                    <CommentList 
+                        key={index} 
+                        comment={comment} 
+                        userId={userId} 
+                        deleteComment={deleteComment} 
+                        handleOpenReply={handleOpenReply} 
+                        handleExitReply={handleExitReply}
+                        openReply={openReply}
+                    />
+                )
             })}
             </ul>
         </div>

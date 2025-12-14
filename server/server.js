@@ -446,7 +446,7 @@ app.delete("/admin/course/deletecontent", async (req, res) => {
 });
 
 //comments in the video 
-app.get("/videos/:videoId/comments", async (req, res) => {
+app.get("/admin/:videoId/comments", async (req, res) => {
   try {
     const { videoId } = req.params;
     if (!req.isAuthenticated()) {
@@ -484,7 +484,7 @@ app.get("/videos/:videoId/comments", async (req, res) => {
   }
 
 });
-app.post("/videos/:videoId/comments", async (req, res) => {
+app.post("/admin/:videoId/comments", async (req, res) => {
   try {
     const { videoId } = req.params;
     const { content } = req.body;
@@ -507,7 +507,7 @@ app.post("/videos/:videoId/comments", async (req, res) => {
   }
 
 });
-app.post("/video/deletecomment", async (req, res) => {
+app.post("/admin/deletecomment", async (req, res) => {
   try {
     const { commentId } = req.body;
 
@@ -2567,10 +2567,15 @@ app.post("/trainee/video/deletecomment", async (req, res) => {
   }
 });
 
-//fetch all the replies
 app.get("/trainee/:commentsId/reply", async(req, res)=>{
   try {
     const {commentsId} = req.params;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
     const result = await db.query(
       `SELECT 
         replies.id,
@@ -2587,6 +2592,7 @@ app.get("/trainee/:commentsId/reply", async(req, res)=>{
       ORDER BY replies.created_at DESC`,
       [commentsId]
     );
+    res.json({ success: true, data: result.rows });
   } catch (error) {
     res.json({ success: false, error });
   }

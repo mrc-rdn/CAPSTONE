@@ -112,9 +112,6 @@ export default function CustomVideoPlayer(props) {
 
     const saveProgressToDB = async () => {
       const currentSeconds = video.currentTime
-      
-
-      console.log(props.videoData.chapter_id,  props.videoData.course_id, video.duration)
 
     
       try {
@@ -125,7 +122,7 @@ export default function CustomVideoPlayer(props) {
           course_id: props.videoData.course_id,
           is_completed: isCompleted
         }, {withCredentials:true});
-        console.log(props.videoData.chapter_id,  props.videoData.course_id)
+      
       } catch (err) {
         console.error("Failed to save progress:", err);
       }
@@ -140,10 +137,8 @@ export default function CustomVideoPlayer(props) {
         }
         if(res.data.is_completed){
           setCompleted(true)
-          console.log('done watchingdfasd')
         }else{
-          setCompleted(false)
-          console.log('not watchingdfasd')
+          setCompleted(false)       
         }
 
       } catch (err) {
