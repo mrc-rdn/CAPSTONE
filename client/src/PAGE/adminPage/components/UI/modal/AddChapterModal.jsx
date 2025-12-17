@@ -74,7 +74,6 @@ export default function AddChapterModal(props) {
            
           </div>
                                  
-            
 
             <button
               className={isMouseOver?'m-3 w-50 h-10 text-2xl text-white bg-green-500 rounded':'m-3 w-50 h-10 text-2xl text-green-500 bg-white border-2  rounded' }

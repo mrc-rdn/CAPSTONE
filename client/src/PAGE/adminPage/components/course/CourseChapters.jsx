@@ -5,6 +5,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Chapter from './Chapter.jsx'
 import EditChapterModal from '../UI/modal/EditChapterModal.jsx';
 import { API_URL } from '../../../../api.js';
+import DeleteContent from '../UI/DeleteContent.jsx';
 
 export default function CourseChapters(props) {
   const [isEditChapter, setEditChapter] = useState(false);
@@ -12,10 +13,6 @@ export default function CourseChapters(props) {
   const [EditChapterData, setEditChapterData] = useState({chapterId:"", chapter_index: "", chapter_title:"", chapter_description: ""})
   const [fetchChapters, setFetchChapters] = useState([]);
   const [activeChapterId, setActiveChapterId] = useState(null);
-
-  const [isVideo, setIsVideo] = useState(false);
-  const [isImage, setIsImage] = useState(false);
-  const [isQuiz, setIsQuiz] = useState(false);
   
   const [refresh, setRefresh]= useState(0);
 
@@ -60,11 +57,9 @@ export default function CourseChapters(props) {
 
   async function handleShowChapter(id, chapter_index) {
     
-    props.handleChaptersInfo(id, chapter_index)
+    props.handleChaptersInfo(id, chapter_index, isEditChapter)
     try {
       const result = await axios.get(`${API_URL}/admin/course/${chapter_index}/${props.courseId}`, { withCredentials: true })    
-
-
     } catch (error) {
       console.log(error);
     }
@@ -75,7 +70,7 @@ export default function CourseChapters(props) {
   };
 
   function handleEditChapter() {
-    setEditChapter(!isEditChapter);
+    
   }
   function handleShowEditChapterModal(chapterId, chapter_index, chapter_title, chapter_description ){
     setIsEditChapterModal(true)
@@ -119,16 +114,17 @@ export default function CourseChapters(props) {
       }
     };
     
-
+    
   return (
     
-      <div className="ml-auto h-full w-4/12 bg-white overflow-y-scroll relative">
+      <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative">
             
+
             <div className="h-10 w-full bg-white flex items-center sticky top-0">
               <h1 className="text-large ml-3 font-bold ">Course content</h1>
               <button
-              onClick={handleEditChapter}
-              className='m-3 ml-auto'
+                onClick={()=>{setEditChapter(!isEditChapter), props.handleEditChapter(isEditChapter)}}
+                className='m-3 ml-auto'
               ><MoreHorizIcon  />
               </button>
             </div>
@@ -162,8 +158,6 @@ export default function CourseChapters(props) {
                               handleShowEditChapterModal={handleShowEditChapterModal}
                               onRefresh={handleRefresh}
                               isEditChapter={isEditChapter}
-                              isVideo={isVideo}
-                              isQuiz={isQuiz}
                               isActive={activeChapterId === item.id } 
                             />
                           </div>

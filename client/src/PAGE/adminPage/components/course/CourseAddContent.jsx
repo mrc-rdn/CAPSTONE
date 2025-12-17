@@ -2,6 +2,7 @@ import React,{useState} from 'react'
 import CreateQuizModal from '../UI/modal/CreateQuizModal.jsx';
 import UploadImagesModal from '../UI/modal/UploadImagesModal.jsx';
 import VideoUploadModal from '../UI/modal/VideoUploadModal.jsx'
+import UploadCertificateModal from '../UI/modal/UploadCertificateModal.jsx';
 
 export default function CourseAddContent(props) {
     const [isLessonUploaded, setIsLessonUploaded] = useState(false);
@@ -22,26 +23,21 @@ export default function CourseAddContent(props) {
       setUploadImage(exit)
       props.onRefresh()
     }
-    
-    async function handleUploadCertificate(){
-      console.log(id,chapterDetails.id)
-      try {
-        const res = await axios.post(`${API_URL}/admin/chapter/addcertificate`, 
-          {courseId:id, chapterId:chapterDetails.id}, 
-          {withCredentials:true})
-          console.log(res)
-      } catch (error) {
-        console.log(error)
-      }
+    function handleExitCertificateUploadModal (){
+      setUplaodCertificate(false)
+      props.onRefresh()
     }
-
+    
   return (
     <div className='w-full h-full relative'>
         {isQuizUpload? <CreateQuizModal onExit={handleExitQuizModal} chapterInfo={props.chapterInfo} />: null }  
         {isUploadVideo? <VideoUploadModal onExit={handleExitVideoUploadModal} chapterInfo={props.chapterInfo}  courseId={props.courseId} /> :null} 
         {isUploadImage? <UploadImagesModal onExit={handleExitImageUploadModal} chapterInfo={props.chapterInfo} courseId={props.courseId} /> : null} 
+        {isUplaodCertificate?<UploadCertificateModal onExit={handleExitCertificateUploadModal} chapterInfo={props.chapterInfo} courseId={props.courseId} />:null}
+        
 
-        {isLessonUploaded?null
+        {isLessonUploaded
+        ?null
         :<div className='h-full w-full grid place-items-center'>
         <button 
             className= {isQuizUpload? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
@@ -86,8 +82,7 @@ export default function CourseAddContent(props) {
                 setQuizUpload(false)
                 setUploadvideo(false)
                 setUploadImage(false)
-                setUplaodCertificate(true)
-                handleUploadCertificate()
+                setUplaodCertificate(true)              
               }}>
             Add Certificate
           </button>

@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react'
-import { API_URL } from '../../../api.js'
+import { API_URL } from '../../../../api.js'
 import axios from 'axios'
 
-export default function Certificate() {
+export default function Certificate(props) {
+    const {title} =  props.certificateData[0]
     const [data, setdata] = useState([]);
     useEffect(()=>{
         async function fetchdata (){
             try {
-                const result = await axios.get(`${API_URL}/trainer/dashboard`, {withCredentials:true})
-                setdata(result.data.user)
-                console.log(result.data.user)
+                const result = await axios.get(`${API_URL}/admin/dashboard`, {withCredentials:true})
+                setdata(result.data.usersInfo[0])
+                console.log(result.data)
             } catch (error) {
                 console.log(error)
             }
@@ -112,7 +113,7 @@ export default function Certificate() {
 
                     {/* Module Name */}
                     <span className="font-bold text-black text-[22px] md:text-lg block my-4 capitalize" id="moduleName">
-                    Loading...
+                    {title}
                     </span>
 
                     {/* Dates */}

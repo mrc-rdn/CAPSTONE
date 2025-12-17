@@ -12,7 +12,7 @@ export default function EditChapterModal(props) {
 
     const [isChapterAdded, setChapterAdded] = useState(false);
     const [isMouseOver, setMouseOver] = useState(false)
-    console.log(chapterId, chapter_index, chapter_title, chapter_description)
+    
 
     async function handleSubmit(e){
       e.preventDefault();

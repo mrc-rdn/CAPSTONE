@@ -150,7 +150,6 @@ app.post("/trainer/login", passport.authenticate("local"), (req, res) => {
 });
 
 //for protection avoid parameters insertion
-
 app.get("/admin/protectedroute", async (req, res) => {
   try {
     if (!req.isAuthenticated()) {
@@ -166,7 +165,6 @@ app.get("/admin/protectedroute", async (req, res) => {
   }
 })
 
-
 //fetching data
 app.get("/admin/dashboard", async (req, res) => {
   try {
@@ -178,13 +176,16 @@ app.get("/admin/dashboard", async (req, res) => {
     }
 
     const trainee = await db.query("SELECT * FROM users WHERE role = 'TRAINEE'");
-    const trainer = await db.query("SELECT * FROM users WHERE role = 'TRAINER' ")
+    const trainer = await db.query("SELECT * FROM users WHERE role = 'TRAINER' ");
+    const userInfo = await db.query("SELECT * FROM users_info WHERE id = $1", [req.user.id])
     const coursesResponse = await db.query("SELECT * FROM courses")
     res.status(200).json({
       success: true,
       traineeCount: trainee.rows.length,
       trainerCount: trainer.rows.length,
-      coursesCount: coursesResponse.rows.length
+      coursesCount: coursesResponse.rows.length, 
+      usersInfo: userInfo.rows
+
     });
 
   } catch (err) {
@@ -230,7 +231,6 @@ app.delete("/admin/coursedelete/:courseId", async (req, res) => {
   }
 })
 
-
 //fethcing data for courses to appear to course admin page
 app.get("/admin/course", async (req, res) => {
 
@@ -253,9 +253,6 @@ app.get("/admin/course", async (req, res) => {
   }
 });
 
-
-
-
 //fetching chapters data to appear according to your course
 app.get("/admin/course/:courseId", async (req, res) => {
   const { courseId } = req.params
@@ -274,7 +271,6 @@ app.get("/admin/course/:courseId", async (req, res) => {
     res.status(400).json({ message: `unable to insert you data:  ${error}`, })
   }
 })
-
 
 //create chapter
 app.post("/admin/course/addchapter", async (req, res) => {
@@ -328,6 +324,7 @@ app.put("/admin/course/editchapter", async (req, res) => {
   }
 
 });
+
 //edit chapter index order
 app.put('/admin/chapter/reorder', async (req, res) => {
   const { orderedChapters } = req.body; // array of {id, order_index}
@@ -362,7 +359,6 @@ app.delete("/admin/chapter/deletechapter/:chapterId", async (req, res) => {
   }
 })
 
-
 // to upload videos
 app.post("/admin/chapter/uploadvideo", uploadVideo.single("video"), async (req, res) => {
   //const activityNumber = req.params;
@@ -377,9 +373,6 @@ app.post("/admin/chapter/uploadvideo", uploadVideo.single("video"), async (req, 
     if (!req.file) {
       return res.status(400).json({ succes: false, message: "No file uploaded" })
     }
-
-
-
     const query = 'INSERT INTO video_items ( title, source_url, required,created_at, course_id, chapter_id , item_type) VALUES ($1, $2, $3, now(), $4, $5, $6) RETURNING*'
     const values = [title, req.file.path, true, course_id, chapter_id, 'VIDEO']
     //const response = await db.query("INSERT INTO video_items ( title, item_type, source_url, order_index, required,created_at, course_id, chapter_id) VALUES ('title', 'VIDEO', 'dfasdfasdf', 1, True, now(), 2, 25)")
@@ -389,7 +382,7 @@ app.post("/admin/chapter/uploadvideo", uploadVideo.single("video"), async (req, 
     res.json({ success: false, message: 'Failed Uploading' })
   }
 });
-
+// to upload image
 app.post('/admin/chapter/upload-image', uploadImage.single('image'), async (req, res) => {
   try {
     const { title, course_id, chapter_id } = req.body;
@@ -412,10 +405,10 @@ app.post('/admin/chapter/upload-image', uploadImage.single('image'), async (req,
   }
 });
 
-
+//delete content
 app.delete("/admin/course/deletecontent", async (req, res) => {
   try {
-    const { isVideo, isQuiz, videoData, quizData } = req.body
+    const { isVideo, isQuiz, isCertificate, videoData, quizData, certificateData } = req.body
     if (!req.isAuthenticated()) {
       return res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -438,7 +431,11 @@ app.delete("/admin/course/deletecontent", async (req, res) => {
 
       const result1 = await db.query('DELETE FROM quizzes WHERE id = $1', [quizData[0].quiz_id])
     }
-    console.log(isVideo, isQuiz, quizData, videoData)
+
+    if(isCertificate){
+      const certificate = await db.query(`DELETE FROM certificate WHERE id = $1`, [certificateData[0].id])
+    }
+    console.log(isVideo, isQuiz,isCertificate, quizData, videoData, certificateData)
     res.json({ success: true })
   } catch (error) {
     res.json({ success: false, message: error })
@@ -704,15 +701,15 @@ app.post("/admin/chapter/mediaitems", async (req, res) => {
 app.post("/admin/chapter/addcertificate", async (req, res) => {
 
   try {
-    const { courseId, chapterId } = req.body
+    const { courseId, chapterId, title } = req.body
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
     if (req.user.role !== "SUPERADMIN") {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
-    const query = `INSERT INTO certificate ( is_certificate,chapter_id,course_id) VALUES ($1, $2, $3) RETURNING*`
-    const value = [true, chapterId, courseId]
+    const query = `INSERT INTO certificate ( is_certificate,chapter_id,course_id, title) VALUES ($1, $2, $3, $4) RETURNING*`
+    const value = [true, chapterId, courseId, title]
     const result = await db.query(query, value);
 
     if (result.rows.length === 1) {
@@ -725,10 +722,10 @@ app.post("/admin/chapter/addcertificate", async (req, res) => {
     res.json({ success: false, messsage: 'there no video or quiz added yet' })
   }
 });
-app.post("/trainer/chapter/getcertificate", async (req, res) => {
+app.get("/admin/:courseId/:chapterId/getcertificate", async (req, res) => {
 
   try {
-    const { courseId, chapterId } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -941,9 +938,9 @@ app.post('/admin/course/traineeprogress', async (req, res) => {
   }
 });
 //video progress
-app.post('/admin/course/traineevideoprogress', async (req, res) => {
+app.get('/admin/:courseId/:chapterId/traineevideoprogress', async (req, res) => {
   try {
-    const { course_id, chapter_id } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -963,16 +960,16 @@ app.post('/admin/course/traineevideoprogress', async (req, res) => {
       AND video_progress.course_id = $1
       AND video_progress.chapter_id = $2
     WHERE enrollments.course_id = $1
-    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    ORDER BY users_info.surname ASC;`, [courseId, chapterId])
     res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
   } catch (error) {
     res.status(400).json({ success: false, message: 'error query' })
   }
 });
 //quizprogress
-app.post('/admin/course/traineequizprogress', async (req, res) => {
+app.get('/admin/:courseId/:chapterId/traineequizprogress', async (req, res) => {
   try {
-    const { course_id, chapter_id } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -993,11 +990,11 @@ app.post('/admin/course/traineequizprogress', async (req, res) => {
           ON quiz_progress.user_id = enrollments.student_id 
           AND quiz_progress.chapter_id = $1
         WHERE enrollments.course_id = $2
-        ORDER BY users_info.surname ASC;`, [chapter_id, course_id])
+        ORDER BY users_info.surname ASC;`, [chapterId, courseId])
     const quizLength = await db.query(`SELECT * FROM quizzes
       JOIN questions
       ON questions.quiz_id = quizzes.id
-      WHERE quizzes.chapter_id = $1`, [chapter_id])
+      WHERE quizzes.chapter_id = $1`, [chapterId])
 
     res.status(200).json({ success: true, message: 'succesful query', data: result.rows, quizLength: quizLength.rows.length })
   } catch (error) {
@@ -1005,9 +1002,9 @@ app.post('/admin/course/traineequizprogress', async (req, res) => {
   }
 });
 //iamgeprogress
-app.post('/admin/course/traineeimageprogress', async (req, res) => {
+app.get('/admin/:courseId/:chapterId/traineeimageprogress', async (req, res) => {
   try {
-    const { course_id, chapter_id } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -1027,7 +1024,7 @@ app.post('/admin/course/traineeimageprogress', async (req, res) => {
       AND image_progress.course_id = $1
       AND image_progress.chapter_id = $2
     WHERE enrollments.course_id = $1
-    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    ORDER BY users_info.surname ASC;`, [courseId, chapterId])
     res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
   } catch (error) {
     res.status(400).json({ success: false, message: 'error query' })
@@ -2450,6 +2447,101 @@ app.get("/trainee/:videoId/progress", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ duration_seconds: 0 });
+  }
+});
+
+
+//video progress
+app.post('/trainee/course/traineevideoprogress', async (req, res) => {
+  try {
+    const { course_id, chapter_id } = req.body
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+
+    const result = await db.query(`SELECT 
+      enrollments.*,
+      users_info.*,
+      video_progress.*
+    FROM enrollments
+    LEFT JOIN users_info
+      ON users_info.id = enrollments.student_id
+    LEFT JOIN video_progress
+      ON video_progress.user_id = enrollments.student_id
+      AND video_progress.course_id = $1
+      AND video_progress.chapter_id = $2
+    WHERE enrollments.course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
+  } catch (error) {
+    res.status(400).json({ success: false, message: 'error query' })
+  }
+});
+//quizprogress
+app.post('/trainee/course/traineequizprogress', async (req, res) => {
+  try {
+    const { course_id, chapter_id } = req.body
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+
+    const result = await db.query(`
+        SELECT 
+          enrollments.*,
+          users_info.*,
+          quiz_progress.*
+          
+        FROM enrollments
+        LEFT JOIN users_info
+          ON users_info.id = enrollments.student_id
+        LEFT JOIN quiz_progress
+          ON quiz_progress.user_id = enrollments.student_id 
+          AND quiz_progress.chapter_id = $1
+        WHERE enrollments.course_id = $2
+        ORDER BY users_info.surname ASC;`, [chapter_id, course_id])
+    const quizLength = await db.query(`SELECT * FROM quizzes
+      JOIN questions
+      ON questions.quiz_id = quizzes.id
+      WHERE quizzes.chapter_id = $1`, [chapter_id])
+
+    res.status(200).json({ success: true, message: 'succesful query', data: result.rows, quizLength: quizLength.rows.length })
+  } catch (error) {
+    res.status(400).json({ success: false, message: 'error query' })
+  }
+});
+//iamgeprogress
+app.post('/trainee/course/traineeimageprogress', async (req, res) => {
+  try {
+    const { course_id, chapter_id } = req.body
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+
+    const result = await db.query(`SELECT 
+      enrollments.*,
+      users_info.*,
+      image_progress.*
+    FROM enrollments
+    LEFT JOIN users_info
+      ON users_info.id = enrollments.student_id
+    LEFT JOIN image_progress
+      ON image_progress.user_id = enrollments.student_id
+      AND image_progress.course_id = $1
+      AND image_progress.chapter_id = $2
+    WHERE enrollments.course_id = $1
+    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
+  } catch (error) {
+    res.status(400).json({ success: false, message: 'error query' })
   }
 });
 

@@ -2,11 +2,11 @@ import React, {useState, useEffect} from 'react'
 import {Link, Navigate} from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-import Chapter from '../course/Chapter.jsx';
-import { API_URL } from '../../../../api.js';
+import Chapter from '../../course/Chapter.jsx';
+import { API_URL } from '../../../../../api.js';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
-import ExcelGenerator from './ExcelGenerator.jsx';
+import ExcelGenerator from '../ExcelGenerator.jsx';
 
 export default function AddChapterModal(props) {
     const exit = false
@@ -45,7 +45,7 @@ export default function AddChapterModal(props) {
                 axios.post(`${API_URL}/admin/chapter/mediaitems`, {courseId: props.courseId, chapterId: id  }, {withCredentials: true}),
                 axios.post(`${API_URL}/admin/chapter/quiz`, {chapterId: id  }, {withCredentials: true}),
                 axios.post(`${API_URL}/admin/course/traineeprogress`, {course_id: props.courseId}, {withCredentials: true}),
-                axios.post(`${API_URL}/admin/course/traineeimageprogress`, {course_id: props.courseId, chapter_id: id  }, {withCredentials: true})
+                axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineeimageprogress`, {withCredentials: true})
             ])
             
             setTraineeDetailes(info.data.data)
@@ -62,7 +62,7 @@ export default function AddChapterModal(props) {
                     
                 }
                 try {
-                    const result = await axios.post(`${API_URL}/admin/course/traineevideoprogress`, {chapter_id: id, course_id: props.courseId,  }, {withCredentials: true})
+                    const result = await axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineevideoprogress`, {withCredentials: true})
                     setVideoData(result.data.data)
                     setIsData(true)
                 } catch (error) {
@@ -72,7 +72,7 @@ export default function AddChapterModal(props) {
             }else if(quiz.data.success){
 
                 try {
-                    const result = await axios.post(`${API_URL}/admin/course/traineequizprogress`, {chapter_id: id, course_id: props.courseId,  }, {withCredentials: true})
+                    const result = await axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineequizprogress`, {withCredentials: true})
                     setQuizData(result.data.data)
                     setQuestionLength(result.data.quizLength)
                     setIsData(true)
