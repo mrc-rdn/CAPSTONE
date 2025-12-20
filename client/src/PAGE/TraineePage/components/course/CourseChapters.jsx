@@ -10,13 +10,11 @@ export default function CourseChapters(props) {
   const [fetchChapters, setFetchChapters] = useState([]);
   const [activeChapterId, setActiveChapterId] = useState(null);
 
-  const [isVideo, setIsVideo] = useState(false);
-  const [isImage, setIsImage] = useState(false);
-  const [isQuiz, setIsQuiz] = useState(false);
+  
   
   const [refresh, setRefresh]= useState(0);
 
-
+  const [lock , setUnlock] = useState(false)
 
   
   useEffect(() => {
@@ -29,7 +27,7 @@ export default function CourseChapters(props) {
 
         const chapterId = chapterItems.data.chapterInfo[0].id
         const chapterIndex = chapterItems.data.chapterInfo[0].order_index
-        props.handleChaptersInfo(chapterId, chapterIndex) 
+        props.handleChaptersInfo(chapterId, chapterIndex, lock) 
         const fetchedChapters = chapterInfo.data.data;
         
         setFetchChapters(fetchedChapters);
@@ -53,15 +51,37 @@ export default function CourseChapters(props) {
  
 
   async function handleShowChapter(id, chapter_index) {
-    
-    props.handleChaptersInfo(id, chapter_index)
-    try {
-      const result = await axios.get(`${API_URL}/trainee/course/${chapter_index}/${props.courseId}`, { withCredentials: true })    
 
+    
+    
+    try {
+     const [videoProgress, quizProgress] = await Promise.all([
+          axios.post(`${API_URL}/trainee/course/traineevideoprogress`,{course_id:props.courseId, chapter_id: id, chapterIndex:chapter_index}, { withCredentials: true }),
+          axios.post(`${API_URL}/trainee/course/traineequizprogress`,{course_id:props.courseId, chapter_id: id, chapterIndex:chapter_index}, { withCredentials: true })
+          
+        ]);
+        
+        const videoProgressData = videoProgress.data.data
+        const quizProgressData = quizProgress.data.data
+        console.log(videoProgressData)
+
+        let unlocked = false
+
+        if(quizProgressData.length < 0){
+          unlocked = true
+        }else if(videoProgressData[0]?.is_completed){
+          unlocked = true
+        }else{
+          unlocked = false
+        }
+        props.handleChaptersInfo(id, chapter_index, unlocked )
 
     } catch (error) {
       console.log(error);
     }
+    
+    
+    
   }
 
   const handleActiveChapter = (chapterId) => {
@@ -73,7 +93,7 @@ export default function CourseChapters(props) {
 
   return (
     
-      <div className="ml-auto h-full w-4/12 bg-white overflow-y-scroll relative">
+      <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative">
             
             <div className="h-10 w-full bg-white flex items-center sticky top-0">
               <h1 className="text-large ml-3 font-bold ">Course content</h1>

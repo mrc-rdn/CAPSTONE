@@ -2006,11 +2006,11 @@ app.post("/trainee/login", passport.authenticate('local'), (req, res) => {
   }
 
 })
-//certificate upload
-app.post("/trainee/chapter/getcertificate", async (req, res) => {
+//certificate fetch 
+app.get("/trainee/:courseId/:chapterId/getcertificate", async (req, res) => {
 
   try {
-    const { courseId, chapterId } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -2210,7 +2210,7 @@ app.post("/trainee/chapter/chapterfirstitem", async (req, res) => {
     res.json({ success: false, messsage: 'there no video or quiz added yet' })
   }
 });
-// fetch the quiz
+// fetch the quiz questions
 app.post("/trainee/chapter/quiz", async (req, res) => {
   const { chapterId } = req.body;
   try {
@@ -2247,7 +2247,7 @@ app.post("/trainee/chapter/quiz", async (req, res) => {
     res.status(500).json({ success: false, error: "Error fetching quizzes" });
   }
 });
-//send data into database
+//send data into database this is the ansers of user it will save into quiz
 app.post("/trainee/quiz/answer", async (req, res) => {
   try {
     const { quiz_id, chapter_id, course_id, score, percentage, tempResults } = req.body;
@@ -2291,6 +2291,7 @@ app.post("/trainee/quiz/answer", async (req, res) => {
   }
 });
 
+// this to fetch all the answers in quiz
 app.post("/trainee/quiz/quizprogress", async (req, res) => {
   try {
     const { chapter_id } = req.body;
@@ -2349,7 +2350,7 @@ app.post("/trainee/:imageId/progressimage", async (req, res) => {
 
     // Insert or update (one record per user/image)
     const result = await db.query(
-      `INSERT INTO image_progress (user_id, chapter_id, course_id, video_id, is_completed)
+      `INSERT INTO video_progress (user_id, chapter_id, course_id, video_id, is_completed)
        VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (user_id, video_id)
        DO UPDATE SET is_completed = EXCLUDED.is_completed
@@ -2367,9 +2368,6 @@ app.post("/trainee/:imageId/progressimage", async (req, res) => {
     res.status(400).json({ success: false, message: "Failed to update image progress" });
   }
 });
-
-
-
 
 //SAVE VIDEO PROGRESS
 app.post("/trainee/:videoId/progress", async (req, res) => {
@@ -2416,7 +2414,7 @@ app.post("/trainee/:videoId/progress", async (req, res) => {
 });
 
 
-// GET VIDEO PROGRESS
+// GET VIDEO PROGRESS and duration to make the video save where they stop to watch and fetch 
 app.get("/trainee/:videoId/progress", async (req, res) => {
   try {
     const { videoId } = req.params;
@@ -2461,25 +2459,23 @@ app.post('/trainee/course/traineevideoprogress', async (req, res) => {
     if (req.user.role !== "TRAINEE") {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
+    const result = await db.query(`SELECT * FROM video_progress
+      WHERE course_id = $1 AND chapter_id = $2  AND user_id = $3`,
+      [course_id, chapter_id, req.user.id]) 
 
-    const result = await db.query(`SELECT 
-      enrollments.*,
-      users_info.*,
-      video_progress.*
-    FROM enrollments
-    LEFT JOIN users_info
-      ON users_info.id = enrollments.student_id
-    LEFT JOIN video_progress
-      ON video_progress.user_id = enrollments.student_id
-      AND video_progress.course_id = $1
-      AND video_progress.chapter_id = $2
-    WHERE enrollments.course_id = $1
-    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
-    res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
+    
+    if(result.rows.length > 0){
+      res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
+    }else{
+      res.status(200).json({ success: false, message: 'unsuccesful query',data: result.rows })
+    }
+    
+  
   } catch (error) {
     res.status(400).json({ success: false, message: 'error query' })
   }
 });
+
 //quizprogress
 app.post('/trainee/course/traineequizprogress', async (req, res) => {
   try {
@@ -2492,33 +2488,25 @@ app.post('/trainee/course/traineequizprogress', async (req, res) => {
     }
 
     const result = await db.query(`
-        SELECT 
-          enrollments.*,
-          users_info.*,
-          quiz_progress.*
-          
-        FROM enrollments
-        LEFT JOIN users_info
-          ON users_info.id = enrollments.student_id
-        LEFT JOIN quiz_progress
-          ON quiz_progress.user_id = enrollments.student_id 
-          AND quiz_progress.chapter_id = $1
-        WHERE enrollments.course_id = $2
-        ORDER BY users_info.surname ASC;`, [chapter_id, course_id])
-    const quizLength = await db.query(`SELECT * FROM quizzes
-      JOIN questions
-      ON questions.quiz_id = quizzes.id
-      WHERE quizzes.chapter_id = $1`, [chapter_id])
+      SELECT * FROM quiz_progress
+      WHERE course_id = $1 AND chapter_id = $2 ANd user_id = $3`, [ course_id, chapter_id, req.user.id])
+      
+    if(result.rows.length > 0){
+      res.status(200).json({ success: true, message: 'succesful query' , data: result.rows})
+    }else{
+      res.status(200).json({ success: false, message: 'unsuccesful query', data: result.rows })
+    }
 
-    res.status(200).json({ success: true, message: 'succesful query', data: result.rows, quizLength: quizLength.rows.length })
+    
   } catch (error) {
     res.status(400).json({ success: false, message: 'error query' })
   }
 });
+
 //iamgeprogress
 app.post('/trainee/course/traineeimageprogress', async (req, res) => {
   try {
-    const { course_id, chapter_id } = req.body
+    const { courseId, chapterId } = req.body
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -2538,89 +2526,74 @@ app.post('/trainee/course/traineeimageprogress', async (req, res) => {
       AND image_progress.course_id = $1
       AND image_progress.chapter_id = $2
     WHERE enrollments.course_id = $1
-    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    ORDER BY users_info.surname ASC;`, [courseId, chapterId])
     res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
   } catch (error) {
     res.status(400).json({ success: false, message: 'error query' })
   }
 });
+  
+app.get('/trainee/:course/progress', async (req, res) => {
+  try {
+    const { course } = req.params
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
 
-// app.post("/trainee/:videoId/progress", async (req, res) => {
-//   try {
-//     const { videoId } = req.params;
-//     const { duration_seconds, chapter_id, course_id } = req.body;
+    // const chapter = await db.query(`SELECT * FROM chapters
+    //         WHERE course_id = $1
+    //         ORDER BY order_index ASC`, [course]);
+    // const trainee = await db.query(`SELECT 
+    //         enrollments.*,
+    //         users_info.*
+    //         FROM enrollments
+    //         LEFT JOIN users_info
+    //         ON users_info.id = enrollments.student_id
+    //         WHERE enrollments.course_id = $1
+    //         ORDER BY users_info.surname ASC;`, [course])
 
-//     if (!req.isAuthenticated()) {
-//       return res.status(401).json({ success: false, message: "unauthorized access" });
-//     }
+    const videoProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                video_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            JOIN video_progress
+                ON video_progress.user_id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+    const quizProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                quiz_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            JOIN quiz_progress
+                ON quiz_progress.user_id = enrollments.student_id
+            WHERE enrollments.course_id = $1
+            ORDER BY users_info.surname ASC;`, [course])
+    const imageProgress = await db.query(`SELECT 
+                enrollments.*,
+                users_info.*,
+                image_progress.*
+            FROM enrollments
+            LEFT JOIN users_info
+                ON users_info.id = enrollments.student_id
+            LEFT JOIN image_progress
+                ON image_progress.user_id = enrollments.student_id
+                
+            WHERE enrollments.course_id = $1`, [course])
 
-//     if (req.user.role !== "TRAINEE") {
-//       return res.status(401).json({ success: false, message: "invalid role" });
-//     }
-
-//     const userId = req.user.id;
-
-//     // 1. Get total video duration
-//     const videoData = await db.query(
-//       "SELECT duration_total_seconds FROM video_items WHERE id = $1",
-//       [videoId]
-//     );
-
-//     if (videoData.rows.length === 0) {
-//       return res.status(404).json({ success: false, message: "Video not found" });
-//     }
-
-//     const totalDuration = videoData.rows[0].duration_total_seconds;
-
-//     // 2. Check if already completed (so it becomes permanent)
-//     const existing = await db.query(
-//       "SELECT is_completed FROM video_progress WHERE user_id = $1 AND video_id = $2",
-//       [userId, videoId]
-//     );
-
-//     let isCompleted = false;
-
-//     if (existing.rows.length > 0 && existing.rows[0].is_completed === true) {
-//       // Already completed → permanent, keep TRUE
-//       isCompleted = true;
-//     } else {
-//       // Not completed before → calculate
-//       isCompleted = duration_seconds >= totalDuration;
-//     }
-
-//     // 3. UPSERT with permanent completion
-//     const query = `
-//       INSERT INTO video_progress (user_id, video_id, chapter_id, course_id, duration_seconds, is_completed)
-//       VALUES ($1, $2, $3, $4, $5, $6)
-//       ON CONFLICT (user_id, video_id)
-//       DO UPDATE SET
-//         duration_seconds = EXCLUDED.duration_seconds,
-//         is_completed = video_progress.is_completed OR EXCLUDED.is_completed,
-//         updated_at = NOW()
-//       RETURNING *;
-//     `;
-
-//     const result = await db.query(query, [
-//       userId,
-//       videoId,
-//       chapter_id,
-//       course_id,
-//       duration_seconds,
-//       isCompleted
-//     ]);
-
-//     res.json({ success: true, data: result.rows[0] });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, message: "DB error" });
-//   }
-// });
-
-
-
-
-
+    res.json({ chapter: chapter.rows, trainee: trainee.rows, video_progress: videoProgress.rows, quiz_progress: quizProgress.rows, image_progress: imageProgress.rows })
+  } catch (error) {
+    res.json({ success: false, error })
+  }
+})
 
 //comments
 app.get("/trainee/:videoId/comments", async (req, res) => {
@@ -2685,7 +2658,7 @@ app.post("/trainee/:videoId/comments", async (req, res) => {
 
 });
 
-app.post("/trainee/video/deletecomment", async (req, res) => {
+app.post("/trainee/deletecomment", async (req, res) => {
   try {
     const { commentId } = req.body;
 

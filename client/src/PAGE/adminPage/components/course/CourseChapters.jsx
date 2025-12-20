@@ -105,7 +105,7 @@ export default function CourseChapters(props) {
         id: item.id,
         order_index: index + 1, // or whatever your indexing is
       }));
-
+      
       try {
         await axios.put(`${API_URL}/admin/chapter/reorder`, { orderedChapters });
         console.log('Chapter order saved!');

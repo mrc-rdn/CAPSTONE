@@ -10,8 +10,8 @@ export default function QuizMultipleChoice({ type_question, question, choices, n
         </div>
       
       <ul>
-        {choices.map(choice => (
-          <li key={choice.id} className='m-2 ml-2'>
+        {choices.map((choice, index) => (
+          <li key={index} className='m-2 ml-2'>
             <label>
               <input 
                 className='mr-1' 

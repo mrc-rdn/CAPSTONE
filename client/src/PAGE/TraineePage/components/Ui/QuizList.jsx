@@ -131,7 +131,7 @@ export default function QuizList(props) {
           { withCredentials: true }
         );
 
-        console.log(res.data.data.length);
+        
 
         //If no progress found → null
         if (res.data.data.length === 0) {
