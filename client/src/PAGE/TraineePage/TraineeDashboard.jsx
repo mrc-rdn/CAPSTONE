@@ -27,7 +27,7 @@ export default function TraineeDashboard() {
     <div className='flex h-full w-full'>
       <Navbar />
       <div className='w-full bg-gray-200'>
-        <Header title="Dashoard" />
+        <Header title="Dashboard" />
       </div>
       
     </div>

@@ -69,9 +69,6 @@ export default function CourseChapters(props) {
     setActiveChapterId(chapterId);
   };
 
-  function handleEditChapter() {
-    
-  }
   function handleShowEditChapterModal(chapterId, chapter_index, chapter_title, chapter_description ){
     setIsEditChapterModal(true)
     setEditChapterData({chapterId:chapterId, chapter_index: chapter_index, chapter_title:chapter_title, chapter_description: chapter_description})
@@ -117,7 +114,7 @@ export default function CourseChapters(props) {
     
   return (
     
-      <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative">
+      <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative shadow-lg">
             
 
             <div className="h-10 w-full bg-white flex items-center sticky top-0">

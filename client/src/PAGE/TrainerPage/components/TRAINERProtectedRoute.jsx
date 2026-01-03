@@ -11,7 +11,7 @@ export default  function ProtectedRoute({children}) {
     useEffect(()=>{
          async function fetchAuth(){ 
             try {
-             const response = await axios.get(`${API_URL}/trainer/dashboard`, {withCredentials: true}) 
+             const response = await axios.get(`${API_URL}/trainer/protectedroute`, {withCredentials: true}) 
              setAuth(response.data.success) 
             } catch (error) {
              setAuth(false)

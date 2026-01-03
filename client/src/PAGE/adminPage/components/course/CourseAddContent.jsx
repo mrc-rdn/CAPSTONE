@@ -3,6 +3,7 @@ import CreateQuizModal from '../UI/modal/CreateQuizModal.jsx';
 import UploadImagesModal from '../UI/modal/UploadImagesModal.jsx';
 import VideoUploadModal from '../UI/modal/VideoUploadModal.jsx'
 import UploadCertificateModal from '../UI/modal/UploadCertificateModal.jsx';
+import TextEditor from '../UI/modal/TextEditor.jsx';
 
 export default function CourseAddContent(props) {
     const [isLessonUploaded, setIsLessonUploaded] = useState(false);
@@ -10,6 +11,7 @@ export default function CourseAddContent(props) {
     const [isUploadVideo, setUploadvideo] = useState(false);
     const [isUploadImage, setUploadImage] = useState(false);
     const [isUplaodCertificate, setUplaodCertificate] = useState(false);
+    const [isTextEditor, setIsTextEditor] = useState(false);
 
     function handleExitQuizModal(exit){
       setQuizUpload(exit)
@@ -27,6 +29,12 @@ export default function CourseAddContent(props) {
       setUplaodCertificate(false)
       props.onRefresh()
     }
+    const handleExitTextEditorModal = ()=>{
+      setIsTextEditor(false)
+      console.log('hello')
+      props.onRefresh()
+    }
+    
     
   return (
     <div className='w-full h-full relative'>
@@ -34,7 +42,7 @@ export default function CourseAddContent(props) {
         {isUploadVideo? <VideoUploadModal onExit={handleExitVideoUploadModal} chapterInfo={props.chapterInfo}  courseId={props.courseId} /> :null} 
         {isUploadImage? <UploadImagesModal onExit={handleExitImageUploadModal} chapterInfo={props.chapterInfo} courseId={props.courseId} /> : null} 
         {isUplaodCertificate?<UploadCertificateModal onExit={handleExitCertificateUploadModal} chapterInfo={props.chapterInfo} courseId={props.courseId} />:null}
-        
+        {isTextEditor?<TextEditor onExit={handleExitTextEditorModal} chapterInfo={props.chapterInfo} courseId={props.courseId} />:null}
 
         {isLessonUploaded
         ?null
@@ -47,6 +55,7 @@ export default function CourseAddContent(props) {
             setUploadvideo(false)
             setUploadImage(false)
             setUplaodCertificate(false)
+            setIsTextEditor(false) 
             }}>
                 Create Quiz
         </button>
@@ -59,6 +68,7 @@ export default function CourseAddContent(props) {
             setUploadvideo(true)
             setUploadImage(false)
             setUplaodCertificate(false)
+            setIsTextEditor(false) 
             }}>
                 Upload Video
         </button>
@@ -71,21 +81,38 @@ export default function CourseAddContent(props) {
               setUploadvideo(false)
               setUploadImage(true)
               setUplaodCertificate(false)
+              setIsTextEditor(false) 
             }}>
                 Upload Image
          </button>
 
-         <button
+          <button
               className= {isUplaodCertificate? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
               onClick={(e)=>{
                 e.preventDefault()
                 setQuizUpload(false)
                 setUploadvideo(false)
                 setUploadImage(false)
-                setUplaodCertificate(true)              
+                setUplaodCertificate(true)   
+                setIsTextEditor(false)            
               }}>
             Add Certificate
           </button>
+
+          <button
+              className= {isUplaodCertificate? 'w-50 h-10 text-2xl bg-green-500' : 'w-50 h-10 text-2xl bg-white'}
+              onClick={(e)=>{
+                e.preventDefault()
+                setQuizUpload(false)
+                setUploadvideo(false)
+                setUploadImage(false)
+                setUplaodCertificate(false)
+                setIsTextEditor(true)              
+              }}>
+            Text Editor
+          </button>
+
+          
     
     
                   

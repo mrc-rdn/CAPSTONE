@@ -13,16 +13,15 @@ export default function Header(props) {
             .replace(/\b\w/g, char => char.toUpperCase()); // capitalize each word
     }
   return (
-    <div className="flex w-full h-full bg-green-700 items-center text-white">
+    <div className="flex w-full h-full bg-green-700 items-center text-white ">
         <Link to="/trainee/course">
-            <button 
-                className="ml-5 text-large"
-            >
-                <ArrowBackIcon /> Back to Course
+            <button className="ml-5 text-sm sm:text-lg">
+            <ArrowBackIcon />
             </button>
+
         </Link>
 
-        <h1 className="text-xl font-medium ml-20">{deslugify(props.courseTitle)}</h1>
+        <h1 className="text-sm sm:text-xl font-medium ml-10">{deslugify(props.courseTitle)}</h1>
 
        
 

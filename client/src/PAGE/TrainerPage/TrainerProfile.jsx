@@ -7,7 +7,7 @@ export default function Profile() {
     <div className="flex w-screen h-screen">
             
         <Navbar/>
-        <h1>profile</h1>  
+        <h1 className='m-5'>COMING SOON</h1>  
 
         
              

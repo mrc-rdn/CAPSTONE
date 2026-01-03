@@ -98,11 +98,7 @@ export default function QuizList(props) {
     console.log("DETAILED RESULTS:", tempResults);
 
     
-    console.log(props.quizData) 
-    console.log(props.quizData[0].quiz_id) 
-    console.log(props.quizData[0].chapter_id) 
-    console.log(props.courseId) 
-    console.log(tempResults) 
+   
     
     try {
       const res = await axios.post(`${API_URL}/trainee/quiz/answer`, {
@@ -113,7 +109,8 @@ export default function QuizList(props) {
         percentage: percent,
         tempResults
       }, {withCredentials: true})
-      
+   setResultFecth(res.data.data)
+      console.log(res.data)
       setRefresh(prev => prev + 1)
     } catch (error) {
       console.log('errorposting your asnwer', error)
@@ -131,18 +128,9 @@ export default function QuizList(props) {
           { withCredentials: true }
         );
 
-        
-
-        //If no progress found → null
-        if (res.data.data.length === 0) {
-          setAnswer(false);
-          setCheckedAnswers(true)   // user has NOT answered
-        } else {
-          setCheckedAnswers(false)
-          setAnswer(true);
-          setResultFecth(res.data.data)
-          //console.log(res.data.data)    // user already answered this chapter
-        }
+        setResultFecth(res.data.data)
+        setAnswer(res.data.success)
+        console.log(res.data)
       } catch (error) {
         console.log(error);
         setAnswer(false);
@@ -185,7 +173,9 @@ export default function QuizList(props) {
         ))}
 
         {/* SUBMIT BUTTON */}
-        <button onClick={handleCheck}>Submit</button>
+        <button
+        className='m-3 w-50 h-10 text-2xl text-white bg-green-500 rounded mx-auto'
+        onClick={handleCheck}>Submit</button>
       </>
     </div>}
     

@@ -44,6 +44,7 @@ export default function TraineeCourse() {
       
       <div className='w-full bg-gray-200'>
         <Header title="Course" />
+        
         <div className='flex flex-wrap w-full '>
         
           {courses.length > 0 ? (courses.map((course)=>{

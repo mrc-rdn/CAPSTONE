@@ -104,7 +104,7 @@ export default function Certificate(props) {
                     className="font-playfair text-5xl md:text-[32px] font-bold text-black border-b-[3px] border-black pb-2.5 mx-auto mb-8 capitalize max-w-[80%] md:max-w-[90%] inline-block"
                     id="recipientName"
                     >
-                    {data.first_name} {data.surname}
+                    {data?.first_name} {data?.surname}
                     </div>
 
                     <p className="text-[15px] text-gray-800 leading-[1.8] mb-2.5">

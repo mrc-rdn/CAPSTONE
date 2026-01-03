@@ -12,7 +12,7 @@ export default function AddTraineeModal(props) {
       e.preventDefault()
       
       try {
-        const response = await axios.post(`${API_URL}/admin/course/enroll`,{courseId: props.courseId, studentId: studentId}, {withCredentials: true});
+        const response = await axios.post(`${API_URL}/trainer/course/enroll`,{courseId: props.courseId, studentId: studentId}, {withCredentials: true});
         setEnrolled(response.data.success)
         console.log(response)
       } catch (error) {

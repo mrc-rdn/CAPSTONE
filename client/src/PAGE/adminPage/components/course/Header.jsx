@@ -18,15 +18,22 @@ export default function Header(props) {
             <button 
                 className="ml-5 text-large"
             >
-                <ArrowBackIcon /> Back to Course
+                <ArrowBackIcon />
             </button>
         </Link>
 
         <h1 className="text-xl font-medium ml-20">{deslugify(props.courseTitle)}</h1>
 
         <button
-        onClick={() => {props.handleOpenTrianeeProgressModal()}}
+        onClick={() => {props.handleOpenAnnouncementModal()}}
         className="ml-auto m-3 p-3  m-3 hover:border-b-3 p-3 transition-all duration-80 ease-in-out"
+        >
+        Announcement
+        </button>
+
+        <button
+        onClick={() => {props.handleOpenTrianeeProgressModal()}}
+        className="m-3 p-3  m-3 hover:border-b-3 p-3 transition-all duration-80 ease-in-out"
         >
         Trainee Progress
         </button>
@@ -37,6 +44,7 @@ export default function Header(props) {
             >
        + Add Chapter
         </button>
+
 
         <button
             onClick={()=>{props.handleOpenAddTraineeModal()}}

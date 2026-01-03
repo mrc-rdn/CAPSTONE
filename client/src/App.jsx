@@ -12,6 +12,7 @@ import AdminCourse from './PAGE/adminPage/AdminCourse.jsx'
 import CourseOverview from './PAGE/adminPage/CourseOverview.jsx'
 import AdminMessages from './PAGE/adminPage/AdminMessages.jsx'
 import CreateAcoount from './PAGE/adminPage/CreateAcoount.jsx'
+import EditProfile from './PAGE/adminPage/EditProfile.jsx'
 
 
 //this is a protect route
@@ -20,6 +21,7 @@ import TrainerDashboard from './PAGE/TrainerPage/TrainerDashboard.jsx'
 import TrainerCourse from "./PAGE/TrainerPage/TrainerCourse.jsx"
 import TrainerMessages from "./PAGE/TrainerPage/TrainerMessages.jsx"
 import TrainerProfile from "./PAGE/TrainerPage/TrainerProfile.jsx"
+import TrainerCourseOverview from './PAGE/TrainerPage/TrainerCourseOverview.jsx'
 
 //this for trainee
 import TraineeDashboard from "./PAGE/TraineePage/TraineeDashboard.jsx"
@@ -40,10 +42,10 @@ export default function App() {
 
         
         <Route path="/trainer/dashboard" element={<TRAINERProtectedRoute><TrainerDashboard/></TRAINERProtectedRoute>} />
-        <Route path="/trainer/mybatch" element={<TRAINERProtectedRoute><TrainerCourse/></TRAINERProtectedRoute>}/>
+        <Route path="/trainer/course" element={<TRAINERProtectedRoute><TrainerCourse/></TRAINERProtectedRoute>}/>
         <Route path="/trainer/messages" element={<TRAINERProtectedRoute><TrainerMessages/></TRAINERProtectedRoute>}/>
         <Route path="/trainer/profile" element={<TRAINERProtectedRoute><TrainerProfile /></TRAINERProtectedRoute>}/>
-
+        <Route path='/trainer/course/:id/:courseTitle' element={<TRAINERProtectedRoute><TrainerCourseOverview /></TRAINERProtectedRoute>} />
 
         <Route path="/trainee/dashboard" element={<TRAINEEProtectedRoute><TraineeDashboard /></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/Course" element={<TRAINEEProtectedRoute><TraineeCourse/></TRAINEEProtectedRoute>}/>
@@ -56,6 +58,7 @@ export default function App() {
         <Route path="/admin/messages" element={<AdminProtectedRoute><AdminMessages /></AdminProtectedRoute>} />
         <Route path="/admin/createaccount" element={<AdminProtectedRoute><CreateAcoount /></AdminProtectedRoute>} />
         <Route path="/admin/course/:id/:courseTitle" element={<AdminProtectedRoute> <CourseOverview /> </AdminProtectedRoute>}/>
+        <Route path="/admin/editprofile" element={<AdminProtectedRoute><EditProfile /></AdminProtectedRoute>} />
       </Routes>
     </Router>
   )

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { API_URL } from '../../../../api.js';
 
 export default function DeleteContent(props) {
-    const {isVideo, isQuiz, isCertificate, videoData, quizData, certificateData} = props
+    const {isVideo, isQuiz, isCertificate,isText, videoData, quizData, certificateData, textData} = props
     
     const handleDelete = async() => {
         
@@ -14,9 +14,11 @@ export default function DeleteContent(props) {
             isVideo,
             isQuiz,
             isCertificate,
+            isText,
             quizData,
             videoData,
-            certificateData
+            certificateData,
+            textData
           },
             withCredentials: true
           })

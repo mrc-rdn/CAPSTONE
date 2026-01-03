@@ -17,13 +17,26 @@ export default function CAContent() {
   const [role, setRole] = useState("");
   const [isAccountCreated, setAccountCreated] = useState(false)
   const [isMouseOver, setMouseOver] = useState(false)
+  //const [color, setcolor] = useState({color:null, shade:null})
+  let shades = ['200','300','400','500','600','700','800']
+  let colors = ['red','yellow','green','orange', 'blue', 'purple', 'pink']
+  let setColor = ""
+  let setShade = ""
+  function random (){
+      
+    let random = Math.round(Math.random() * 6)
+    setColor = colors[random]
+    setShade = shades[random]
+    //setcolor({color:colors[random], shade:shades[random]})
+  }
 
   async function fetchData(e){
-    
     e.preventDefault();
+    random()
+    
     try{
       const response = await axios.post(`${API_URL}/admin/registeraccount`,
-        { firstName: firstName, surname: surname, contactNo:contactNo , username: username , password: password, role: role },
+        { firstName: firstName, surname: surname, contactNo:contactNo , username: username , password: password, role: role, color:setColor, shade:setShade },
         {withCredentials: true})
         
       setAccountCreated(response.data.success)

@@ -10,6 +10,7 @@ import { API_URL } from '../../api';
 export default function AdminModules() {
   const [isModal, setIsModal] = useState(false)
   const [courseData, setCourseData] = useState([]);
+  const [refresh, setRefresh] = useState(0)
   const courses = courseData
   
      function handleExit(exit){
@@ -19,7 +20,9 @@ export default function AdminModules() {
       setIsModal(true)
      }
          
-     
+     const handleRefresh = ()=>{
+      setRefresh(prev => prev + 1)
+    }
      useEffect(()=>{
       async function fetchData(){
         try {
@@ -33,7 +36,7 @@ export default function AdminModules() {
         
       }
       fetchData();
-     },[])
+     },[refresh])
     
     
   return (
@@ -56,7 +59,7 @@ export default function AdminModules() {
               key={course.id}
               title={course.title} 
               description={course.description} 
-              
+              handleRefresh={handleRefresh}
               />
               
               )

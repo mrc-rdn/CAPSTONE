@@ -13,10 +13,14 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary"
 
 import db from './db/connection.js'
+import http from "http";    
+import { Server } from "socket.io";
+
 
 const app = express();
 const port = 3000;
 const saltRounds = parseInt(process.env.SALTED_ROUNDS);
+const server = http.createServer(app);
 
 env.config();
 
@@ -53,15 +57,30 @@ const imageStorage = new CloudinaryStorage({
 
 const uploadImage = multer({ storage: imageStorage });
 
+
+const UploadProfile = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "profile_Pic", // folder para sa images
+    resource_type: "image", // importante para sa jpg/png/gif
+    allowed_formats: ["jpg", "jpeg", "png", "gif"],
+    public_id: (req, file) => `image_${Date.now()}_${file.originalname}`,
+  },
+});
+
+const UploadImageProfile = multer({ storage: UploadProfile });
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: "http://localhost:5173", // your React app's URL https://e-kabuhayanlmsfe.onrender.com
-    credentials: true,               // allow cookies to be sent
-  })
-);
+const frontendURL = process.env.NODE_ENV === "developmen"
+  ? "https://capstone-deployment-seven.vercel.app"
+  : "http://localhost:5173"
+
+app.use(cors({
+  origin: frontendURL,
+  credentials: true,
+}))
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -78,14 +97,38 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+const io = new Server(server, {
+  cors: { 
+    origin: frontendURL,
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+  
+app.set("io", io);
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("join-chat", (chatId) => {
+    socket.join(`chat_${chatId}`);
+  });
+
+  socket.on("send_message", (data) =>{
+    socket.to(data.room).emit("Receive_message", data);
+  })
+  
+
+});
+
 function generateNumericId() {
   return Date.now().toString().slice(-6) + Math.floor(100 + Math.random() * 900);
 }
 
 
+
 //resgiter account of trainer and trainee
 app.post("/admin/registeraccount", async (req, res) => {
-  const { firstName, surname, contactNo, username, password, role } = req.body;
+  const { firstName, surname, contactNo, username, password, role, color, shade } = req.body;
 
   try {
     if (!req.isAuthenticated()) {
@@ -114,7 +157,7 @@ app.post("/admin/registeraccount", async (req, res) => {
             const users = usersRes.rows[0]
             const userId = users.id
 
-            const userInfoRes = await db.query("INSERT INTO users_info (id, first_name, surname, contact_no) VALUES ($1, $2, $3, $4) RETURNING *", [userId, firstName, surname, contactNo])
+            const userInfoRes = await db.query("INSERT INTO users_info (id, first_name, surname, contact_no, color, shades) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *", [userId, firstName, surname, contactNo, color, shade])
 
             res.json({ success: true, message: "Account created" })
           }
@@ -130,6 +173,9 @@ app.post("/admin/registeraccount", async (req, res) => {
 //admin
 //admin
 //admin 
+
+// Create chat between 2 users
+
 
 
 // admin & trainer login 
@@ -179,17 +225,179 @@ app.get("/admin/dashboard", async (req, res) => {
     const trainer = await db.query("SELECT * FROM users WHERE role = 'TRAINER' ");
     const userInfo = await db.query("SELECT * FROM users_info WHERE id = $1", [req.user.id])
     const coursesResponse = await db.query("SELECT * FROM courses")
+    const username = await db.query("SELECT * FROM users WHERE id = $1 ",[req.user.id])
     res.status(200).json({
       success: true,
       traineeCount: trainee.rows.length,
       trainerCount: trainer.rows.length,
       coursesCount: coursesResponse.rows.length, 
-      usersInfo: userInfo.rows
+      usersInfo: userInfo.rows[0],
+      username: req.user.username,
+      color:userInfo.rows[0].color,
+      shade:userInfo.rows[0].shades
 
     });
 
   } catch (err) {
     res.status(500).json({ message: err })
+  }
+});
+
+//calendar todo list 
+app.post("/admin/calendar/events", async (req, res) => {
+
+  try {
+    const { event_date, text, color } = req.body;
+
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `
+      INSERT INTO calendar_events (user_id, event_date, text, color)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `;
+
+    const result = await db.query(query, [req.user.id, event_date, text, color]);
+
+    res.json({ success: true, event: result.rows[0] });
+  } catch (error) {
+    res.json({ success: false, message: error });
+  }
+
+});
+//fetch the data inside the calendar
+app.get("/admin/calendar/events", async (req, res) => {
+  try {
+
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `SELECT * FROM calendar_events WHERE user_id = $1 ORDER BY event_date ASC`,
+      [req.user.id]
+    );
+
+    res.json({ success: true, events: result.rows });
+  } catch (error) {
+    res.json({ success: false, message: error });
+  }
+
+});
+//delete the data inside the chapter
+app.delete("/admin/calendar/events/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userId = req.user.id;
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `DELETE FROM calendar_events WHERE id = $1 AND user_id = $2 RETURNING *`,
+      [id, userId]
+    );
+
+    res.json({ success: true, deleted: result.rows[0] });
+  } catch (error) {
+    res.json({ success: false, message: error });
+  }
+
+});
+
+app.post('/admin/dashboard/upcomingschedule', async(req,res)=>{
+  
+  try {
+    const {date1, date2} = req.body
+   
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `SELECT * FROM calendar_events WHERE user_id = $1 AND event_date >= $2 AND event_date <  $3`
+    const values = [ req.user.id, date1, date2]
+
+    const result = await db.query(query, values)
+    res.json({success: true, data: result.rows})
+    
+  } catch (error) {
+    
+  }
+})
+
+app.post('/admin/EditProfile/UploadProfile', UploadImageProfile.single('image'), async (req, res) => {
+  try {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    if (!req.file) {
+      return res.status(400).json({ succes: false, message: "No file uploaded" })
+    }
+    const query = 'UPDATE users_info SET profile_pic = $1 WHERE id = $2'
+    const values = [req.file.path, req.user.id]
+    const response = await db.query(query, values)
+    res.json({ success: true, message: `File received successfully`, data: response.rows })
+    console.log(response)
+  } catch (error) {
+    res.json({ success: false, message: 'Failed Uploading' })
+  }
+});
+app.post("/admin/edituserinfo", async (req, res) => {
+  const { firstName, surname, contactNo, password } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const checkResult = await db.query("SELECT * FROM users WHERE username = $1", [req.user.username])
+
+    if (checkResult.rows.length < 0) {
+      res.json({ success: false, error: "Username already exists." })
+    } else {
+      if (password.length < 8) {
+
+        res.json({ error: "your password is too short" })
+      } else {
+
+        bcrypt.hash(password, saltRounds, async (err, hash) => {
+
+          if (err) {
+            res.json("Error hasing password:", err)
+          } else {
+            const usersRes = await db.query("UPDATE users SET password = $1 WHERE id = $2", [ hash, req.user.id])
+
+            
+
+            const userInfoRes = await db.query(
+              `UPDATE users_info 
+                SET first_name = $1, 
+                surname = $2, 
+                contact_no = $3
+              WHERE id = $4`, [ firstName, surname, contactNo, req.user.id])
+
+            res.json({ success: true, message: "Account created" })
+          }
+        })
+      }
+    }
+  } catch (err) {
+    res.json({ error: err.message })
   }
 });
 
@@ -228,6 +436,26 @@ app.delete("/admin/coursedelete/:courseId", async (req, res) => {
     res.status(200).json({ succes: true, messsage: 'success deleting the course' })
   } catch (error) {
     res.status(400).json({ message: `unable to delete the course:  ${error}`, })
+  }
+})
+
+//fetch the data on your course how many enrolled on your course
+app.get("/admin/:courseId/enrolled", async(req, res)=>{
+  const {courseId} = req.params
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `SELECT * FROM enrollments WHERE course_id = $1`
+    const value = [courseId]
+    const response = await db.query(query,value)
+    res.status(200).json({ success: true, data: response.rows })
+
+  } catch (error) {
+    res.status(400).json({ success: error })
   }
 })
 
@@ -408,7 +636,7 @@ app.post('/admin/chapter/upload-image', uploadImage.single('image'), async (req,
 //delete content
 app.delete("/admin/course/deletecontent", async (req, res) => {
   try {
-    const { isVideo, isQuiz, isCertificate, videoData, quizData, certificateData } = req.body
+    const { isVideo, isQuiz, isCertificate,isText, videoData, quizData, certificateData, textData } = req.body
     if (!req.isAuthenticated()) {
       return res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -434,6 +662,9 @@ app.delete("/admin/course/deletecontent", async (req, res) => {
 
     if(isCertificate){
       const certificate = await db.query(`DELETE FROM certificate WHERE id = $1`, [certificateData[0].id])
+    }
+    if(isText){
+      await db.query(`DELETE FROM text_editor WHERE id = $1`, [textData[0].id])
     }
     console.log(isVideo, isQuiz,isCertificate, quizData, videoData, certificateData)
     res.json({ success: true })
@@ -846,75 +1077,7 @@ app.post("/admin/course/enroll", async (req, res) => {
   }
 })
 
-//calendar todo list 
-app.post("/admin/calendar/events", async (req, res) => {
 
-  try {
-    const { event_date, text, color } = req.body;
-
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "SUPERADMIN") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = `
-      INSERT INTO calendar_events (user_id, event_date, text, color)
-      VALUES ($1, $2, $3, $4)
-      RETURNING *;
-    `;
-
-    const result = await db.query(query, [req.user.id, event_date, text, color]);
-
-    res.json({ success: true, event: result.rows[0] });
-  } catch (error) {
-    res.json({ success: false, message: error });
-  }
-
-});
-//fetch the data inside the calendar
-app.get("/admin/calendar/events", async (req, res) => {
-  try {
-
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "SUPERADMIN") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const result = await db.query(
-      `SELECT * FROM calendar_events WHERE user_id = $1 ORDER BY event_date ASC`,
-      [req.user.id]
-    );
-
-    res.json({ success: true, events: result.rows });
-  } catch (error) {
-    res.json({ success: false, message: error });
-  }
-
-});
-//delete the data inside the chapter
-app.delete("/admin/calendar/events/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const userId = req.user.id;
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "SUPERADMIN") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const result = await db.query(
-      `DELETE FROM calendar_events WHERE id = $1 AND user_id = $2 RETURNING *`,
-      [id, userId]
-    );
-
-    res.json({ success: true, deleted: result.rows[0] });
-  } catch (error) {
-    res.json({ success: false, message: error });
-  }
-
-});
 
 //trainee progress 
 app.post('/admin/course/traineeprogress', async (req, res) => {
@@ -1061,7 +1224,7 @@ app.post('/admin/:course/excelrender', async (req, res) => {
             LEFT JOIN users_info
                 ON users_info.id = enrollments.student_id
             JOIN video_progress
-                ON video_progress.user_id = enrollments.student_id
+                ON video_progress.user_id = enrollments.student_id 
             WHERE enrollments.course_id = $1
             ORDER BY users_info.surname ASC;`, [course])
     const quizProgress = await db.query(`SELECT 
@@ -1091,7 +1254,94 @@ app.post('/admin/:course/excelrender', async (req, res) => {
   } catch (error) {
     res.json({ success: false, error })
   }
-})
+});
+
+app.get("/admin/notifications/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      "SELECT * FROM announcement WHERE user_id = $1 ORDER BY created_at DESC",
+      [userId]
+    );
+    res.json(result.rows);
+    
+  } catch (error) {
+    res.json({ success: false, error })
+  }
+  
+});
+
+// POST a new notification (from admin or system)
+app.post("/admin/annoucement", async (req, res) => {
+  try {
+    const {courseId, title, message } = req.body;
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      "INSERT INTO notifications (user_id, course_id, title, message) VALUES ($1,$2,$3) RETURNING *",
+      [req.user.id,courseId , title, message]
+    );
+    res.json(result.rows[0]);
+    
+  } catch (error) {
+    res.json({ success: false, error })
+  }
+ 
+});
+
+app.post('/admin/posts', async (req, res) => {
+    const { title, courseId, chapterId, content } = req.body;
+    try {
+      if (!req.isAuthenticated()) {
+        res.status(401).json({ success: false, messsage: 'unauthorized access' })
+      }
+      if (req.user.role !== "SUPERADMIN") {
+        res.status(401).json({ success: false, message: 'invalid role' })
+      }
+        const result = await db.query(
+            'INSERT INTO text_editor (user_id, course_id , chapter_id , title, content) VALUES($1, $2, $3, $4, $5) RETURNING *',
+            [req.user.id, courseId,  chapterId,  title, content]
+        );
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error saving post');
+    }
+});
+
+app.get('/admin/posts/:courseId/:chapterId', async (req, res) => {
+  const { courseId, chapterId } = req.params;
+    try {
+      if (!req.isAuthenticated()) {
+        res.status(401).json({ success: false, messsage: 'unauthorized access' })
+      }
+      if (req.user.role !== "SUPERADMIN") {
+        res.status(401).json({ success: false, message: 'invalid role' })
+      }
+        const result = await db.query('SELECT * FROM text_editor WHERE course_id = $1 AND chapter_id = $2', [courseId, chapterId]);
+        if(result.rows.length > 0 ){
+          res.json({ success: true, data: result.rows });
+        }else{
+          res.json({ success: false });
+        }
+        
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error fetching posts');
+    }
+  });
+
 
 
 app.post("/admin/dashboard/logout", (req, res, next) => {
@@ -1130,7 +1380,20 @@ app.post("/admin/dashboard/logout", (req, res, next) => {
 //trainer
 //trainer
 // login trainer side
+app.get("/trainer/protectedroute", async (req, res) => {
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'Unauthorized' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(403).json({ success: false, message: 'role is invalid' })
+    }
 
+    res.status(200).json({ success: true, message: "success login" })
+  } catch (error) {
+    res.status(400).json({ success: false, message: "Server error" })
+  }
+})
 
 // this will get all the data in your crediatials after you login 
 app.get("/trainer/dashboard", async (req, res) => {
@@ -1142,8 +1405,16 @@ app.get("/trainer/dashboard", async (req, res) => {
         const TRAINEEcount = await db.query("SELECT * FROM users WHERE role = $1", ['TRAINEE']);
 
         const totalTrainee = TRAINEEcount.rows
+        const userInfo = await db.query("SELECT * FROM users_info WHERE id = $1", [req.user.id])
+       
 
-        res.json({ success: true, user: response.rows[0], totalTrainee: totalTrainee.length, })
+        res.json({ success: true, 
+          user: response.rows[0],
+          userInfo:userInfo.rows[0], 
+          totalTrainee: totalTrainee.length, 
+          color:userInfo.rows[0].color,
+          shade:userInfo.rows[0].shades})
+
       } else {
         return res.json({ success: false, message: 'role is invalid' })
       }
@@ -1158,36 +1429,8 @@ app.get("/trainer/dashboard", async (req, res) => {
 
 
 });
-app.post("/trainer/course/enroll", async (req, res) => {
-
-  try {
-    const { courseId, studentId } = req.body;
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINER") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = `SELECT * FROM users WHERE id = $1`
-    const values = [studentId]
-    const result = await db.query(query, values);
-    if (result.rows.length > 0) {
-      if (result.rows[0].role === 'TRAINER') {
-        res.status(401).json({ success: false, message: 'Access denied. Your user role does not satisfy the enrollment criteria for this course.' })
-      }
-      const query1 = 'INSERT INTO enrollments (course_id, student_id) VALUES ($1, $2) RETURNING *'
-      const values2 = [courseId, studentId]
-      const response = await db.query(query1, values2)
-      res.status(200).json({ success: true, message: 'success enrollment', data: response.rows })
-    } else {
-      res.status(200).json({ success: false, message: 'unsuccess enrollment there ', data: result.rows })
-    }
 
 
-  } catch (error) {
-    res.status(400).json({ success: false, messsage: 'failed enrollment please check', error: error })
-  }
-})
 //create course
 app.post("/trainer/course/createcourse", async (req, res) => {
   const { title, description } = req.body;
@@ -1232,7 +1475,8 @@ app.post("/trainer/course/createcourse", async (req, res) => {
     res.status(400).json({ message: `unable to insert you data:  ${error}`, })
   }
 });
-//fetch the data courses
+
+//fetch the data courses to appear in trainer side this appear where you are assigned to
 app.get("/trainer/course", async (req, res) => {
 
   try {
@@ -1253,9 +1497,108 @@ app.get("/trainer/course", async (req, res) => {
     res.status(400).json({ success: error })
   }
 });
+
+//fetch the data on your course how many enrolled on your course
+app.get("/trainer/:courseId/enrolled", async(req, res)=>{
+  const {courseId} = req.params
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `SELECT * FROM enrollments WHERE course_id = $1`
+    const value = [courseId]
+    const response = await db.query(query,value)
+    res.status(200).json({ success: true, data: response.rows })
+
+  } catch (error) {
+    res.status(400).json({ success: error })
+  }
+})
+//fetching chapters data to appear according to your course
+app.get("/trainer/course/:courseId", async (req, res) => {
+  const { courseId } = req.params
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = 'SELECT * FROM courses JOIN chapters ON courses.id = chapters.course_id WHERE courses.id = $1 ORDER BY order_index ASC'
+    const response = await db.query(query, [courseId]);
+    res.status(200).json({ success: true, data: response.rows, chapterLength: response.rows.length })
+
+  } catch (error) {
+    res.status(400).json({ message: `unable to insert you data:  ${error}`, })
+  }
+})
+
+// fetching the data inside the chapter so if you open or click the course it will appear automatically 
+//course chapters.jsx
+app.get("/trainer/course/:chapterindex/:courseId", async (req, res) => {
+  try {
+    const { chapterindex, courseId } = req.params
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+
+
+    const query1 = `SELECT * FROM chapters 
+      JOIN quizzes
+      ON quizzes.chapter_id = chapters.id
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+    const value1 = [courseId, chapterindex]
+    const quizItems = await db.query(query1, value1)
+
+    const query2 = `SELECT * FROM chapters 
+      JOIN video_items 
+      ON chapters.id = video_items.chapter_id 
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+    const value2 = [courseId, chapterindex]
+    const videoItems = await db.query(query2, value2);
+
+    const query3 = `SELECT *FROM chapters
+      WHERE chapters.course_id = $1 AND chapters.order_index = $2`
+    const value3 = [courseId, chapterindex]
+    const chapterInfo = await db.query(query3, value3);
+
+    console.log(quizItems.rows.length, videoItems.rows.length)
+    if (quizItems.rows.length === 0 && videoItems.rows.length === 0) {
+      return res.json({
+        success: false,
+        message: "No video or quiz added yet.",
+        chapterInfo: chapterInfo.rows,
+        data: {
+          quiz: quizItems.rows,
+          video: videoItems.rows
+        }
+      });
+    }
+    // Success
+    return res.json({
+      success: true,
+      message: "Success gathering your data",
+      chapterInfo: chapterInfo.rows,
+      data: {
+        quiz: quizItems.rows,
+        video: videoItems.rows
+      }
+    });
+
+
+  } catch (error) {
+    res.json({ success: false, messsage: 'there no video or quiz added yet' })
+  }
+});
 //create chapter
 app.post("/trainer/course/addchapter", async (req, res) => {
-  const { course_id, chapter_name, description, chapter_no } = req.body
+  const { courseId, chapterName, description, chapterIndex } = req.body
   try {
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, message: 'unauthorized access' })
@@ -1270,7 +1613,7 @@ app.post("/trainer/course/addchapter", async (req, res) => {
     const time = date.toLocaleTimeString();
     const response = await db.query(
       "INSERT INTO chapters (course_id, title, description, order_index, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING * ",
-      [course_id, chapter_name, description, chapter_no, time]
+      [courseId, chapterName, description, chapterIndex, time]
     )
     res.status(200).json({ success: true, data: response.rows[0] })
 
@@ -1279,24 +1622,7 @@ app.post("/trainer/course/addchapter", async (req, res) => {
     res.status(400).json({ message: `unable to insert you data:  ${error}`, })
   }
 });
-//fetch chapter
-app.post("/trainer/course/chapter", async (req, res) => {
-  const { course_Id } = req.body
-  try {
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, message: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINER") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = 'SELECT * FROM courses JOIN chapters ON courses.id = chapters.course_id WHERE courses.id = $1'
-    const response = await db.query(query, [course_Id]);
-    res.status(200).json({ success: true, data: response.rows, chapterLength: response.rows.length })
 
-  } catch (error) {
-    res.status(400).json({ message: `unable to insert you data:  ${error}`, })
-  }
-})
 //edit the title and description of chapter
 app.put("/trainer/course/editchapter", async (req, res) => {
   try {
@@ -1356,106 +1682,7 @@ app.delete("/trainer/chapter/deletechapter/:chapterId", async (req, res) => {
   }
 })
 
-//certificate upload
-app.post("/trainer/chapter/addcertificate", async (req, res) => {
 
-  try {
-    const { courseId, chapterId } = req.body
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINER") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = `INSERT INTO certificate ( is_certificate,chapter_id,course_id) VALUES ($1, $2, $3) RETURNING*`
-    const value = [true, chapterId, courseId]
-    const result = await db.query(query, value);
-
-    if (result.rows.length === 1) {
-      res.json({ success: true, message: 'success gathering your data', data: result.rows })
-    } else {
-      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
-    }
-
-  } catch (error) {
-    res.json({ success: false, messsage: 'there no video or quiz added yet' })
-  }
-});
-app.post("/trainer/chapter/getcertificate", async (req, res) => {
-
-  try {
-    const { courseId, chapterId } = req.body
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINER") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = `SELECT * FROM certificate WHERE course_id = $1 AND chapter_id = $2`
-    const value = [courseId, chapterId]
-    const result = await db.query(query, value);
-    console.log(result.rows.length)
-    if (result.rows.length > 0) {
-      res.json({ success: true, message: 'success gathering your data', data: result.rows })
-    } else {
-      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
-    }
-
-  } catch (error) {
-    res.json({ success: false, messsage: 'there no video or quiz added yet' })
-  }
-});
-
-
-app.post("/trainer/chapter/mediaitems", async (req, res) => {
-
-  try {
-    const { courseId, chapterId } = req.body
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINER") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = `SELECT * FROM chapters JOIN video_items ON chapters.id = video_items.chapter_id WHERE chapters.course_id = $1 AND video_items.chapter_id = $2`
-    const value = [courseId, chapterId]
-    const result = await db.query(query, value);
-
-    if (result.rows.length === 1) {
-      res.json({ success: true, message: 'success gathering your data', data: result.rows })
-    } else {
-      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
-    }
-
-  } catch (error) {
-    res.json({ success: false, messsage: 'there no video or quiz added yet' })
-  }
-});
-
-// fetching the first data inside the chapter so if you open the course it will appear automatically 
-app.post("/trainer/chapter/chapterfirstitem", async (req, res) => {
-  try {
-    const { courseId } = req.body
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINER") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = `SELECT * FROM chapters JOIN video_items ON chapters.id = video_items.chapter_id WHERE chapters.course_id = $1 AND video_items.order_index = $2`
-    const value = [courseId, 1]
-    const result = await db.query(query, value);
-
-    if (result.rows.length === 1) {
-      res.json({ success: true, message: 'success gathering your data', data: result.rows })
-    } else {
-      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
-    }
-
-  } catch (error) {
-    res.json({ success: false, messsage: 'there no video or quiz added yet' })
-  }
-});
 
 //this upload the video
 app.post("/trainer/chapter/uploadvideo", uploadVideo.single("video"), async (req, res) => {
@@ -1471,11 +1698,8 @@ app.post("/trainer/chapter/uploadvideo", uploadVideo.single("video"), async (req
     if (!req.file) {
       return res.status(400).json({ succes: false, message: "No file uploaded" })
     }
-
-
-
-    const query = 'INSERT INTO video_items ( title, source_url, order_index, required,created_at, course_id, chapter_id , item_type) VALUES ($1, $2, $3, $4, now(), $5, $6, $7) RETURNING*'
-    const values = [title, req.file.path, order_index, false, course_id, chapter_id, 'VIDEO']
+    const query = 'INSERT INTO video_items ( title, source_url, required,created_at, course_id, chapter_id , item_type) VALUES ($1, $2, $3, now(), $4, $5, $6) RETURNING*'
+    const values = [title, req.file.path, false, course_id, chapter_id, 'VIDEO']
     //const response = await db.query("INSERT INTO video_items ( title, item_type, source_url, order_index, required,created_at, course_id, chapter_id) VALUES ('title', 'VIDEO', 'dfasdfasdf', 1, True, now(), 2, 25)")
     const response = await db.query(query, values)
     res.json({ success: true, message: `File received successfully`, data: response })
@@ -1493,11 +1717,11 @@ app.post('/trainer/chapter/upload-image', uploadImage.single('image'), async (re
     if (req.user.role !== "TRAINER") {
       return res.status(401).json({ success: false, message: 'invalid role' })
     }
-    if (!req.file) {
-      return res.status(400).json({ succes: false, message: "No file uploaded" })
+    if (!req.file.path) {
+      return res.status(400).json({ success: false, message: "No file uploaded" })
     }
-    const query = 'INSERT INTO video_items ( title, source_url, order_index, required,created_at, course_id, chapter_id, item_type) VALUES ($1, $2, $3, $4, now(), $5, $6, $7) RETURNING*'
-    const values = [title, req.file.path, order_index, true, course_id, chapter_id, "IMAGE"]
+    const query = 'INSERT INTO video_items ( title, source_url, required,created_at, course_id, chapter_id, item_type) VALUES ($1, $2, $3,now(), $4,  $5, $6) RETURNING*'
+    const values = [title, req.file.path, true, course_id, chapter_id, "IMAGE"]
     const response = await db.query(query, values)
     res.json({ success: true, message: `File received successfully`, data: response.rows })
     console.log(response)
@@ -1505,6 +1729,182 @@ app.post('/trainer/chapter/upload-image', uploadImage.single('image'), async (re
     res.json({ success: false, message: 'Failed Uploading' })
   }
 });
+
+//delete content
+app.delete("/trainer/course/deletecontent", async (req, res) => {
+  try {
+    const { isVideo, isQuiz, isCertificate, videoData, quizData, certificateData } = req.body
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+
+    if (isVideo) {
+      const result = await cloudinary.uploader.destroy(
+        videoData.source_url,
+        { resource_type: "video" } // ← important kapag video
+      );
+      const result1 = await cloudinary.uploader.destroy(
+        videoData.source_url,
+        { resource_type: "image" });
+      const result2 = await db.query('DELETE FROM video_items WHERE id = $1', [videoData.id])
+    }
+
+    if (isQuiz) {
+
+      const result1 = await db.query('DELETE FROM quizzes WHERE id = $1', [quizData[0].quiz_id])
+    }
+
+    if(isCertificate){
+      const certificate = await db.query(`DELETE FROM certificate WHERE id = $1`, [certificateData[0].id])
+    }
+    console.log(isVideo, isQuiz,isCertificate, quizData, videoData, certificateData)
+    res.json({ success: true })
+  } catch (error) {
+    res.json({ success: false, message: error })
+  }
+});
+//comments in the video 
+app.get("/trainer/:videoId/comments", async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+
+    const result = await db.query(
+      `SELECT 
+        comments.id,
+        comments.video_item_id,
+        comments.user_id,
+        comments.content,
+        comments.created_at,
+        users_info.first_name,
+        users_info.surname
+      FROM comments
+      JOIN users_info 
+      ON users_info.id = comments.user_id
+      WHERE comments.video_item_id = $1
+      ORDER BY comments.created_at DESC`,
+      [videoId]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({ success: true, message: 'there is a comment', data: result.rows, userId: req.user.id });
+    } else {
+      res.json({ success: false, message: 'there is no comment yet', data: result.rows });
+    }
+
+  } catch (error) {
+    res.json(error)
+  }
+
+});
+app.post("/trainer/:videoId/comments", async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const { content } = req.body;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `INSERT INTO comments (video_item_id, user_id, content)
+      VALUES ($1, $2, $3)
+      RETURNING *`,
+      [videoId, req.user.id, content]
+    );
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    req.json(error)
+  }
+
+});
+app.post("/trainer/deletecomment", async (req, res) => {
+  try {
+    const { commentId } = req.body;
+
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, message: "unauthorized access" });
+    }
+
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: "invalid role" });
+    }
+
+    const result = await db.query(
+      `DELETE FROM comments
+       WHERE id = $1
+       RETURNING *`,
+      [commentId]
+    );
+
+    res.json({ success: true, deleted: result.rows[0] });
+  } catch (error) {
+    res.json({ success: false, error });
+  }
+});
+
+app.get("/trainer/:commentsId/reply", async(req, res)=>{
+  try {
+    const {commentsId} = req.params;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `SELECT 
+        replies.id,
+        replies.comments_id,
+        replies.user_id,
+        replies.content,
+        replies.created_at,
+        users_info.first_name,
+        users_info.surname
+      FROM replies
+      JOIN users_info 
+      ON users_info.id = replies.user_id
+      WHERE replies.comments_id = $1
+      ORDER BY replies.created_at DESC`,
+      [commentsId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    res.json({ success: false, error });
+  }
+})
+app.post("/trainer/:commentsId/reply", async (req, res) => {
+  try {
+    const { commentsId } = req.params;
+    const { content  } = req.body;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `INSERT INTO replies (comments_id, content, created_at, user_id)
+      VALUES ($1, $2,now(), $3)
+      RETURNING *`, 
+      [commentsId, content, req.user.id])
+
+     res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    req.json(error)
+  }
+});
+
 //to create a quiz
 app.post("/trainer/chapter/createquiz", async (req, res) => {
   const { chapter_id, title, questions } = req.body;
@@ -1593,126 +1993,115 @@ app.delete("trainer/chapter/deletequiz", async (req, res) => {
     res.status(400).json({ success: false, message: `there is a error in query section ${error}` })
   }
 });
-// deleting cotent inside the 
-app.delete("/trainer/course/deletecontent", async (req, res) => {
+
+// this part is for getting the chapteritems to retrieve the video
+app.post("/trainer/chapter/mediaitems", async (req, res) => {
+
   try {
-    const { isVideo, isQuiz, videoData, quizData } = req.body
+    const { courseId, chapterId } = req.body
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
     if (req.user.role !== "TRAINER") {
-      return res.status(401).json({ success: false, message: 'invalid role' })
+      res.status(401).json({ success: false, message: 'invalid role' })
     }
+    const query = `SELECT * FROM chapters JOIN video_items ON chapters.id = video_items.chapter_id WHERE chapters.course_id = $1 AND video_items.chapter_id = $2`
+    const value = [courseId, chapterId]
+    const result = await db.query(query, value);
 
-    if (isVideo) {
-      const result = await cloudinary.uploader.destroy(
-        videoData.source_url,
-        { resource_type: "video" } // ← important kapag video
-      );
-      const result1 = await cloudinary.uploader.destroy(
-        videoData.source_url,
-        { resource_type: "image" });
-      const result2 = await db.query('DELETE FROM video_items WHERE id = $1', [videoData.id])
-    }
-
-    if (isQuiz) {
-
-      const result1 = await db.query('DELETE FROM quizzes WHERE id = $1', [quizData[0].quiz_id])
-    }
-    console.log(isVideo, isQuiz, quizData, videoData)
-    res.json({ success: true })
-  } catch (error) {
-    res.json({ success: false, message: error })
-  }
-});
-
-//comments in the video 
-app.get("/trainer/:videoId/comments", async (req, res) => {
-  try {
-    const { videoId } = req.params;
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINER") {
-      return res.status(401).json({ success: false, message: 'invalid role' })
-    }
-
-    const result = await db.query(
-      `SELECT 
-        comments.id,
-        comments.video_item_id,
-        comments.user_id,
-        comments.content,
-        comments.created_at,
-        users_info.first_name,
-        users_info.surname
-      FROM comments
-      JOIN users_info 
-      ON users_info.id = comments.user_id
-      WHERE comments.video_item_id = $1
-      ORDER BY comments.created_at DESC`,
-      [videoId]
-    );
-
-    if (result.rows.length < 0) {
-      res.json({ success: true, message: 'there is a comment', data: result.rows });
+    if (result.rows.length === 1) {
+      res.json({ success: true, message: 'success gathering your data', data: result.rows })
     } else {
-      res.json({ success: false, message: 'there is no comment yet', data: result.rows });
+      res.json({ success: false, messsage: 'there no video added yet', data: result.rows })
     }
 
   } catch (error) {
-    res.json(error)
+    res.json({ success: false, messsage: 'there no video or quiz added yet' })
   }
-
 });
-app.post("/trainer/:videoId/comments", async (req, res) => {
+
+//certificate upload
+app.post("/trainer/chapter/addcertificate", async (req, res) => {
+
   try {
-    const { videoId } = req.params;
-    const { content } = req.body;
+    const { courseId, chapterId, title } = req.body
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
     if (req.user.role !== "TRAINER") {
-      return res.status(401).json({ success: false, message: 'invalid role' })
+      res.status(401).json({ success: false, message: 'invalid role' })
     }
-    const result = await db.query(
-      `INSERT INTO comments (video_item_id, user_id, content)
-      VALUES ($1, $2, $3)
-      RETURNING *`,
-      [videoId, req.user.id, content]
-    );
+    const query = `INSERT INTO certificate ( is_certificate,chapter_id,course_id, title) VALUES ($1, $2, $3, $4) RETURNING*`
+    const value = [true, chapterId, courseId, title]
+    const result = await db.query(query, value);
 
-    res.json(result.rows[0]);
+    if (result.rows.length === 1) {
+      res.json({ success: true, message: 'success gathering your data', data: result.rows })
+    } else {
+      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
+    }
+
   } catch (error) {
-    req.json(error)
+    res.json({ success: false, messsage: 'there no video or quiz added yet' })
   }
-
 });
-app.post("/trainer/video/deletecomment", async (req, res) => {
+app.get("/trainer/:courseId/:chapterId/getcertificate", async (req, res) => {
+
   try {
-    const { commentId } = req.body;
-
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ success: false, message: "unauthorized access" });
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
-
     if (req.user.role !== "TRAINER") {
-      return res.status(401).json({ success: false, message: "invalid role" });
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `SELECT * FROM certificate WHERE course_id = $1 AND chapter_id = $2`
+    const value = [courseId, chapterId]
+    const result = await db.query(query, value);
+    console.log(result.rows.length)
+    if (result.rows.length > 0) {
+      res.json({ success: true, message: 'success gathering your data', data: result.rows })
+    } else {
+      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
     }
 
-    const result = await db.query(
-      `DELETE FROM comments
-       WHERE id = $1
-       RETURNING *`,
-      [commentId]
-    );
-
-    res.json({ success: true, deleted: result.rows[0] });
   } catch (error) {
-    res.json({ success: false, error });
+    res.json({ success: false, messsage: 'there no video or quiz added yet' })
   }
 });
 
+
+//enrol
+app.post("/trainer/course/enroll", async (req, res) => {
+
+  try {
+    const { courseId, studentId } = req.body;
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `SELECT * FROM users WHERE id = $1`
+    const values = [studentId]
+    const result = await db.query(query, values);
+    if (result.rows.length > 0) {
+      if (result.rows[0].role === 'TRAINER') {
+        res.status(401).json({ success: false, message: 'Access denied. Your user role does not satisfy the enrollment criteria for this course.' })
+      }
+      const query1 = 'INSERT INTO enrollments (course_id, student_id) VALUES ($1, $2) RETURNING *'
+      const values2 = [courseId, studentId]
+      const response = await db.query(query1, values2)
+      res.status(200).json({ success: true, message: 'success enrollment', data: response.rows })
+    } else {
+      res.status(200).json({ success: false, message: 'unsuccess enrollment there ', data: result.rows })
+    }
+
+
+  } catch (error) {
+    res.status(400).json({ success: false, messsage: 'failed enrollment please check', error: error })
+  }
+})
 
 //calendar todo list 
 app.post("/trainer/calendar/events", async (req, res) => {
@@ -1805,9 +2194,9 @@ app.post('/trainer/course/traineeprogress', async (req, res) => {
   }
 });
 //video progress
-app.post('/trainer/course/traineevideoprogress', async (req, res) => {
+app.get('/trainer/:courseId/:chapterId/traineevideoprogress', async (req, res) => {
   try {
-    const { course_id, chapter_id } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -1827,16 +2216,16 @@ app.post('/trainer/course/traineevideoprogress', async (req, res) => {
       AND video_progress.course_id = $1
       AND video_progress.chapter_id = $2
     WHERE enrollments.course_id = $1
-    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    ORDER BY users_info.surname ASC;`, [courseId, chapterId])
     res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
   } catch (error) {
     res.status(400).json({ success: false, message: 'error query' })
   }
 });
 //quizprogress
-app.post('/trainer/course/traineequizprogress', async (req, res) => {
+app.get('/trainer/:courseId/:chapterId/traineequizprogress', async (req, res) => {
   try {
-    const { course_id, chapter_id } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -1857,11 +2246,11 @@ app.post('/trainer/course/traineequizprogress', async (req, res) => {
           ON quiz_progress.user_id = enrollments.student_id 
           AND quiz_progress.chapter_id = $1
         WHERE enrollments.course_id = $2
-        ORDER BY users_info.surname ASC;`, [chapter_id, course_id])
+        ORDER BY users_info.surname ASC;`, [chapterId, courseId])
     const quizLength = await db.query(`SELECT * FROM quizzes
       JOIN questions
       ON questions.quiz_id = quizzes.id
-      WHERE quizzes.chapter_id = $1`, [chapter_id])
+      WHERE quizzes.chapter_id = $1`, [chapterId])
 
     res.status(200).json({ success: true, message: 'succesful query', data: result.rows, quizLength: quizLength.rows.length })
   } catch (error) {
@@ -1869,9 +2258,9 @@ app.post('/trainer/course/traineequizprogress', async (req, res) => {
   }
 });
 //iamgeprogress
-app.post('/trainer/course/traineeimageprogress', async (req, res) => {
+app.get('/trainer/:courseId/:chapterId/traineeimageprogress', async (req, res) => {
   try {
-    const { course_id, chapter_id } = req.body
+    const { courseId, chapterId } = req.params
     if (!req.isAuthenticated()) {
       res.status(401).json({ success: false, messsage: 'unauthorized access' })
     }
@@ -1891,7 +2280,7 @@ app.post('/trainer/course/traineeimageprogress', async (req, res) => {
       AND image_progress.course_id = $1
       AND image_progress.chapter_id = $2
     WHERE enrollments.course_id = $1
-    ORDER BY users_info.surname ASC;`, [course_id, chapter_id])
+    ORDER BY users_info.surname ASC;`, [courseId, chapterId])
     res.status(200).json({ success: true, message: 'succesful query', data: result.rows })
   } catch (error) {
     res.status(400).json({ success: false, message: 'error query' })
@@ -1961,6 +2350,8 @@ app.post('/trainer/:course/excelrender', async (req, res) => {
 })
 
 
+
+
 //log out trainer side
 app.post("/trainer/dashboard/logout", (req, res, next) => {
 
@@ -1996,8 +2387,9 @@ app.post("/trainer/dashboard/logout", (req, res, next) => {
 //login for trainee
 app.post("/trainee/login", passport.authenticate('local'), (req, res) => {
   try {
+    
     if (req.user.role === "TRAINEE") {
-      res.json({ success: true, redirectTo: "/trainee/dashboard" })
+      res.json({ success: true, redirectTo: "/trainee/dashboard" , user: req.user.username})
     } else {
       res.json({ success: false, message: "role is invalid" })
     }
@@ -2006,31 +2398,7 @@ app.post("/trainee/login", passport.authenticate('local'), (req, res) => {
   }
 
 })
-//certificate fetch 
-app.get("/trainee/:courseId/:chapterId/getcertificate", async (req, res) => {
 
-  try {
-    const { courseId, chapterId } = req.params
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ success: false, messsage: 'unauthorized access' })
-    }
-    if (req.user.role !== "TRAINEE") {
-      res.status(401).json({ success: false, message: 'invalid role' })
-    }
-    const query = `SELECT * FROM certificate WHERE course_id = $1 AND chapter_id = $2`
-    const value = [courseId, chapterId]
-    const result = await db.query(query, value);
-    console.log(result.rows.length)
-    if (result.rows.length > 0) {
-      res.json({ success: true, message: 'success gathering your data', data: result.rows })
-    } else {
-      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
-    }
-
-  } catch (error) {
-    res.json({ success: false, messsage: 'there no video or quiz added yet' })
-  }
-});
 
 
 // //getting a certain data of users
@@ -2040,8 +2408,8 @@ app.get("/trainee/dashboard", async (req, res) => {
     if (req.isAuthenticated()) {
       if (req.user.role === "TRAINEE") {
         const response = await db.query("SELECT role, username, users.id, first_name, surname FROM users JOIN users_info ON users.id = users_info.id WHERE username = $1", [req.user.username])
-
-        res.json({ success: true, data: response.rows[0] })
+        const userInfo = await db.query("SELECT * FROM users_info WHERE id = $1", [req.user.id])
+        res.json({ success: true, data: response.rows[0], usersInfo:userInfo.rows, user: req.user.username })
       } else {
         return res.json({ success: false, message: 'role is invalid' })
       }
@@ -2159,9 +2527,34 @@ app.get("/trainee/course/:chapterindex/:courseId", async (req, res) => {
   }
 });
 
+//certificate fetch 
+app.get("/trainee/course/:courseId/:chapterId/getcertificate", async (req, res) => {
+
+  try {
+    const { courseId, chapterId } = req.params
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const query = `SELECT * FROM certificate WHERE course_id = $1 AND chapter_id = $2`
+    const value = [courseId, chapterId]
+    const result = await db.query(query, value);
+    console.log(result.rows.length)
+    if (result.rows.length > 0) {
+      res.json({ success: true, message: 'success gathering your data', data: result.rows })
+    } else {
+      res.json({ success: false, messsage: 'there no video or quiz added yet', data: result.rows })
+    }
+
+  } catch (error) {
+    res.json({ success: false, messsage: 'there no video or quiz added yet' })
+  }
+});
 
 // fetch the first item
-app.post("/trainee/chapter/mediaitems", async (req, res) => {
+app.post("/trainee/course/chapter/mediaitems", async (req, res) => {
 
   try {
     const { courseId, chapterId } = req.body
@@ -2187,7 +2580,7 @@ app.post("/trainee/chapter/mediaitems", async (req, res) => {
 });
 
 // fetching the first data inside the chapter so if you open the course it will appear automatically 
-app.post("/trainee/chapter/chapterfirstitem", async (req, res) => {
+app.post("/trainee/course/chapter/chapterfirstitem", async (req, res) => {
   try {
     const { courseId } = req.body
     if (!req.isAuthenticated()) {
@@ -2211,7 +2604,7 @@ app.post("/trainee/chapter/chapterfirstitem", async (req, res) => {
   }
 });
 // fetch the quiz questions
-app.post("/trainee/chapter/quiz", async (req, res) => {
+app.post("/trainee/course/chapter/quiz", async (req, res) => {
   const { chapterId } = req.body;
   try {
     if (!req.isAuthenticated()) {
@@ -2310,11 +2703,20 @@ app.post("/trainee/quiz/quizprogress", async (req, res) => {
       [chapter_id, req.user.id]   // use logged-in user
     );
 
-    res.status(200).json({
+    
+    if(result.rows.length > 0 ){
+      res.status(200).json({
       success: true,
       message: 'quiz progress fetched',
       data: result.rows
     });
+    }else{
+      res.status(200).json({
+      success: false,
+      message: 'there is no progress yet',
+      data: result.rows
+    });
+    }
 
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -2760,6 +3162,391 @@ app.post("/trainee/dashboard/logout", (req, res, next) => {
 
 
 
+//mmessage features on all role
+// Create chat between 2 users
+//admmin chats
+app.post("/admin/addContact", async (req, res) => {
+  const { user1_id, user2_id } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    
+    const checkContacts2 = await db.query(`
+      SELECT * FROM chats
+      WHERE chats.user1_id = $1 AND chats.user2_id = $2;`, 
+      [req.user.id, user2_id])
+    
+    if (checkContacts2.rows.length > 0){
+      console.log('you already contact this person', checkContacts2.rows.length)
+      return res.json({success:false, message: 'The contact person has already been added.'});
+    }else{
+      console.log('not contacted')
+      const chat = await db.query(
+        `INSERT INTO chats (user1_id, user2_id)
+        VALUES ($1, $2)
+        RETURNING *`,
+        [req.user.id, user2_id]
+      );
+      return res.json({success:true, data:chat.rows[0]});
+    }
+
+    
+
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all chats of a user
+app.get("/admin/chats", async (req, res) => {
+  
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const chats = await db.query(
+      `SELECT
+          chats.*,
+          users_info.first_name AS user1_firstname,
+          users_info.surname AS user1_surname,
+          users_info_1.first_name AS user2_firstname,
+          users_info_1.surname AS user2_surname
+      FROM chats
+      JOIN users_info 
+          ON users_info.id = chats.user1_id
+      JOIN users_info AS users_info_1 
+          ON users_info_1.id = chats.user2_id
+      WHERE chats.user1_id = $1 OR chats.user2_id = $1;`,
+      [req.user.id]
+    );
+
+    res.json(chats.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Send message
+app.post("/admin/sendMessage", async (req, res) => {
+  const { chat_id, sender_id, message } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const msg = await db.query(
+      `INSERT INTO messages (chat_id, sender_id, message)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [chat_id, req.user.id, message]
+    );
+    io.to(`chat_${chat_id}`).emit("receive_message", msg.rows[0]);
+    res.json(msg.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get messages by chat
+app.get("/admin/:chatId", async (req, res) => {
+  const { chatId } = req.params;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const messages = await db.query(
+      `SELECT 
+         m.id,
+         u.first_name,
+         m.message,
+         m.created_at
+       FROM messages m
+       JOIN users_info AS u ON m.sender_id = u.id
+       WHERE m.chat_id = $1
+       ORDER BY m.created_at ASC`,
+      [chatId]
+    );
+
+    res.json({success:true , data:messages.rows});
+  } catch (err) {
+    res.status(500).json({success:false, error: err.message });
+  }
+});
+
+//trainer chats
+app.post("/trainer/addContact", async (req, res) => {
+  const { user1_id, user2_id } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const checkContacts2 = await db.query(`
+      SELECT * FROM chats
+      WHERE chats.user1_id = $1 AND chats.user2_id = $2;`, 
+      [req.user.id, user2_id])
+    
+    if (checkContacts2.rows.length > 0){
+      console.log('you already contact this person', checkContacts2.rows.length)
+      return res.json({success:false, message: 'The contact person has already been added.'});
+    }else{
+      console.log('not contacted')
+      const chat = await db.query(
+        `INSERT INTO chats (user1_id, user2_id)
+        VALUES ($1, $2)
+        RETURNING *`,
+        [req.user.id, user2_id]
+      );
+      return res.json({success:true, data:chat.rows[0]});
+    }
+
+    res.json(chat.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all chats of a user
+app.get("/trainer/chats", async (req, res) => {
+  
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const chats = await db.query(
+      `SELECT
+          chats.*,
+          users_info.first_name AS user1_firstname,
+          users_info.surname AS user1_surname,
+          users_info_1.first_name AS user2_firstname,
+          users_info_1.surname AS user2_surname
+      FROM chats
+      JOIN users_info 
+          ON users_info.id = chats.user1_id
+      JOIN users_info AS users_info_1 
+          ON users_info_1.id = chats.user2_id
+      WHERE chats.user1_id = $1 OR chats.user2_id = $1;`,
+      [req.user.id]
+    );
+
+    res.json(chats.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Send message
+app.post("/trainer/sendMessage", async (req, res) => {
+  const { chat_id, sender_id, message } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const msg = await db.query(
+      `INSERT INTO messages (chat_id, sender_id, message)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [chat_id, req.user.id, message]
+    );
+    io.to(`chat_${chat_id}`).emit("receive_message", msg.rows[0]);
+    res.json(msg.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get messages by chat
+app.get("/trainer/:chatId", async (req, res) => {
+  const { chatId } = req.params;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const messages = await db.query(
+      `SELECT 
+         m.id,
+         u.first_name,
+         m.message,
+         m.created_at
+       FROM messages m
+       JOIN users_info AS u ON m.sender_id = u.id
+       WHERE m.chat_id = $1
+       ORDER BY m.created_at ASC`,
+      [chatId]
+    );
+
+    res.json(messages.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+//trainee chats 
+app.post("/trainee/addContact", async (req, res) => {
+  const { user1_id, user2_id } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+
+    if(req.user.id === user2_id){
+      return res.json({success:false, message: 'forbidden '});
+    }
+    const checkContacts2 = await db.query(`
+      SELECT * FROM chats
+      WHERE chats.user1_id = $1 AND chats.user2_id = $2;`, 
+      [req.user.id , user2_id])
+    
+    if (checkContacts2.rows.length > 0){
+      console.log('you already contact this person', checkContacts2.rows.length)
+      return res.json({success:false, message: 'The contact person has already been added.'});
+    }else{
+      console.log('not contacted')
+      const chat = await db.query(
+        `INSERT INTO chats (user1_id, user2_id)
+        VALUES ($1, $2)
+        RETURNING *`,
+        [req.user.id, user2_id]
+      );
+      return res.json({success:true, data:chat.rows[0]});
+    }
+
+
+    res.json(chat.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all chats of a user
+app.get("/trainee/chats", async (req, res) => {
+  
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const chats = await db.query(
+      `SELECT
+          chats.*,
+          users_info.first_name AS user1_firstname,
+          users_info.surname AS user1_surname,
+          users_info_1.first_name AS user2_firstname,
+          users_info_1.surname AS user2_surname
+      FROM chats
+      JOIN users_info 
+          ON users_info.id = chats.user1_id
+      JOIN users_info AS users_info_1 
+          ON users_info_1.id = chats.user2_id
+      WHERE chats.user1_id = $1 OR chats.user2_id = $1;`,
+      [req.user.id]
+    );
+
+    res.json(chats.rows);
+
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Send message
+app.post("/trainee/sendMessage", async (req, res) => {
+  const { chat_id, sender_id, message } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const msg = await db.query(
+      `INSERT INTO messages (chat_id, sender_id, message)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [chat_id, req.user.id, message]
+    );
+    io.to(`chat_${chat_id}`).emit("receive_message", msg.rows[0]);
+    res.json(msg.rows[0]);
+  } catch (err) {
+    res.status(500).json({success:false, error: err.message });
+  }
+});
+
+// Get messages by chat
+app.get("/trainee/:chatId", async (req, res) => {
+  const { chatId } = req.params;
+
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ success: false, message: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const messages = await db.query(
+      `SELECT 
+         m.id,
+         u.first_name,
+         m.message,
+         m.created_at
+       FROM messages m
+       JOIN users_info AS u ON m.sender_id = u.id
+       WHERE m.chat_id = $1
+       ORDER BY m.created_at ASC`,
+      [chatId]
+    );
+
+    res.json({success:true , data:messages.rows});
+  } catch (err) {
+    res.status(500).json({success:false , error: err.message });
+  }
+});
+
+
+
 
 
 
@@ -2805,6 +3592,10 @@ passport.deserializeUser((user, cb) => {
 
 });
 
-app.listen(port, () => {
+
+
+
+
+server.listen(port, () => {
   console.log(`now listening in port :${port} http://localhost:${port}`)
 })

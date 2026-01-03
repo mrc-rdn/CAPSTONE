@@ -13,6 +13,8 @@ import AddTraineeModal from './components/UI/modal/AddTraineeModal.jsx'
 import TraineeProgressModal from "./components/UI/modal/TraineeProgressModal.jsx"
 import Certificate from "./components/UI/Certificate.jsx"
 import DeleteContent from './components/UI/DeleteContent.jsx'
+import AnnouncementModal from './components/UI/modal/AnnouncementModal.jsx'
+import TextPresenter from './components/UI/TextPresenter.jsx'
 
 
 
@@ -30,10 +32,14 @@ export default function CourseOverview() {
     const [isVideo, setIsVideo] = useState(false);
     const [isQuiz, setIsQuiz] = useState(false);
     const [isCertificate, setIsCertificate] = useState(false)
+    const [isText, setIstext] = useState(false)
     const [quizData, setQuizData] = useState([])
     const [videoData, setVideoData] = useState([])
     const [certificateData, setCertificateData] = useState([])
+    const [textData, setTextData] = useState([])
     const [isEditChapter, setIsEditChapterModal] = useState(false)
+    const [isAnnounceModalOpen, setIsAnnouncementModalOpen ] = useState(false)
+    
 
     const handleOpenChapterAddModal = async()=>{
       setIsChapterModal(true) 
@@ -56,6 +62,12 @@ export default function CourseOverview() {
     const handleExitTraineeProgressModal = () =>{
       setIsTraineeProgressModal(false)
     }
+    const handleOpenAnnouncementModal = () =>{
+      setIsAnnouncementModalOpen(true)
+    }
+    const handleExitAnnouncementModal = () =>{
+      setIsAnnouncementModalOpen(false)
+    }
 
     function handleRefresh(){
       setRefresh(prev => prev + 1)
@@ -69,19 +81,22 @@ export default function CourseOverview() {
     const handleChaptersInfo = async(chaptersId, chapterIndex , isEditChapter)=>{
       setIsEditChapterModal(isEditChapter)
        try {
-          const [video, quiz, certificate] = await Promise.all([
+          const [video, quiz, certificate, text] = await Promise.all([
           axios.post(`${API_URL}/admin/chapter/mediaitems`, {courseId: id, chapterId: chaptersId  }, {withCredentials: true}),
           axios.post(`${API_URL}/admin/chapter/quiz`, {chapterId: chaptersId  }, {withCredentials: true}),
-          axios.get(`${API_URL}/admin/${id}/${chaptersId}/getcertificate`, {withCredentials:true})
+          axios.get(`${API_URL}/admin/${id}/${chaptersId}/getcertificate`, {withCredentials:true}),
+          axios.get(`${API_URL}/admin/posts/${id}/${chaptersId}`, {withCredentials:true})
+
 
         ])
-       
+       console.log(text.data.data)
           
           if(quiz.data.success){
             setIsQuiz(true) 
             setIsVideo(false)
             setIsLessonUploaded(false)
             setIsCertificate(false)
+            setIstext(false)
             setQuizData(quiz.data.data)
             
           } else if(video.data.success){
@@ -89,6 +104,7 @@ export default function CourseOverview() {
             setIsQuiz(false) 
             setIsLessonUploaded(false)
             setIsCertificate(false)
+            setIstext(false)
             setVideoData(video.data.data[0])
             
           }else if (certificate.data.success){
@@ -96,11 +112,20 @@ export default function CourseOverview() {
             setIsQuiz(false) 
             setIsCertificate(true)
             setIsLessonUploaded(false)
+            setIstext(false)
             setCertificateData(certificate.data.data)
+          }else if(text.data.success){
+            setIsVideo(false)
+            setIsQuiz(false) 
+            setIsCertificate(false)
+            setIsLessonUploaded(false)
+            setIstext(true)
+            setTextData(text.data.data)
           }else{
             setIsQuiz(false)
             setIsVideo(false)
             setIsCertificate(false)
+            setIstext(false)
             setIsLessonUploaded(true)
           }
           
@@ -116,7 +141,7 @@ export default function CourseOverview() {
   return (
     <div className='w-screen h-screen'>
         <div className='h-1/12'>
-          <Header courseTitle={courseTitle}  handleOpenChapterAddModal={handleOpenChapterAddModal} handleOpenAddTraineeModal={handleOpenAddTraineeModal} handleOpenTrianeeProgressModal={handleOpenTraineeProgress} />
+          <Header courseTitle={courseTitle} handleOpenAnnouncementModal={handleOpenAnnouncementModal}  handleOpenChapterAddModal={handleOpenChapterAddModal} handleOpenAddTraineeModal={handleOpenAddTraineeModal} handleOpenTrianeeProgressModal={handleOpenTraineeProgress} />
         </div>
         
         <div className='h-11/12 w-full flex'>
@@ -126,8 +151,9 @@ export default function CourseOverview() {
             {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoData.id} videoData={videoData}  />:null}
             {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData} />:null}
             {isCertificate? <Certificate courseId={id} certificateData={certificateData} />: null}
+            {isText? <TextPresenter data={textData} />:null}
             {isEditChapter
-            ? (isLesson ? null : <DeleteContent isQuiz={isQuiz} isVideo={isVideo} isCertificate={isCertificate} videoData={videoData}  quizData={quizData} certificateData={certificateData}  onRefresh={handleRefresh}/>)
+            ? (isLesson ? null : <DeleteContent isQuiz={isQuiz} isVideo={isVideo} isCertificate={isCertificate} isText={isText} videoData={videoData}  quizData={quizData} certificateData={certificateData} textData={textData}  onRefresh={handleRefresh}/>)
             : null}
 
             {isLesson? <CourseAddContent onRefresh={handleRefresh} chapterInfo={chapterInfo} courseId={id} />: null}
@@ -140,6 +166,7 @@ export default function CourseOverview() {
         {isTraineeProgressModal?<TraineeProgressModal   onExit={handleExitTraineeProgressModal} courseId={id}  /> :null}
         {isAddTraineeModal?<AddTraineeModal onExit={handleExitaddTraineeModal}  courseId={id}/>: null}
         {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} courseId={id} chapterlength1={chapterLength}/>: null}
+        {isAnnounceModalOpen?<AnnouncementModal onExit={handleExitAnnouncementModal} courseId={id} />:null}
     </div>
 
   )

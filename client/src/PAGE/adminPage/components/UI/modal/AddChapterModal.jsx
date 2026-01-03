@@ -39,7 +39,7 @@ export default function AddChapterModal(props) {
 
 
   return (
-    <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex items-center justify-center '>
+    <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex items-center justify-center z-100'>
       <div className='w-130 h-90 bg-white p-3 rounded'>
 
 

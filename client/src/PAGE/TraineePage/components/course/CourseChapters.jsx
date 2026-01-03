@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Chapter from './Chapter.jsx'
 import { API_URL } from '../../../../api.js';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function CourseChapters(props) {
   const [isEditChapter, setEditChapter] = useState(false);
@@ -93,13 +94,16 @@ export default function CourseChapters(props) {
 
   return (
     
-      <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative">
+      <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative shadow-lg">
             
             <div className="h-10 w-full bg-white flex items-center sticky top-0">
-              <h1 className="text-large ml-3 font-bold ">Course content</h1>
-              
+              <h1 className="text-xs  ml-3 font-bold lg:text-sm  ">Course content</h1>
+              <button className='ml-auto p-3 lg:hidden'
+                onClick={()=>props.handleExitChapters()}
+              >
+                <CloseIcon  />
+              </button>
             </div>
-            
             
             <div>
               {fetchChapters.map((item, index) => (

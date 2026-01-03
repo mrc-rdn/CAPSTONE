@@ -8,6 +8,7 @@ import QuizList from './components/UI/QuizList.jsx'
 import MediaPlayer from './components/UI/MediaPlayer.jsx'
 import ImagePlayer from './components/Ui/ImagePlayer.jsx'
 import Certificate from './components/Ui/Certificate.jsx'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 
 
@@ -31,6 +32,8 @@ export default function CourseOverview() {
     const [lock, setunlock] = useState(false)
     const [chapterIndex, setChapterIndex] = useState()
 
+    const [isOpenChapters, setIsOpenChapters] = useState(false)
+
     function handleRefresh(){
        setRefresh(prev => prev + 1)
        
@@ -43,9 +46,9 @@ export default function CourseOverview() {
         setChapterIndex(chapterIndex)
        try {
           const [video, quiz, certificate, progress] = await Promise.all([
-          axios.post(`${API_URL}/trainee/chapter/mediaitems`, {courseId: id, chapterId: chaptersId  }, {withCredentials: true}),
-          axios.post(`${API_URL}/trainee/chapter/quiz`, {chapterId: chaptersId  }, {withCredentials: true}),
-          axios.get(`${API_URL}/trainee/${id}/${chaptersId}/getcertificate`, {withCredentials:true}),
+          axios.post(`${API_URL}/trainee/course/chapter/mediaitems`, {courseId: id, chapterId: chaptersId  }, {withCredentials: true}),
+          axios.post(`${API_URL}/trainee/course/chapter/quiz`, {chapterId: chaptersId  }, {withCredentials: true}),
+          axios.get(`${API_URL}/trainee/course/${id}/${chaptersId}/getcertificate`, {withCredentials:true}),
          
         ])
        
@@ -83,27 +86,40 @@ export default function CourseOverview() {
       setChapterInfo({chapterId: chaptersId, chapterIndex: chapterIndex})
     }
 
-    console.log(lock)
+    const handleOpenChapters = ()=>{
+      setIsOpenChapters(true)
+    }
+    const handleExitChapters = ()=>{
+      console.log('hello')
+      setIsOpenChapters(false)
+    }
   return (
     <div className='w-screen h-screen'>
-        <div className='h-1/12'>
+        <div className='h-13 lg:h-1/12'>
           <Header courseTitle={courseTitle}   />
         </div>
         
-        <div className='h-11/12 w-full flex'>
-          <div className='w-full h-full'>
+        <div className=' md:h-11/12 w-full h-full flex '>
+          <div className='w-full h-full '>
             {isQuiz?<QuizList quizData={quizData} courseId={id} /> : null }
             {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoData.id} videoData={videoData}  />:null}
             {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData} courseId={id} chapterId={chapterId} />:null}
             {isCertificate? <Certificate courseId={id} certificateData={certificateData} />: null}
 
-            {isLesson?<div className='w-full'> <p>there is no content</p> </div> : null}
-            {lock || chapterIndex === 1 ? null: <div className='absolute inset-0 z-100 bg-gray-500/40 w-full h-full flex justify-center items-center'><p>lock</p></div>}
-          </div>
+            {isLesson?<div className='w-full h-full flex justify-center items-center'> <p> No Content </p> </div> : null}
             
-          <div className='w-4/12 h-full'>
-            <CourseChapters  courseId={id} refresh={refresh} handleChaptersInfo={handleChaptersInfo} />
           </div>
+          
+          {isOpenChapters?null:<button className="p-1 bg-green-700 lg:hidden fixed right-0 top-20 z-50 "
+          onClick={handleOpenChapters}>
+            <ArrowBackIosNewIcon sx={{fontSize: 15}} />
+          </button>}
+          
+          <div className={isOpenChapters?`  w-10/12 h-full absolute right-0 z-100 `:`hidden lg:block lg:w-4/12 h-full`}>
+            <CourseChapters  courseId={id} refresh={refresh} handleChaptersInfo={handleChaptersInfo} handleExitChapters={handleExitChapters} />
+          </div>
+
+         
             
         </div>
        

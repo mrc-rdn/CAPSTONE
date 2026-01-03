@@ -1,7 +1,7 @@
 import React,{useState, useEffect} from 'react'
 import { Navigate } from 'react-router-dom'
 import axios from "axios"
-import { API_URL } from '../../../../api.js'
+import { API_URL } from '../../../../api'
 
 
 export default function ProtectedRoute({children}) {
@@ -11,7 +11,9 @@ export default function ProtectedRoute({children}) {
         async function fetchAuth(){
             try {
                 const res = await axios.get(`${API_URL}/trainee/dashboard`, {withCredentials: true}) 
+                console.log(res.data.success)
                 setAuth(res.data.success)
+                
             } catch (error) {
                 setAuth(false)
             }

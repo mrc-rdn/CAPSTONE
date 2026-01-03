@@ -69,8 +69,8 @@ function Comments({ videoId }) {
     
   return (
     <div className=" w-full h-full relative">
-      <h3 className="text-lg font-bold mb-3">
-       {comments.length} Comments
+      <h3 className="text-sm font-bold mb-3">
+       {comments.length} Comment
       </h3>
 
       {/* Input Section */}

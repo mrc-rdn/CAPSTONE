@@ -24,7 +24,7 @@ export default function TraineeLoginPage() {
       }, { withCredentials: true })
       console.log(res.data)
 
-      if(res.data.redirectTo){
+      if(res.data.success){
         Navigate(res.data.redirectTo)
       }
 

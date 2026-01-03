@@ -162,9 +162,9 @@ export default function CustomVideoPlayer(props) {
     
 
   return (
-    <div className="w-full h-full flex flex-col justify-center">
+    <div className="lg:w-full lg:h-full flex flex-col justify-center">
       <div className="overflow-y-scroll">
-        <div className="relative bg-black w-full h-130">
+        <div className="relative bg-black w-full md:h-130">
           <video ref={videoRef} src={videoURL} className="w-full h-full" onTimeUpdate={handleTimeUpdate} controls={false} />
 
           {/* Controls Overlay */}

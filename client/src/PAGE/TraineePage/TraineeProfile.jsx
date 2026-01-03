@@ -46,16 +46,18 @@ export default function Profile() {
         
       <div className='w-full bg-gray-200'>
         <Header title="Profile" />  
-        <div className="max-w-xl mx-auto bg-white shadow-xl rounded-2xl p-6 mt-10">
+        <div className="w-10/12 mx-auto bg-white shadow-xl rounded-2xl p-6 mt-10">
           <div className="flex items-center mb-6">
             <div className="w-20 h-20 rounded-full bg-green-200 flex items-center justify-center text-3xl font-bold text-green-800">
               <PersonRoundedIcon sx={{ fontSize: 50 }} />
             </div>
             <div className="ml-4">
-              <h2 className="text-3xl font-semibold text-gray-800">
-                {user.first_name} {user.surname}
+              <h2 className="text-xl lg:text-2xl font-semibold text-gray-800">
+                {user?.first_name?.charAt(0).toUpperCase() + user?.first_name?.slice(1)}{" "}
+                {user?.surname?.charAt(0).toUpperCase() + user?.surname?.slice(1)}
+                
               </h2>
-              <p className="text-gray-500 text-lg">User ID: {user.id}</p>
+              <p className="text-gray-500 lg:text-lg">User ID: {user.id}</p>
             </div>
           </div>
 

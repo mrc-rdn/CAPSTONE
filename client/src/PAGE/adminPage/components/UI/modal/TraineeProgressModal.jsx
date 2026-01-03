@@ -52,7 +52,7 @@ export default function AddChapterModal(props) {
             setQuiz(quiz.data.success)
             setVideo(video.data.success)
             
-           console.log(video.data, quiz.data, info.data, image.data)
+          
             if(video.data.success){
                 setVideoType(video.data.data[0].item_type)
 
@@ -76,6 +76,8 @@ export default function AddChapterModal(props) {
                     setQuizData(result.data.data)
                     setQuestionLength(result.data.quizLength)
                     setIsData(true)
+                    console.log(props.courseId)
+                    console.log(id)
                 } catch (error) {
                     console.error("Error fetching video progress:", videoErr);
                 }

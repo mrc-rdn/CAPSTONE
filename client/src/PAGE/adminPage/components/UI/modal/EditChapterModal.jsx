@@ -31,7 +31,7 @@ export default function EditChapterModal(props) {
     }
     const handleDelete = async (e) =>{
       e.preventDefault();
-      
+      console.log(chapterId)
       try {
         const res = await axios.delete(`${API_URL}/admin/chapter/deletechapter/${chapterId}`,{
           withCredentials: true
