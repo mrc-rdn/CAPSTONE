@@ -32,7 +32,7 @@ export default function EditUserInfo(props) {
     const sendData = async (e)=>{
         e.preventDefault();
         if(password === confirmPassword){
-            const res = await axios.post(`${API_URL}/admin/edituserinfo`, {firstName, surname, contactNo, password}, {withCredentials:true})
+            const res = await axios.post(`${API_URL}/trainee/edituserinfo`, {firstName, surname, contactNo, password}, {withCredentials:true})
            
             setIsPasswordMatch(false)
             return setUpdateProfile(res.data.success)
@@ -69,10 +69,10 @@ export default function EditUserInfo(props) {
             {picture?<img src={picture} alt="" className='w-30 h-30 rounded-full mb-3' />
             :<div className={`w-30 h-30 rounded-full flex text-3xl items-center justify-center m-3 ${userColorClass}`}>
                 <p>
-                {firstName.slice(0,1)}
+                {firstName.slice(0,1).toUpperCase()}
                 </p>
             </div>}
-            <div className='absolute top-10 right-120'>
+            <div className='absolute top-10 right-123'>
                 <CreateIcon />
             </div>
             
@@ -167,7 +167,7 @@ export default function EditUserInfo(props) {
             
             <div className='w-full flex justify-center'>
                
-                    <Link to='/admin/dashboard'>
+                    <Link to='/trainee/dashboard'>
                         <button 
                             className={isMouseOver?'m-3 w-30 h-10 text-sm text-white bg-green-600 rounded font-bold':'m-3 w-30 h-10 text-sm text-green-600 bg-white border-2 rounded' }
                             onMouseOver={()=> setMouseOver(true)}

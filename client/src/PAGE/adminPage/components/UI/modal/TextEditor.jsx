@@ -17,13 +17,14 @@ export default function TextEditor(props) {
     const savePost = async () => {
         if (!title || !content) return alert("Title and content are required");
         try {
-            const res = await axios.post(`${API_URL}/admin/posts`,
+            const res = await axios.post(`${API_URL}/admin/texteditor`,
                 { title:title, courseId: props.courseId, chapterId: props.chapterInfo.chapterId, content: content },
                 {withCredentials:true});
             setPosts([res.data, ...posts]);
             setTitle('');
             setContent('');
             setIspostingSuccess(true)
+            props.onExit()
         } catch (err) {
             console.error(err);
             setIspostingSuccess(false)

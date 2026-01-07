@@ -9,13 +9,14 @@ export default function Chapter(props) {
   function handleClick(){
     props.handleOpenChapter(props.id, props.chapter_no)
     props.handleActiveChapter(props.id)
+    
     console.log()
   }
 
   return (
     <div 
-      className={`w-full h-18 bg-green-500 border-gray-200 border-2 flex flex-row p-2 hover:bg-green-600 
-        ${props.isActive ? "bg-green-600": "bg-green-500"} `}onClick={handleClick}>
+      className={`w-full h-18 bg-green-500 border-gray-200 border-2 flex flex-row p-2 hover:bg-green-500 relative
+        ${props.isActive ? "bg-green-500": "bg-green-600"} `}onClick={handleClick}>
         <div>
           <p className='text-2xl font-normal'>{props.title}: </p> 
           <p className='text-gray-900/60'>{props.description}</p>
@@ -29,9 +30,11 @@ export default function Chapter(props) {
               <EditIcon />
             </button>
           </div>
-          <div className=' m-3'>
+          
+          <div className=' m-3 mr-4'>
             <DehazeIcon />
           </div>
+          <p className='absolute right-2 text-xs top-2'>{props.orderIndex}</p>
         </div>
         :null
         }

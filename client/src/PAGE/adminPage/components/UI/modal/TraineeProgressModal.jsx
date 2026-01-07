@@ -11,15 +11,20 @@ import ExcelGenerator from '../ExcelGenerator.jsx';
 export default function AddChapterModal(props) {
     const exit = false
     const [activeChapterId, setActiveChapterId] = useState(null);
-    const [traineeDetails , setTraineeDetailes] = useState([])
-    const [isQuiz, setQuiz] = useState(false);
-    const [isVideo, setVideo] = useState(false);
+    const [isQuiz, setIsQuiz] = useState(false);
+    const [isVideo, setIsVideo] = useState(false);
+    const [isImage, setIsImage] = useState(false);
+    const [isCertificate, setIsCertificate] = useState(false);
+    const [isText, setIsText] = useState(false);
+    const [isData, setIsData] = useState(null);
+
     const [videoData, setVideoData] = useState([]);
-    const [videoType, setVideoType]= useState("")
+    const [imageData, setImageData] = useState([])
     const [quizData, setQuizData] = useState([]);
     const [questionLength, setQuestionLength] = useState()
-    const [imageData, setImageData] = useState([])
-    const [isData, setIsData] = useState(null)
+    const [textData, setTextData] = useState([])
+    const [certificateData, setCertificateData] = useState([])
+    
 
     const [chapters, setChapters] = useState([])
     useEffect(()=>{
@@ -41,51 +46,82 @@ export default function AddChapterModal(props) {
     async function handleShowChapter(id){
         
         try {
-            const [video, quiz, info, image] = await Promise.all([
+            const [video, quiz, text, certificate] = await Promise.all([
                 axios.post(`${API_URL}/admin/chapter/mediaitems`, {courseId: props.courseId, chapterId: id  }, {withCredentials: true}),
                 axios.post(`${API_URL}/admin/chapter/quiz`, {chapterId: id  }, {withCredentials: true}),
-                axios.post(`${API_URL}/admin/course/traineeprogress`, {course_id: props.courseId}, {withCredentials: true}),
-                axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineeimageprogress`, {withCredentials: true})
+                axios.get(`${API_URL}/admin/texteditor/${props.courseId}/${id}`, {withCredentials: true}),
+                axios.get(`${API_URL}/admin/${props.courseId}/${id}/getcertificate`, {withCredentials:true}),
             ])
-            
-            setTraineeDetailes(info.data.data)
-            setQuiz(quiz.data.success)
-            setVideo(video.data.success)
-            
-          
-            if(video.data.success){
-                setVideoType(video.data.data[0].item_type)
+            console.log(video.data, quiz.data, text.data, certificate.data)
 
-                if(video.data.data[0].item_type === 'IMAGE'){
-                    setImageData(image.data.data)
+            if(video.data.success){
+                
+                if(video.data.data[0].item_type === "VIDEO"){
+                    const result = await axios.get(`${API_URL}/admin/traineeprogress/${props.courseId}/${id}`, {withCredentials:true})
+                    setIsVideo(true)
                     setIsData(true)
-                    
-                }
-                try {
-                    const result = await axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineevideoprogress`, {withCredentials: true})
+                    setIsImage(false)
+                    setIsQuiz(false)
+                    setIsText(false)
+                    setIsCertificate(false)
                     setVideoData(result.data.data)
+
+                    
+                }else if(video.data.data[0].item_type === "IMAGE"){
+                    const result = await axios.get(`${API_URL}/admin/traineeprogress/${props.courseId}/${id}`, {withCredentials:true})
+                    setIsVideo(false)
                     setIsData(true)
-                } catch (error) {
-                    console.error("Error fetching video progress:", videoErr);
+                    setIsImage(true)
+                    setIsQuiz(false)
+                    setIsText(false)
+                    setIsCertificate(false)
+                    setImageData(result.data.data)
                 }
 
             }else if(quiz.data.success){
-
-                try {
-                    const result = await axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineequizprogress`, {withCredentials: true})
+                //admin/:courseId/:chapterId
+                 const result = await axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineequizprogress`, {withCredentials:true})
+                    setIsVideo(false)
+                    setIsData(true)
+                    setIsImage(false)
+                    setIsQuiz(true)
+                    setIsText(false)
+                    setIsCertificate(false)
                     setQuizData(result.data.data)
                     setQuestionLength(result.data.quizLength)
-                    setIsData(true)
-                    console.log(props.courseId)
-                    console.log(id)
-                } catch (error) {
-                    console.error("Error fetching video progress:", videoErr);
-                }
+                    console.log(result.data)
                 
-            }else{
-                setIsData(false)
-            }
+            }else if (text.data.success){
+                const result = await axios.get(`${API_URL}/admin/traineeprogress/${props.courseId}/${id}`, {withCredentials:true})
+                    setIsVideo(false)
+                    setIsData(true)
+                    setIsImage(false)
+                    setIsQuiz(false)
+                    setIsText(true)
+                    setIsCertificate(false)
+                    setTextData(result.data.data)
+                    console.log(result.data.data)
             
+            }else if (certificate.data.success){
+                const result = await axios.get(`${API_URL}/admin/traineeprogress/${props.courseId}/${id}`, {withCredentials:true})
+                    setIsVideo(false)
+                    setIsData(true)
+                    setIsImage(false)
+                    setIsQuiz(false)
+                    setIsText(false)
+                    setIsCertificate(true)
+                    setCertificateData(result.data.data)
+            }else{
+                setIsVideo(false)
+                setIsData(false)
+                setIsImage(false)
+                setIsQuiz(false)
+                setIsText(false)
+                setIsCertificate(false)
+            }
+
+            
+          
         } catch (err) {
            console.log(err)
         }
@@ -111,18 +147,18 @@ export default function AddChapterModal(props) {
                         <tr>
                         <th class="py-3 px-6 text-left">ID</th>
                         <th class="py-3 px-6 text-left">Name</th>
-                        <th class="py-3 px-6 text-center">{isQuiz&&'Quiz'}{isVideo&&'Video'} Completed</th>
+                        <th class="py-3 px-6 text-center">{isQuiz&&'Quiz Completed'}{isVideo&&'Video Completed'}{isImage&&'Image Completed'} {isText&&'Text Completed'}{isCertificate&&'Certificate'} </th>
                         {isQuiz&&<th class="py-3 px-6 text-center">Score</th>}
                         </tr>
                     </thead>
                     <tbody class="text-gray-700">
-                    {videoType === 'VIDEO'&& !isQuiz&&(videoData.map((info, index)=>{
+                    {isVideo &&(videoData.map((info, index)=>{
                         return(
                         <tr class="border-b hover:bg-gray-100 transition duration-300" key={index}>
-                            <td class="py-4 px-6 border-x-1">{info.student_id}</td>
+                            <td class="py-4 px-6 border-x-1">{info.user_id}</td>
                             <td class="py-4 px-6 border-x-1">{info.surname.charAt(0).toUpperCase() + info.surname.slice(1)} {info.first_name.charAt(0).toUpperCase()+ info.first_name.slice(1)} </td>
                             <td class="py-4 px-6  text-center">{
-                                info.is_completed 
+                                info.is_done
                                 ?<CheckCircleRoundedIcon fontSize='large' className='text-green-400'/>
                                 :<ClearRoundedIcon fontSize='large' className='text-red-400' /> 
                             }</td>
@@ -130,13 +166,13 @@ export default function AddChapterModal(props) {
                         </tr>)
                         }))}
 
-                        {videoType === 'IMAGE'&& !isQuiz&&(imageData.map((info, index)=>{
+                        {isImage && !isQuiz&&(imageData.map((info, index)=>{
                         return(
                         <tr class="border-b hover:bg-gray-100 transition duration-300" key={index}>
-                            <td class="py-4 px-6 border-x-1">{info.student_id}</td>
-                            <td class="py-4 px-6 border-x-1">{info.first_name} {info.surname}</td>
+                            <td class="py-4 px-6 border-x-1">{info.user_id}</td>
+                            <td class="py-4 px-6 border-x-1">{info.surname.charAt(0).toUpperCase() + info.surname.slice(1)} {info.first_name.charAt(0).toUpperCase()+ info.first_name.slice(1)}</td>
                             <td class="py-4 px-6  text-center">{
-                                (info.is_completed)
+                                (info.is_done)
                                 ?<CheckCircleRoundedIcon fontSize='large' className='text-green-400'/>
                                 :<ClearRoundedIcon fontSize='large' className='text-red-400' /> 
                             }</td>
@@ -148,7 +184,7 @@ export default function AddChapterModal(props) {
                         return(
                         <tr class="border-b hover:bg-gray-100 transition duration-300" key={index}>
                             <td class="py-4 px-6 border-x-1">{info.student_id}</td>
-                            <td class="py-4 px-6 border-x-1">{info.first_name} {info.surname}</td>
+                            <td class="py-4 px-6 border-x-1">{info.surname.charAt(0).toUpperCase() + info.surname.slice(1)} {info.first_name.charAt(0).toUpperCase()+ info.first_name.slice(1)}</td>
                             <td class="py-4 px-6  text-center">{
                                 (info.percentage !== null)
                                 ?<CheckCircleRoundedIcon fontSize='large' className='text-green-400'/>
@@ -157,10 +193,42 @@ export default function AddChapterModal(props) {
                             {isQuiz&&<td class="py-4 px-6 text-center space-x-2 border-y-1">{info.score}{(info.percentage !== null)?`/${questionLength}`:null}</td>}
                         </tr>)
                     }))} 
+                    {isText&&(textData.map((info, index)=>{
+                        return(
+                        <tr class="border-b hover:bg-gray-100 transition duration-300" key={index}>
+                            <td class="py-4 px-6 border-x-1">{info.user_id}</td>
+                            <td class="py-4 px-6 border-x-1">{info.first_name} {info.surname}</td>
+                            <td class="py-4 px-6  text-center">{
+                                (info.is_done)
+                                ?<CheckCircleRoundedIcon fontSize='large' className='text-green-400'/>
+                                :<ClearRoundedIcon fontSize='large' className='text-red-400' /> 
+                            }</td>
+                            
+                        </tr>)
+                        
+                        }))}
+                    {isCertificate&&(certificateData.map((info, index)=>{
+                        return(
+                        <tr class="border-b hover:bg-gray-100 transition duration-300" key={index}>
+                            <td class="py-4 px-6 border-x-1">{info.user_id}</td>
+                            <td class="py-4 px-6 border-x-1">{info.first_name} {info.surname}</td>
+                            <td class="py-4 px-6  text-center">{
+                                (info.is_done)
+                                ?<CheckCircleRoundedIcon fontSize='large' className='text-green-400'/>
+                                :<ClearRoundedIcon fontSize='large' className='text-red-400' /> 
+                            }</td>
+                            
+                        </tr>)
+                        
+                        }))}
                     
 
                     </tbody>
-                    </table>: <p>no record yet</p>  }
+                    </table >
+                    
+                        
+            
+                    :<p>no record yet</p> }
                 </div>
             </div>
             <div className='w-100 h-full ml-auto overflow-y-scroll'>

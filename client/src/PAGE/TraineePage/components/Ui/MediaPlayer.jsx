@@ -7,7 +7,7 @@ import Comments from './Comments.jsx'
 import { API_URL } from "../../../../api.js";
 
 export default function CustomVideoPlayer(props) {
-  const { videoId, videoURL } = props
+  const { videoId, videoURL, videoData } = props
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -22,21 +22,18 @@ export default function CustomVideoPlayer(props) {
       const video = videoRef.current;
       if (!video) return;
       if(!isCompleted){
-        console.log('the video is not done wactching')
         if (video.currentTime === video.duration) {
-          const result = await axios.post(`${API_URL}/trainee/${videoId}/completed`, {
-          is_completed: true
-          }, {withCredentials:true});
-          console.log(result)
-          
+          const [ result, result1] = await Promise.all([axios.post(`${API_URL}/trainee/${videoId}/completed`, 
+            {is_completed: true}, {withCredentials:true}),
+            axios.post(`${API_URL}/trainee/chapterprogress/${videoData.course_id}/${videoData.chapter_id}`,{}, {withCredentials:true})
+        ])
+         console.log(result, result1)
         } else {
           console.log('video not done watching')
         }
       }
       
     };
-
-  
 
   // Play/Pause
   const togglePlay = () => {
@@ -116,13 +113,11 @@ export default function CustomVideoPlayer(props) {
     
       try {
         
-        const result = await axios.post(`${API_URL}/trainee/${videoId}/progress`, {
-          duration_seconds: currentSeconds,
-          chapter_id: props.videoData.chapter_id, 
-          course_id: props.videoData.course_id,
-          is_completed: isCompleted
-        }, {withCredentials:true});
-      
+        const [ videoprogress] = await Promise.all([ axios.post(`${API_URL}/trainee/${videoId}/progress`, 
+          {duration_seconds: currentSeconds,chapter_id: props.videoData.chapter_id, course_id: props.videoData.course_id, is_completed: isCompleted}, {withCredentials:true}),
+           
+        ])
+          
       } catch (err) {
         console.error("Failed to save progress:", err);
       }
@@ -131,15 +126,9 @@ export default function CustomVideoPlayer(props) {
     const loadProgressFromDB = async () => {
       try {
         const res = await axios.get(`${API_URL}/trainee/${videoId}/progress`, {withCredentials: true});
-        if (res.data.duration_seconds) {
-          video.currentTime = res.data.duration_seconds;
-          setCurrentTime(res.data.duration_seconds);
-        }
-        if(res.data.is_completed){
-          setCompleted(true)
-        }else{
-          setCompleted(false)       
-        }
+         video.currentTime = res.data.duration_seconds || 0;
+          setCurrentTime(res.data.duration_seconds || 0);
+          setCompleted(Boolean(res.data.is_completed));
 
       } catch (err) {
         console.error("Failed to load progress:", err);

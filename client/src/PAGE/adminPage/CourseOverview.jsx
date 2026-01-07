@@ -26,7 +26,6 @@ export default function CourseOverview() {
     const [chapterLength, setChapterLength] = useState(0);
     const [refresh, setRefresh] = useState(0)
     const [chapterInfo, setChapterInfo] = useState({chapterId: "", chapterIndex: ""})
-    const [chapterData, setChapterData] = useState([])
 
     const [isLesson, setIsLessonUploaded] = useState(false)
     const [isVideo, setIsVideo] = useState(false);
@@ -85,11 +84,11 @@ export default function CourseOverview() {
           axios.post(`${API_URL}/admin/chapter/mediaitems`, {courseId: id, chapterId: chaptersId  }, {withCredentials: true}),
           axios.post(`${API_URL}/admin/chapter/quiz`, {chapterId: chaptersId  }, {withCredentials: true}),
           axios.get(`${API_URL}/admin/${id}/${chaptersId}/getcertificate`, {withCredentials:true}),
-          axios.get(`${API_URL}/admin/posts/${id}/${chaptersId}`, {withCredentials:true})
+          axios.get(`${API_URL}/admin/texteditor/${id}/${chaptersId}`, {withCredentials:true})
 
 
         ])
-       console.log(text.data.data)
+        
           
           if(quiz.data.success){
             setIsQuiz(true) 
@@ -166,7 +165,7 @@ export default function CourseOverview() {
         {isTraineeProgressModal?<TraineeProgressModal   onExit={handleExitTraineeProgressModal} courseId={id}  /> :null}
         {isAddTraineeModal?<AddTraineeModal onExit={handleExitaddTraineeModal}  courseId={id}/>: null}
         {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} courseId={id} chapterlength1={chapterLength}/>: null}
-        {isAnnounceModalOpen?<AnnouncementModal onExit={handleExitAnnouncementModal} courseId={id} />:null}
+        {isAnnounceModalOpen?<AnnouncementModal onExit={handleExitAnnouncementModal} courseId={id} certificate={certificateData} />:null}
     </div>
 
   )

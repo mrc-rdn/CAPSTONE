@@ -8,12 +8,15 @@ import { API_URL } from '../../../../api.js';
 import DeleteContent from '../UI/DeleteContent.jsx';
 import CloseIcon from '@mui/icons-material/Close';
 
+
+
 export default function CourseChapters(props) {
   const [isEditChapter, setEditChapter] = useState(false);
   const [isEditChapterModal, setIsEditChapterModal ] = useState(false)
   const [EditChapterData, setEditChapterData] = useState({chapterId:"", chapter_index: "", chapter_title:"", chapter_description: ""})
   const [fetchChapters, setFetchChapters] = useState([]);
   const [activeChapterId, setActiveChapterId] = useState(null);
+ 
   
   const [refresh, setRefresh]= useState(0);
 
@@ -28,9 +31,11 @@ export default function CourseChapters(props) {
       try {
         const [chapterInfo, chapterItems] = await Promise.all([
           axios.get(`${API_URL}/trainer/course/${props.courseId}`, { withCredentials: true }),// this to fetch all the chapters
-          axios.get(`${API_URL}/trainer/course/1/${props.courseId}`, { withCredentials: true })
+          axios.get(`${API_URL}/trainer/course/1/${props.courseId}`, { withCredentials: true }),
+          
         ]);
         console.log(chapterItems.data)
+        
         const chapterId = chapterItems.data.chapterInfo[0].id
         const chapterIndex = chapterItems.data.chapterInfo[0].order_index
         props.handleChaptersInfo(chapterId, chapterIndex) 
@@ -109,7 +114,8 @@ export default function CourseChapters(props) {
         console.error('Failed to save chapter order', err);
       }
     };
-    
+
+   
     
   return (
     

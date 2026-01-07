@@ -40,16 +40,19 @@ export default function UploadProfile(props) {
     <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex items-center justify-center '>
       <div className='w-130 h-90 bg-white p-3 rounded'>
         <button onClick={()=>{props.onExit(exit) }}><CloseIcon /></button>
+        <p className="m-3">Upload Profile Picture</p>
         
         {isImageUploaded?<p>success Uploading Image</p>
-        :<form onSubmit={handleImageUpload}>
+        :<form onSubmit={handleImageUpload} className="w-full h-full flex flex-col items-center">
           <input
+          className="w-10/12 h-10 text-2xl bg-green-500 rounded p-1 m-15"
             type="file"
+            
             onChange={(e) => setImage(e.target.files[0])}
             required
           />
 
-          <button type="submit" disabled={uploading}>
+          <button type="submit" disabled={uploading} className="m-3 w-50 h-10 text-2xl text-green-500 bg-white border-2  rounded">
             {uploading ? "Uploading..." : "Upload"}
           </button>
         </form>}

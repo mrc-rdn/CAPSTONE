@@ -41,7 +41,8 @@ console.log()
     setQuestions(updated);
   };
 
-  const saveQuiz = async () => {
+  const saveQuiz = async (e) => {
+    e.preventDefault()
     try {
       await axios.post(`${API_URL}/admin/chapter/createquiz`, 
       {chapter_id: props.chapterInfo.chapterId,
@@ -55,6 +56,7 @@ console.log()
     }
     finally{
       setIsQuizUploaded(true)
+      props.onExit(exit)
     }
     
     
@@ -73,7 +75,7 @@ console.log()
             <div className="p-4 w-full">
               <h2 className="text-xl font-bold mb-4">Create a Quiz</h2>
               {isQuizUploaded?<p>Success uplading the quiz</p>
-              :<div>
+              :<form onSubmit={saveQuiz}> <div>
                 <input
                   placeholder="Quiz Title"
                   className="border-2 border-green-700 p-2 mb-4 w-full rounded-md"
@@ -102,6 +104,7 @@ console.log()
                       placeholder="Question text"
                       value={question.question_text}
                       onChange={(e) => updateQuestion(index, "question_text", e.target.value)}
+                      required
                       className="border p-2 w-full mb-2 rounded-md"
                     />
                   
@@ -109,6 +112,7 @@ console.log()
                       <input
                         placeholder="Correct Answer"
                         value={question.correct_answer}
+                        required
                         onChange={(e) => updateQuestion(index, "correct_answer", e.target.value)}
                         className="border p-2 w-full rounded-md"
                       />
@@ -119,12 +123,14 @@ console.log()
                             <input
                               placeholder={`Choice ${j + 1}`}
                               value={choice.choice_text}
+                              required
                               onChange={(e) => handleChoiceChange(index, j, "choice_text", e.target.value)}
                               className="border p-2 flex-1 rounded-md"
                             />
                             <input
                               type="checkbox"
                               checked={choice.is_correct}
+                              
                               onChange={(e) =>
                                 handleChoiceChange(index, j, "is_correct", e.target.checked)
                               }
@@ -144,11 +150,12 @@ console.log()
                   </div>
                 ))}
 
-                <button onClick={saveQuiz} onMouseOver={()=>setMouseOver(false)} onMouseOut={()=>setMouseOver(true)} 
+                <button type='submit' onMouseOver={()=>setMouseOver(false)} onMouseOut={()=>setMouseOver(true)} 
                 className={isMouseOver?"bg-white border-1 border-green-700 text-green px-4 py-2 rounded " : "bg-green-700 border-1 border-green-700 text-white px-4 py-2 rounded "}>
                   Save Quiz
                 </button>
-              </div>}
+              </div>
+              </form>}
             </div>
         </div> 
       

@@ -14,6 +14,7 @@ export default function UploadCertificateModal(props) {
           {withCredentials:true})
           console.log(res)
           setIsUpload(true)
+          props.onExit()
       } catch (error) {
         console.log(error)
         setIsUpload(false)

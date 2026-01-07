@@ -1,6 +1,8 @@
 import React from 'react'
 
 export default function messages(props) {
+   console.log(props.message.first_name)
+    console.log(props.userData)
   return (
     
     <div className="w-full">

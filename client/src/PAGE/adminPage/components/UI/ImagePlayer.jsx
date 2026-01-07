@@ -3,9 +3,11 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export default function ImagePlayer(props) {
   const [zoom, setZoom] = useState(false);
+  console.log(props.videoData)
 
   return (
-    <div className="w-full h-full bg-black flex justify-center items-center overflow-hidden">
+  <div className="overflow-y-scroll w-full h-full">
+    <div className="w-full h-11/12 bg-black flex justify-center items-center overflow-hidden">
       <TransformWrapper
         initialScale={1}
         wheel={{ step: 0.2 }}
@@ -24,6 +26,11 @@ export default function ImagePlayer(props) {
           />
         </TransformComponent>
       </TransformWrapper>
+      
     </div>
+    <h1 className="text-lg m-3 font-semibold ">
+      Title: <span className="font-bold"> {props.videoData.title}</span>
+      </h1>
+  </div>
   );
 }

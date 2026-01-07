@@ -29,6 +29,7 @@ export default function AddChapterModal(props) {
           {withCredentials:true})
           
           setChapterAdded(result.data.success)
+          props.onExit(exit)
       } catch (error) {
         setChapterAdded(false)
         console.log(error)

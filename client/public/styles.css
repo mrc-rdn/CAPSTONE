@@ -23,7 +23,39 @@
 }
 
 
-.agreen{
-  background-color: #6a0afb;
+.green{
+  background-color: #2D4F2B;
 }
+
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  html, body {
+    width: 297mm;
+    height: 210mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #certificate,
+  #certificate * {
+    visibility: visible;
+  }
+
+  #certificate {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+
 

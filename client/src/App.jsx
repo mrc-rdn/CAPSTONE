@@ -28,8 +28,8 @@ import TraineeDashboard from "./PAGE/TraineePage/TraineeDashboard.jsx"
 import TRAINEEProtectedRoute from "./PAGE/TraineePage/components/routes/TRAINEEProtectedRoute.jsx"
 import TraineeCourse from "./PAGE/TraineePage/TraineeCourse.jsx";
 import TraineeMessages from "./PAGE/TraineePage/TraineeMessages.jsx";
-import TraineeProfile from "./PAGE/TraineePage/TraineeProfile.jsx";
 import TraineeCourseOverview from './PAGE/TraineePage/CourseOverview.jsx'
+import TraineeEditProfile from './PAGE/TraineePage/EditProfile.jsx'
 
 export default function App() {
   return (
@@ -50,8 +50,8 @@ export default function App() {
         <Route path="/trainee/dashboard" element={<TRAINEEProtectedRoute><TraineeDashboard /></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/Course" element={<TRAINEEProtectedRoute><TraineeCourse/></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/messages" element={<TRAINEEProtectedRoute><TraineeMessages/></TRAINEEProtectedRoute>}/>
-        <Route path="/trainee/profile" element={<TRAINEEProtectedRoute><TraineeProfile /></TRAINEEProtectedRoute>}/>
         <Route path='/trainee/course/:id/:courseTitle' element={<TRAINEEProtectedRoute><TraineeCourseOverview /></TRAINEEProtectedRoute>} />
+        <Route path="/trainee/editprofile" element={<TRAINEEProtectedRoute><TraineeEditProfile /></TRAINEEProtectedRoute>} />
 
         <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
         <Route path="/admin/course" element={<AdminProtectedRoute><AdminCourse /></AdminProtectedRoute>} />

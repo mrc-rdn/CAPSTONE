@@ -8,16 +8,23 @@ import { API_URL } from '../../api'
 import Profile from './components/dashboard/Profile.jsx'
 import Course from './components/course/Course.jsx'
 import UpcomingEvents from './components/dashboard/UpcomingEvents.jsx'
+import Courses from './components/dashboard/courses.jsx'
 
 export default function AdminDashboard() {
   const [data , setData]= useState([])
   const [color, setcolor] = useState({color:null, shade:null})
   const [upcomingEventsData, setUpcomingEventData] = useState([])
+  const [courses, setCourseData] = useState([])
+  const [refresh, setRefresh] = useState(0)
+
   
   useEffect(()=>{
     async function fetchData(){
       try {
-        const response = await axios.get(`${API_URL}/admin/dashboard`, {withCredentials: true});
+        const [response, course] = await Promise.all([
+          axios.get(`${API_URL}/admin/dashboard`, {withCredentials: true}),
+          axios.get(`${API_URL}/admin/course`, {withCredentials: true})])
+          setCourseData(course.data.data)
         setData(response.data)
       } catch (error) {
         
@@ -26,6 +33,11 @@ export default function AdminDashboard() {
     fetchData()
     
   },[])
+
+  const handleRefresh = ()=>{
+    setRefresh(prev => prev + 1)
+    
+  }
 
   const colorMap = {
     red: {200: 'bg-red-200',300: 'bg-red-300',400: 'bg-red-400',500: 'bg-red-500',600: 'bg-red-600',700: 'bg-red-700', 800: 'bg-red-800'},
@@ -61,26 +73,30 @@ export default function AdminDashboard() {
             <div className='w-full flex flex-col items-center'>
               <Dcontent  traineeCount={data.traineeCount} trainerCount={data.trainerCount} coursesCount={data.coursesCount}/>
             </div>
-            <div className='w-full h-6/12 bg-green-700 rounded-lg border-2 border-gray-200'
+            <div className='w-full h-8/12 bg-green-700 rounded-lg border-2 border-gray-200'
               style={{boxShadow: "3px 3px 5px rgba(0,0,0,0.1)"}}>
-              <div className='w-50 h-10 flex items-center justify-center'>
-                <p className='text-white text-lg '>Announcements</p>
+              <div className='w-30 h-10 flex items-center justify-center'>
+                <p className='text-white text-lg '>Courses</p>
               </div>
               
-              <div className='bg-green-100 w-full h-30 rounded-br-md'>
-
+              <div className='bg-green-200 w-full h-10/12 rounded-br-md flex flex-wrap justify-center'>
+                {courses.length > 0 ? (courses.map((course)=>{
+                    return(
+                    <Courses key={course.id} course={course} />
+                    
+                    )
+                  })
+                  ): (<p>No Course Found</p>)
+                }
               </div>
 
 
             </div>
-            <div className='w-full h-6/12 bg-green-600 rounded-lg border-2 border-gray-200'
-              style={{boxShadow: "3px 3px 5px rgba(0,0,0,0.1)"}}>
-
-            </div>
+            
           </div>
           <div className='w-4/12 flex flex-col gap-8'>
             <div className='w-full h-100'>
-              <CalendarTodo handleUpcomingEventData={handleUpcomingEventData} />
+              <CalendarTodo handleUpcomingEventData={handleUpcomingEventData} onRefresh={handleRefresh} />
             </div>
             
             <div className='h-5/12 rounded-lg bg-white flex items-center flex-col border-2 border-gray-200'
@@ -91,7 +107,7 @@ export default function AdminDashboard() {
               
               <div className='h-35 w-11/12 overflow-y-scroll '>
                 {upcomingEventsData.map((item, index)=>{
-                    return <UpcomingEvents key={index} text={item.text} eventDate={item.event_date} color={item.color} />
+                    return <UpcomingEvents  key={index} text={item.text} eventDate={item.event_date} color={item.color} refresh={refresh}/>
                   })
 
                 }

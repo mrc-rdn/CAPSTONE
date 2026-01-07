@@ -49,7 +49,7 @@ export default function CourseChapters(props) {
     };
     
     fetchingChapters();
-  }, [props.refresh, refresh]);
+  }, [refresh , props.refresh]);
 
 
   // Functions
@@ -106,6 +106,7 @@ export default function CourseChapters(props) {
       try {
         await axios.put(`${API_URL}/admin/chapter/reorder`, { orderedChapters });
         console.log('Chapter order saved!');
+        setRefresh(prev => prev + 1)
       } catch (err) {
         console.error('Failed to save chapter order', err);
       }
@@ -147,6 +148,7 @@ export default function CourseChapters(props) {
                           >
                             <Chapter
                               id={item.id}
+                              orderIndex={item.order_index}
                               title={item.title}
                               chapter_no={item.order_index}
                               description={item.description}

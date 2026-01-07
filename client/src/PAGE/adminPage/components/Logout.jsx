@@ -21,7 +21,7 @@ export default function Logout() {
         }
     }
   return (
-    <div className='flex flex-col gap-6 mt-6 px-4'>
+    <div className='flex flex-col gap-6  px-4'>
       <button onClick={handleLogout} className="flex items-center gap-2 text-white font-semibold hover:text-green-200">Logout</button>
     </div>
   )

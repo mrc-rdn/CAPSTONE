@@ -7,7 +7,7 @@ export default function Profile(props) {
     const navigate = useNavigate()
     const [picture, setPicture] = useState("")
     const handleEditProfile = ()=>{
-        return navigate('/admin/editprofile')
+        return navigate('/trainee/editprofile')
     }
     
     useEffect(() => {
@@ -29,7 +29,7 @@ return (
             :<div className='ml-2'>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${props.userColorClass}`}>
                     <p>
-                    {props.data.usersInfo && props.data.usersInfo && props.data.usersInfo.first_name.slice(0,1)}
+                    {props.data.usersInfo && props.data.usersInfo && props.data.usersInfo.first_name.slice(0,1).toUpperCase()}
                     </p>
                 </div>
             </div>}

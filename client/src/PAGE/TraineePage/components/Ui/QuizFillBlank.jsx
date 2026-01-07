@@ -5,7 +5,7 @@ export default function QuizFillBlank(props) {
   const { type_question, question, no } = props;
 
   return (
-    <div className='w-full h-30 bg-green-700 text-white p-2 mt-2 mb-2 rounded-md'>
+    <div  className='w-full h-30 bg-green-700 text-white p-2 mt-2 mb-2 rounded-md'>
       <h1 className="">{type_question==="fill_blank"&& "Fill Blank"}</h1>
       <div className='flex'>
         <h1>{no}.</h1>

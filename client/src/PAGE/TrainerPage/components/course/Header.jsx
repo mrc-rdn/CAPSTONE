@@ -59,12 +59,7 @@ export default function Header(props) {
        + Chapter
         </button>
 
-        <button
-            onClick={()=>{props.handleOpenAddTraineeModal()}}
-            className=" m-3 hover:border-b-3  hover:border-b-3 lg:p-3 transition-all duration-80 ease-in-out p-3 text-sm"
-        >
-        + Trainee
-        </button>
+        
       </div>
       </div>
 

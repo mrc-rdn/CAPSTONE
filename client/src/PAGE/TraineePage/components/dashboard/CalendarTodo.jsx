@@ -64,7 +64,7 @@ export default function GoogleCalendarUI(props) {
     const formatted1 = `${year1}-${month1}-${day1}`;
     const formatted2 = `${year2}-${month2}-${day2}`;
 
-    const result = await axios.post(`${API_URL}/admin/dashboard/upcomingschedule`,
+    const result = await axios.post(`${API_URL}/trainee/dashboard/upcomingschedule`,
         {date1: formatted1, date2: formatted2},
         {withCredentials:true}
     )
@@ -93,7 +93,7 @@ export default function GoogleCalendarUI(props) {
     const formatted1 = `${year1}-${month1}-${day1}`;
     const formatted2 = `${year2}-${month2}-${day2}`;
 
-    const result = await axios.post(`${API_URL}/admin/dashboard/upcomingschedule`,
+    const result = await axios.post(`${API_URL}/trainee/dashboard/upcomingschedule`,
         {date1: formatted1, date2: formatted2},
         {withCredentials:true}
     )
@@ -119,7 +119,7 @@ export default function GoogleCalendarUI(props) {
     const formatted2 = `${year2}-${month2}-${day2}`;
     
     
-    const result = await axios.post(`${API_URL}/admin/dashboard/upcomingschedule`,
+    const result = await axios.post(`${API_URL}/trainee/dashboard/upcomingschedule`,
         {date1: formatted1, date2: formatted2},
         {withCredentials:true}
     )
@@ -175,7 +175,7 @@ export default function GoogleCalendarUI(props) {
   useEffect(()=>{
    async function fetchEvents() {
     try {
-      const res = await axios.get(`${API_URL}/admin/calendar/events`, {
+      const res = await axios.get(`${API_URL}/trainee/calendar/events`, {
         withCredentials: true
       });
 
@@ -202,7 +202,7 @@ export default function GoogleCalendarUI(props) {
 
   const deleteEvent = async (id) => {
     try {
-      const res = await axios.delete(`${API_URL}/admin/calendar/events/${id}` , {withCredentials:true})
+      const res = await axios.delete(`${API_URL}/trainee/calendar/events/${id}` , {withCredentials:true})
       console.log(res)
       handleRefresh()
     } catch (error) {

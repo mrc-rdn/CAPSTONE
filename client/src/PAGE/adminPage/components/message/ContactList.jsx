@@ -41,7 +41,7 @@ export default function ContactList({userData, socket, handlerefresh}) {
                 const fetchData = await axios.get(`${API_URL}/admin/chats`, {withCredentials:true})
                 
                 setContacts(fetchData.data)
-                
+                console.log(fetchData.data)
             } catch (error) {
                 console.log('error', error)
             }
@@ -84,6 +84,9 @@ export default function ContactList({userData, socket, handlerefresh}) {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
     console.log(userData )
+   
+
+console.log(contacts)
   return (
     <div className='h-11/12 flex'>
         <div className='w-2/12 h-full bg-white'>
@@ -94,6 +97,9 @@ export default function ContactList({userData, socket, handlerefresh}) {
                            contactData={contact} 
                            firstName={contact.user1_firstname} 
                            surname={contact.user1_surname} 
+                           profile={contact.user1_profile_pic}
+                           color={contact.user1_color}
+                           shade={contact.user1_shades}
                            handleSelectContact={handleSelectContact}
                            handleActiveChapter={()=>setActiveContactId(contact.id)}
                            isActive={activeContactId === contact.id } />
@@ -101,6 +107,9 @@ export default function ContactList({userData, socket, handlerefresh}) {
                             contactData={contact} 
                             firstName={contact.user2_firstname} 
                             surname={contact.user2_surname} 
+                            profile={contact.user2_profile_pic}
+                            color={contact.user2_color}
+                            shade={contact.user2_shades}
                             handleSelectContact={handleSelectContact}
                             handleActiveChapter={()=>setActiveContactId(contact.id)}
                             isActive={activeContactId === contact.id } />
@@ -115,7 +124,7 @@ export default function ContactList({userData, socket, handlerefresh}) {
                     <Messages
                         key={index}
                         message={message}
-                        userData={userData[0]}
+                        userData={userData}
                     />
                     ))}
                     {/* 👇 anchor */}

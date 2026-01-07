@@ -51,6 +51,7 @@ export default function AdminMessages() {
 
     return () => socket.disconnect();
   }, []);
+  
 
   return (
     <div className="flex w-screen h-screen ">

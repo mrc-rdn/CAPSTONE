@@ -19,11 +19,16 @@ export default function ContactList({userData, socket}) {
     const [refresh, setRefresh]= useState(0);
     const bottomRef = useRef(null);
     const [isOpenChat, setIsOpenChat] = useState(false)
+    const [notif, setNotifCount] = useState(0)
     
     function handleRefresh(index){
         setRefresh(prev => prev + 1)
         
     }
+    socket.on("new_notification", () => {
+  setNotifCount(prev => prev + 1);
+});
+console.log(notif)
     const handleSelectContactMessage = async(contactId)=>{
         console.log(contactId)
         setContactId(contactId)
@@ -140,7 +145,7 @@ export default function ContactList({userData, socket}) {
                     <Messages
                         key={index}
                         message={message}
-                        userData={userData[0]}
+                        userData={userData}
                     />
                     ))}
                     {/* 👇 anchor */}

@@ -41,9 +41,7 @@ export default function Navrbar(props) {
           <Link to="/trainee/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
             <MessageIcon sx={{fontSize: 35}} /> Messages
           </Link>
-          <Link to="/trainee/profile" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
-            <PersonIcon sx={{fontSize: 35}} /> Profile
-          </Link>
+          
         </nav>
         <Logout />
       </div>
@@ -104,16 +102,7 @@ export default function Navrbar(props) {
               Messages
             </span>
           </Link>
-          <Link to="/trainee/profile" className="group relative flex items-center text-white font-semibold">
-            <PersonIcon sx={{fontSize: 35}} />
-            <span
-              className="w-30  h-16 absolute left-14 bg-green-700 text-white px-2 py-5 text-lg whitespace-nowrap font-semibold
-              opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 ease-out pointer-events-none
-              "
-            >
-              Profile
-            </span>
-          </Link>
+          
         </nav>
         <Logout />
       </div>

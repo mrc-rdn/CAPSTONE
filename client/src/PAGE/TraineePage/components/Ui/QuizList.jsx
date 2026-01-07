@@ -25,6 +25,7 @@ function groupQuizzes(quizData) {
 }
 
 export default function QuizList(props) {
+
   const [results, setResults] = useState([]);
   const [resultFetch, setResultFecth] = useState([])
   const [isAnswer, setAnswer] = useState(false)
@@ -42,6 +43,7 @@ export default function QuizList(props) {
     }));
   };
 
+  
   // FINAL SCORE
   const handleCheck = async () => {
     //console.log(props.chapterDetails, props.courseDetails)
@@ -101,16 +103,14 @@ export default function QuizList(props) {
    
     
     try {
-      const res = await axios.post(`${API_URL}/trainee/quiz/answer`, {
-        quiz_id: props.quizData[0].quiz_id, 
-        chapter_id: props.quizData[0].chapter_id, 
-        course_id:  props.courseId, 
-        score: score , 
-        percentage: percent,
-        tempResults
-      }, {withCredentials: true})
-   setResultFecth(res.data.data)
-      console.log(res.data)
+      const [quizanswer, progress] = await Promise.all([
+        axios.post(`${API_URL}/trainee/quiz/answer`, 
+        {quiz_id: props.quizData[0].quiz_id, chapter_id: props.quizData[0].chapter_id, course_id:  props.courseId, score: score ,percentage: percent, tempResults}, 
+        {withCredentials: true}),
+        axios.post(`${API_URL}/trainee/chapterprogress/${props.courseId}/${props.quizData[0].chapter_id}`,{}, {withCredentials:true})
+      ]); 
+      console.log(progress.data)
+      setResultFecth(quizanswer.data.data)
       setRefresh(prev => prev + 1)
     } catch (error) {
       console.log('errorposting your asnwer', error)
@@ -130,7 +130,6 @@ export default function QuizList(props) {
 
         setResultFecth(res.data.data)
         setAnswer(res.data.success)
-        console.log(res.data)
       } catch (error) {
         console.log(error);
         setAnswer(false);
@@ -153,6 +152,7 @@ export default function QuizList(props) {
           <div key={index} className=''>
             {quiz.type === "fill_blank" && (
               <QuizFillBlank
+                key={index}
                 no={index + 1}
                 type_question={quiz.type}
                 question={quiz.question_text}
@@ -162,6 +162,7 @@ export default function QuizList(props) {
 
             {quiz.type === "multiple_choice" && (
               <QuizMultipleChoice
+                key={index}
                 no={index + 1}
                 type_question={quiz.type}
                 question={quiz.question_text}

@@ -3,7 +3,7 @@ import React from 'react'
 export default function CheckedAnswers(props) {
   return (
     <>
-    <div key={props.key} className="mb-3 p-3 border rounded bg-white">
+    <div className="mb-3 p-3 border rounded bg-white">
       <p><strong>{props.item.no}. {props.item.question}</strong></p>
       <p>
         {props.item.is_correct ? 

@@ -1,11 +1,7 @@
-import PersonIcon from "@mui/icons-material/Person";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ReplyList from "./ReplyList";
+import React from 'react'
 
-
-export default function CommentList({ comment, userId, deleteComment, onRefresh, profile, shade, color }) {
-
-    const colorMap = {
+export default function Reply({first_name,surname, profile, shade, color, content}) {
+  const colorMap = {
     red: {200: 'bg-red-200',300: 'bg-red-300',400: 'bg-red-400',500: 'bg-red-500',600: 'bg-red-600',700: 'bg-red-700', 800: 'bg-red-800'},
     yellow: {200: 'bg-yellow-200',300: 'bg-yellow-300',400: 'bg-yellow-400',500: 'bg-yellow-500',600: 'bg-yellow-600',700: 'bg-yellow-700',800: 'bg-yellow-800'},
     green: {200: 'bg-green-200',300: 'bg-green-300',400: 'bg-green-400',500: 'bg-green-500',600: 'bg-green-600',700: 'bg-green-700',800: 'bg-green-800'},
@@ -16,38 +12,23 @@ export default function CommentList({ comment, userId, deleteComment, onRefresh,
   }
 
  const userColorClass = colorMap[color]?.[shade] || 'bg-gray-500';
- console.log(comment)
   return (
-    <li>
-      <div className="m-3 p-3 border rounded">
-        <div className="flex items-center">
-          {profile
+    <div className='mt-5'>
+      <div className='flex'>
+        {profile
             ?<img src={profile} alt="" className='w-8 h-8 rounded-full ml-2 border-1' />
             :<div className='ml-2'>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${userColorClass}`}>
                     <p>
-                    { comment.first_name.slice(0,1).toUpperCase()}
+                    { first_name.slice(0,1).toUpperCase()}
                     </p>
                 </div>
             </div>}
-          <h1 className="ml-3">
-            {comment.first_name} {comment.surname}
-          </h1>
-
-          {comment.user_id === userId && (
-            <button className="ml-auto" onClick={() => deleteComment(comment.id)}>
-              <DeleteIcon />
-            </button>
-          )}
-        </div>
-
-        <p className="ml-16 break-words w-11/12 mb-3">{comment.content}</p>
-
-        <ReplyList
-          commentId={comment.id}
-          onRefresh={onRefresh}
-        />
+        <h1 className="ml-3">
+            {first_name} {surname}
+        </h1>
       </div>
-    </li>
-  );
+    <p className="ml-16 break-words w-11/12 mb-3">{content}</p>
+  </div>
+  )
 }

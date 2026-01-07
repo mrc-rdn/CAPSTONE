@@ -1,55 +1,86 @@
-import React, {useEffect, useState} from 'react'
-import { API_URL } from '../../../../api.js'
-import axios from 'axios'
+import React, { useEffect, useState, useRef } from 'react';
+import { API_URL } from '../../../../api.js';
+import axios from 'axios';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export default function Certificate(props) {
-    const {title} =  props.certificateData[0]
-    const [data, setdata] = useState([]);
-    useEffect(()=>{
-        async function fetchdata (){
-            try {
-                const result = await axios.get(`${API_URL}/trainee/dashboard`, {withCredentials:true})
-                setdata(result.data.usersInfo[0])
-                console.log(result.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        fetchdata()
-    },[])
-    const [completionDate, setCompletionDate] = useState({
-    fullDate: "",
-    day: "",
-    month: "",
-    year: "",
-    time: "",
+  const { title } = props.certificateData[0];
+  const [data, setData] = useState({});
+  const [completionDate, setCompletionDate] = useState({
+    fullDate: '',
+    day: '',
+    month: '',
+    year: '',
+    time: '',
   });
+
+  const certificateRef = useRef(); // <-- Ref for the certificate div
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const result = await axios.get(`${API_URL}/trainee/dashboard`, { withCredentials: true });
+        setData(result.data.usersInfo);
+        console.log(result.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const now = new Date();
-
-    const options = { month: "long" }; // "November"
-    const month = new Intl.DateTimeFormat("en-US", options).format(now);
-
-    const day = now.getDate(); // 27
-    const year = now.getFullYear(); // 2025
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const options = { month: 'long' };
+    const month = new Intl.DateTimeFormat('en-US', options).format(now);
+    const day = now.getDate();
+    const year = now.getFullYear();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
 
     setCompletionDate({
-      fullDate: now.toLocaleDateString(), // e.g., 11/27/2025
+      fullDate: now.toLocaleDateString(),
       day: day,
       month: month,
       year: year,
-      time: `${hours}:${minutes}`, // 24-hour format
+      time: `${hours}:${minutes}`,
     });
   }, []);
+
+  // Function to generate PDF
+  const handleDownloadPDF = async () => {
+    const element = certificateRef.current;
+    if (!element) return;
+
+    const canvas = await html2canvas(element, { scale: 3 }); // scale for better resolution
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'px',
+      format: [canvas.width, canvas.height],
+    });
+
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save(`${data.first_name}_${data.surname}_certificate.pdf`);
+  };
+  console.log(props.certificateData)
+  const handleprogress = async()=>{
+    const sendprogress = await axios.post(`${API_URL}/trainee/chapterprogress/${props.courseId}/${props.certificateData[0].chapter_id}`,{}, {withCredentials:true})
+  }
+
   return (
-    <div className='w-full h-full overflow-y-scroll '>
-      <div className='w-full min-h-screen  flex justify-center p-2 sm:p-4 lg:p-8'>
+    <div className="w-full h-full overflow-y-scroll">
+      <div className="w-full min-h-screen flex flex-col items-center p-2 sm:p-4 lg:p-8">
         <div className="w-full max-w-[1200px]">
-          <div className="bg-white shadow-2xl relative border-[8px] sm:border-[12px] lg:border-[15px] border-green-700 print:shadow-none" id="certificate">
-            <div className="p-6 sm:p-10 md:p-12 lg:p-16 xl:px-20 relative bg-white border-2 lg:border-[3px] border-yellow-600 min-h-[600px] sm:min-h-[700px] lg:min-h-[750px]">
+          {/* Certificate Div */}
+          <div className='w-full min-h-screen  flex justify-center p-2 sm:p-4 lg:p-8'>
+        <div className="w-full max-w-[1200px] max-h-[1000px]">
+          <div id="certificate"
+              className="bg-white mx-auto relative border-[15px] border-green-700 print:border-[15px]"
+              style={{width: "270mm",height: "197mm"}}>
+           <div className="relative bg-white border-[3px] border-yellow-600 h-full p-[40px] ">
 
               {/* Watermark */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] lg:w-[800px] lg:h-[800px] opacity-20 z-0">
@@ -81,7 +112,7 @@ export default function Certificate(props) {
 
                   <div className="text-[9px] sm:text-[10px] lg:text-xs font-semibold text-gray-800 tracking-wide leading-[1.6] sm:leading-[1.8] mb-2 px-2">
                     PARAÑAQUE LIVELIHOOD RESOURCE MANAGEMENT OFFICE
-                    <br />
+                  
                     PARAÑAQUE SKILLS TRAINING CENTER
                     <br />
                     <span className="hidden sm:inline">PLRMO Bldg. Simplicio Cruz Cmpd., Brgy. San Isidro, Parañaque City</span>
@@ -89,11 +120,11 @@ export default function Certificate(props) {
                   </div>
                 </div>
 
-                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-[4px] sm:tracking-[8px] lg:tracking-[12px] my-3 sm:my-4 lg:my-5 uppercase" 
+                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-black text-black tracking-[4px] sm:tracking-[8px] lg:tracking-[12px] my-3 sm:my-4 lg:my-5 uppercase" 
                     style={{ textShadow: "2px 2px 4px rgba(13, 92, 58, 0.1)" }}>
                   CERTIFICATE
                 </h1>
-                <h2 className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl font-normal text-gray-800 tracking-[3px] sm:tracking-[6px] lg:tracking-[8px] mb-5 sm:mb-7 lg:mb-8 uppercase">
+                <h2 className="font-serif text-base sm:text-lg md:text-xl lg:text-xl font-normal text-gray-800 tracking-[3px] sm:tracking-[6px] lg:tracking-[8px] mb-5 sm:mb-7 lg:mb-8 uppercase">
                   OF COMPLETION
                 </h2>
 
@@ -101,7 +132,7 @@ export default function Certificate(props) {
 
                 
                 <div
-                  className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black border-b-2 lg:border-b-[3px] border-black pb-2 lg:pb-2.5 mx-auto mb-5 sm:mb-7 lg:mb-8 capitalize max-w-[90%] sm:max-w-[85%] lg:max-w-[80%] inline-block break-words"
+                  className="font-serif text-xl sm:text-3xl md:text-xl lg:text-3xl font-bold text-black border-b-2 lg:border-b-[3px] border-black pb-2 lg:pb-2.5 mx-auto mb-5 sm:mb-7 lg:mb-8 capitalize max-w-[90%] sm:max-w-[85%] lg:max-w-[80%] inline-block break-words"
                   id="recipientName"
                 >
                   {data.first_name} {data.surname}
@@ -159,7 +190,19 @@ export default function Certificate(props) {
           </div>
         </div>  
       </div>
-  
+
+
+          {/* Button to download */}
+          <button
+            onClick={() => {window.print(), handleprogress()}}
+            className="mt-6 px-6 py-2 bg-green-700 text-white rounded"
+          >
+            Print / Save as PDF
+          </button>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
+
+

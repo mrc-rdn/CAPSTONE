@@ -23,6 +23,7 @@ export default function EditChapterModal(props) {
             {withCredentials: true})
         setChapterAdded(true)
         console.log(result.data)
+        props.onExit()
       } catch (error) {
         console.log(error)
       }
@@ -39,6 +40,7 @@ export default function EditChapterModal(props) {
           console.log(res)
           setDelete(true)
           setChapterAdded(true)
+          props.onExit()
       } catch (error) {
         console.log('error deleting chapter',error)
       }
