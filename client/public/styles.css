@@ -27,6 +27,18 @@
   background-color: #2D4F2B;
 }
 
+.lightGreen{
+  background-color: #708A58;
+}
+
+.orange{
+  background-color: #FFB823;
+}
+
+.cream{
+  background-color: #FFF1CA;
+}
+
 
 @media print {
   @page {
