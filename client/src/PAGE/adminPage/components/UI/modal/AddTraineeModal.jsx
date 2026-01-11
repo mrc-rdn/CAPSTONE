@@ -69,7 +69,7 @@ export default function AddTraineeModal(props) {
   let result = getCompletionPercentagePerUser(progress);
 
 
-
+console.log(result)
   return (
     <div className='w-full h-full bg-gray-500/80 fixed inset-0 grid place-items-center z-200'>
       <div className='w-10/12 h-10/12 bg-white p-3 rounded-lg p-5'>

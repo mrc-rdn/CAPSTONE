@@ -33,6 +33,11 @@ export default function Navrbar(props) {
           hover:text-yellow-400 hover:bg-white rounded ">
           <DashboardIcon sx={{fontSize: 30}} /> Dashboard
         </Link>
+         <Link to="/admin/statistics" 
+          className="flex w-full px-2 py-3 items-center gap-2 text-white font-semibold 
+          hover:text-yellow-400 hover:bg-white rounded ">
+          <GroupsIcon sx={{fontSize: 30}} /> Master List
+        </Link>
         <Link to="/admin/course" 
           className="flex w-full px-2 py-3 items-center gap-2 text-white font-semibold 
           hover:text-yellow-400 hover:bg-white rounded ">

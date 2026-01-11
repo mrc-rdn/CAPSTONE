@@ -1,63 +1,69 @@
-import React, {useEffect, useState} from 'react'
-import Navbar from './components/Navbar.jsx'
-import Header from './components/message/Header.jsx'
-import AddContactModal from './components/message/AddContactModal.jsx'
-import ContactList from './components/message/ContactList.jsx'
-import axios from 'axios'
-import { API_URL } from '../../api.js'
+import React, { useEffect, useState } from "react";
+import Navbar from "./components/Navbar.jsx";
+import Header from "./components/message/Header.jsx";
+import ContactList from "./components/message/ContactList.jsx";
+import axios from "axios";
+import { API_URL } from "../../api.js";
 import { io } from "socket.io-client";
 
+// ✅ ISANG SOCKET INSTANCE LANG
 const socket = io(API_URL, {
   withCredentials: true,
-  autoConnect: false
+  autoConnect: false,
 });
 
-export default function Message() {
-  const [isAddContactModal, setIsAddContactModal] = useState(false)
-  const [userData, setUserData] = useState([])
+export default function AdminMessages() {
+  const [userData, setUserData] = useState({});
+  const [refresh, setRefresh] = useState(0);
 
-  function handleOpenAddContactModal (){
-    setIsAddContactModal(true)
-    
-  }
-  function onExitAddContactModal (){
-    setIsAddContactModal(false)
-  }
+  const handleRefresh = () => {
+    setRefresh((prev) => prev + 1);
+  };
 
-
-  useEffect(()=>{
-    async function fetchData(){
+  // =============================
+  // FETCH USER INFO
+  // =============================
+  useEffect(() => {
+    async function fetchUser() {
       try {
-        const response = await axios.get(`${API_URL}/trainer/dashboard`, {withCredentials: true});
-        setUserData(response.data.userInfo)
-        
-      } catch (error) {
-        console.log(error)
+        const res = await axios.get(`${API_URL}/trainer/dashboard`, {
+          withCredentials: true,
+        });
+        setUserData(res.data.userInfo);
+      } catch (err) {
+        console.log(err);
       }
     }
-    fetchData()
-  },[])
-//
-  useEffect(() => {
-    socket.connect();
+    fetchUser();
+  }, []);
 
-    socket.on("connect", () => {
-      console.log("Socket connected:", socket.id);
-    });
+  // =============================
+  // SOCKET CONNECT (ONCE)
+  // =============================
+  useEffect(() => {
+    if (!userData?.id) return;
+
+    socket.connect();
+    socket.emit("join-user", userData.id);
 
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [userData?.id]);
+console.log(userData)
   return (
-    <div className="flex w-screen h-screen ">
-        <Navbar />
-        <div className='w-full bg-gray-200'>
-          
-          <Header title="message" handleOpenAddContactModal={handleOpenAddContactModal} />
-          {isAddContactModal?<AddContactModal onExit={onExitAddContactModal} /> :null }
-          <ContactList userData={userData} socket={socket} />
-        </div>
+    <div className="flex w-screen h-screen">
+      <Navbar />
+
+      <div className="w-full bg-gray-200">
+        <Header title="message" refresh={handleRefresh} />
+
+        <ContactList
+          userData={userData}
+          socket={socket}
+          refresh={refresh}
+        />
+      </div>
     </div>
-  )
+  );
 }

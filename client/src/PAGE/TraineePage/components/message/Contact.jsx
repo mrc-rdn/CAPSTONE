@@ -8,6 +8,8 @@ export default function Contact(props) {
     props.handleSelectContact(props.contactData.id)
     props.handleActiveChapter(props.contactData.id)
   }
+console.log( props.profile ,props.color, props.shade)
+
    const colorMap = {
           red: {200: 'bg-red-200',300: 'bg-red-300',400: 'bg-red-400',500: 'bg-red-500',600: 'bg-red-600',700: 'bg-red-700', 800: 'bg-red-800'},
           yellow: {200: 'bg-yellow-200',300: 'bg-yellow-300',400: 'bg-yellow-400',500: 'bg-yellow-500',600: 'bg-yellow-600',700: 'bg-yellow-700',800: 'bg-yellow-800'},
@@ -19,27 +21,31 @@ export default function Contact(props) {
       }
   
     const userColorClass = colorMap[props.color]?.[props.shade] || 'bg-gray-500';
-
+console.log(props.contactData)
   return (
-     <div className={
+    <div className={
       props.isActive
       ?'w-full h-15 flex bg-green-600 justify-center items-center'
       :'w-full h-15 flex justify-center items-center'} 
       onClick={ handleSelect}
     >
-        <div>{props.profile
-
-          ?<div className='ml-2 w-11 h-11 '><img src={props.profile} alt="" className='w-11 h-11 rounded-full border-1' /></div>
-          :<div className='ml-2'>
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center ${userColorClass}`}>
-                  <p>
-                  {props.firstName.slice(0,1).toUpperCase()}
-                  </p>
-              </div>
-          </div>}
-        </div>
+        <div className='relative'> {props.profile
+            ?<img src={props.profile} alt="" className='w-10 h-10 rounded-full ml-2 border-1 mr-3' />
+            :<div className='ml-2'>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${userColorClass}`}>
+                    <p>
+                    {props.firstName.slice(0,1).toUpperCase()}
+                    </p>
+                </div>
+            </div>}
+            {props.unread_count > 0 && (
+              <span className="w-4 h-4 bg-red-500 pl-1 text-white text-xs rounded-full absolute bottom-6 left-10">
+                {props.unread_count}
+              </span>
+            )}
+          </div>
         <div className='w-full flex m-1'>
-            <p className=' mr-1'>{props.firstName} </p> <p> {props.surname}</p>
+            <p className='ml-1 mr-1'>{props.firstName} </p> <p> {props.surname}</p>
         </div>
     </div>
   )

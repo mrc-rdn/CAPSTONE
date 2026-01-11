@@ -1,10 +1,11 @@
 import React from 'react'
 
 export default function messages(props) {
-   console.log(props.message.first_name)
-    console.log(props.userData)
+  console.log(props.message.first_name)
+  console.log(props.userData)
   return (
     
+   
     <div className="w-full">
     {props.message.first_name !== props.userData.first_name && props.message.sender_id !== props.userData.id 
     ? (// RECEIVER (LEFT)
@@ -32,9 +33,8 @@ export default function messages(props) {
         </div>
     )}
     </div>
-
-
       
     
   )
 }
+

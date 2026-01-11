@@ -13,6 +13,7 @@ import CourseOverview from './PAGE/adminPage/CourseOverview.jsx'
 import AdminMessages from './PAGE/adminPage/AdminMessages.jsx'
 import CreateAcoount from './PAGE/adminPage/CreateAcoount.jsx'
 import EditProfile from './PAGE/adminPage/EditProfile.jsx'
+import MasterList from './PAGE/adminPage/MasterList.jsx'
 
 
 //this is a protect route
@@ -55,6 +56,7 @@ export default function App() {
 
         <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
         <Route path="/admin/course" element={<AdminProtectedRoute><AdminCourse /></AdminProtectedRoute>} />
+        <Route path="/admin/statistics" element={<AdminProtectedRoute><MasterList /></AdminProtectedRoute>} />
         <Route path="/admin/messages" element={<AdminProtectedRoute><AdminMessages /></AdminProtectedRoute>} />
         <Route path="/admin/createaccount" element={<AdminProtectedRoute><CreateAcoount /></AdminProtectedRoute>} />
         <Route path="/admin/course/:id/:courseTitle" element={<AdminProtectedRoute> <CourseOverview /> </AdminProtectedRoute>}/>
