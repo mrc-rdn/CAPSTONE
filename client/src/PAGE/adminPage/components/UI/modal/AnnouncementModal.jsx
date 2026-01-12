@@ -83,117 +83,180 @@ export default function AddChapterModal(props) {
 
 
   return (
-    <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex items-center justify-center z-100 '>
-      <div className='w-full h-full bg-gray-100 p-3 rounded flex flex-col'>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="w-11/12 h-[90vh] bg-white rounded-xl shadow-xl flex flex-col">
 
-        <div>
-          <button onClick={()=>{props.onExit(exit);}}><CloseIcon /></button>
-        </div>
-        <div className='w-full flex items-center'>
-
-       
-        <h1  className='text-2xl mt-3 ml-6'>Announcement</h1>
-        
-        <button 
-          className='w-55 h-12 bg-green-500 rounded text-white font-bold ml-auto'
-          onClick={()=> setIsTextArea(true)}>Create Announcement
+      {/* ===== HEADER ===== */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#6F8A6A]/40">
+        <h1 className="text-xl font-semibold text-[#2D4F2B]">
+          Announcements
+        </h1>
+        <button
+          onClick={() => props.onExit(exit)}
+          className="w-9 h-9 flex items-center justify-center text-[#2D4F2B]"
+        >
+          <CloseIcon />
         </button>
-        
-        
-        </div>
-        {isTextArea&&<div className='w-full h-full bg-gray-500/40 z-1000 absolute inset-0'>
-        <div className='w-full h-full flex items-center justify-center'>
-          <form  onSubmit={handleSubmit}
-        className='flex flex-col items-center h-7/12 my-auto bg-white w-6/12 rounded-lg'>
-          <div className='w-full'>
-            <button className='m-5' onClick={()=>{setIsTextArea(false);}}><CloseIcon /></button>
-            <h1 className='ml-9'>Create Announcement</h1>
-          </div>
-           
-          <div className='w-10/12 flex flex-col m-2'>
-            <label >Title</label>
-            <input 
-            className='w-full h-9 m-2 bg-green-500 rounded p-1'
-            onChange={(e)=>{setTitle(e.target.value) }}
-            type="text" 
-            maxLength="25"
-            required
-            placeholder='Title'
-            value={title} />
-          </div>
-            
-          <div className='w-10/12 flex flex-col mb-10 '>
-            <label>Message</label>
-            <div className='flex items-center'>
-              <textarea 
-              ref={textareaRef}
-              className=' w-full bg-green-500 rounded p-1 h-8 max-h-[140px] overflow-y-scroll m-2'
-              onChange={handleChange}
-              type="text" 
-              maxLength='480'
-              required
-              placeholder='Message' 
-              value={message}/>
-              <button
-                className={isMouseOver?'m-3 w-30 h-10 text-2xl text-white bg-green-500 rounded':'m-3 w-30 h-10 text-2xl text-green-500 bg-white border-2  rounded' }
-                onMouseOver={()=> setMouseOver(true)}
-                onMouseOut={()=> setMouseOver(false)}
-                type='submit'>
-                  Send
-              </button>
-          
+      </div>
 
+      {/* ===== BODY ===== */}
+      <div className="flex-1 overflow-y-auto px-6 py-4">
+
+        {/* Create Announcement Button (NO BOX) */}
+        <div className="mb-6">
+          <button
+            onClick={() => setIsTextArea(true)}
+            className="
+              h-11 px-6
+              rounded-xl
+              font-semibold
+              bg-[#2D4F2B]
+              text-white
+              hover:bg-[#708A58]
+              transition
+            "
+          >
+            Create Announcement
+          </button>
+        </div>
+
+        {/* ===== CREATE ANNOUNCEMENT MODAL ===== */}
+        {isTextArea && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <form
+              onSubmit={handleSubmit}
+              className="w-6/12 bg-white rounded-xl shadow-xl flex flex-col"
+            >
+              {/* Inner Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#6F8A6A]/40">
+                <h2 className="text-lg font-semibold text-[#2D4F2B]">
+                  Create Announcement
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsTextArea(false)}
+                  className="w-9 h-9 flex items-center justify-center text-[#2D4F2B]"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+
+              {/* Form Body */}
+              <div className="px-6 py-5 flex flex-col gap-4">
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm text-[#2D4F2B]">Title</label>
+                  <input
+                    type="text"
+                    maxLength={25}
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter title"
+                    className="
+                      h-10 px-3
+                      rounded-lg
+                      border border-[#6F8A6A]
+                      focus:outline-none
+                      focus:ring-2
+                      focus:ring-[#FFB823]
+                    "
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm text-[#2D4F2B]">Message</label>
+                  <textarea
+                    ref={textareaRef}
+                    value={message}
+                    onChange={handleChange}
+                    maxLength={480}
+                    required
+                    placeholder="Write your announcement here..."
+                    className="
+                      min-h-[120px] max-h-[200px]
+                      px-3 py-2
+                      rounded-lg
+                      border border-[#6F8A6A]
+                      resize-none
+                      focus:outline-none
+                      focus:ring-2
+                      focus:ring-[#FFB823]
+                    "
+                  />
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    className="
+                      w-40 h-10
+                      rounded-xl
+                      font-semibold
+                      bg-[#2D4F2B]
+                      text-white
+                      hover:bg-[#708A58]
+                      transition
+                    "
+                  >
+                    SEND
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ===== ANNOUNCEMENT LIST ===== */}
+        {announcement.map((item, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-xl shadow-md p-5 mb-4"
+          >
+            <div className="flex items-center mb-3">
+              {item.profile_pic ? (
+                <img
+                  src={item.profile_pic}
+                  alt=""
+                  className="w-11 h-11 rounded-full border"
+                />
+              ) : (
+                <div
+                  className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-bold 
+                    ${colorMap[item.color]?.[item.shades] || "bg-gray-500"}`}
+                >
+                  {item.first_name.slice(0, 1)}
+                </div>
+              )}
+
+              <div className="ml-3">
+                <p className="font-semibold text-gray-800">
+                  {item.first_name} {item.surname}
+                </p>
+              </div>
+
+              {userId === item.user_id && (
+                <button
+                  className="ml-auto text-gray-400 hover:text-red-500 transition"
+                  onClick={() => handleDelete(item.id)}
+                >
+                  <DeleteIcon />
+                </button>
+              )}
             </div>
-          
-            
-          
+
+            <h2 className="text-lg font-bold text-gray-800 mb-2">
+              {item.title}
+            </h2>
+
+            <p className="text-gray-600 break-words">
+              {item.message}
+            </p>
           </div>
-                                
+        ))}
+      </div>
 
-            
-        </form></div>
-        </div>
-        }
-       
-       <div className='w-full h-full '>
-
-        
-        <div className='h-9/12 overflow-y-scroll mt-5 w-full'>
-
-        
-         {
-            announcement.map((item, index)=>{
-              return <div key={index} className="w-10/12 h-6/12 mx-auto my-4 p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition">
-                        <div className='flex items-center'>
-                          {item.profile_pic
-                          ?<img src={item.profile_pic} alt="" className='w-11 h-11 rounded-full ml-2 border-1' />
-                          :<div className='ml-2'>
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${colorMap[item.color]?.[item.shades]|| 'bg-gray-500'} `}>
-                                  <p>
-                                  {item && item.first_name.slice(0,1)}
-                                  </p>
-                              </div>
-                          </div>}
-                          <p className='m-2'>{item.first_name}</p>
-                          <p>{item.surname}</p>
-                          {
-                            userId === item.user_id && <button className='ml-auto' onClick={()=>handleDelete(item.id)}><DeleteIcon /></button>
-                          }
-                          
-                        </div>
-                        <h2 className="text-xl font-bold text-gray-800 mb-2 m-3">{item.title}</h2>
-                        <p className="text-gray-600 break-words">{item.message}</p>
-                      </div>
-            })
-          }
-          </div>
-       
-       
-      
-        </div>
-        
-
-      </div> 
     </div>
-  )
+  </div>
+);
 }

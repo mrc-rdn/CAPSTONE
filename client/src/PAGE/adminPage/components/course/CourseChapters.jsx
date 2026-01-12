@@ -118,7 +118,7 @@ export default function CourseChapters(props) {
       <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative shadow-lg">
             
 
-            <div className="h-10 w-full bg-white flex items-center sticky top-0">
+            <div className="h-10 w-full bg-gray-200 flex items-center sticky top-0">  {/*course content header*/}
               <h1 className="text-large ml-3 font-bold ">Course content</h1>
               <button
                 onClick={()=>{setEditChapter(!isEditChapter), props.handleEditChapter(isEditChapter)}}

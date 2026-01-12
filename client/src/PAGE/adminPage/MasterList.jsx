@@ -8,10 +8,12 @@ import CourseTraineeProgress from './components/statistics/CourseTraineeProgress
 const MasterList = () => {
 
   return (
-    <div className="flex w-screen h-screen ">
+    <div className="flex w-screen h-screen overflow-hidden">
             <Navbar />
-            <div className='w-full bg-gray-200'>
-              
+            <div className='w-10/12 bg-gray-200 overflow-y-scroll'>
+                <div>
+                  
+                </div>
                 <Header title="MasterList"   />
                 <StatisticsCollection  />
                 

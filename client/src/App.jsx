@@ -4,6 +4,8 @@ import LandingPage from "./PAGE/homePage/landingPage.jsx"
 import TraineeLoginPage from "./PAGE/homePage/TraineeLoginPage.jsx"
 import TrainerLoginPage from "./PAGE/homePage/TrainerLoginPage.jsx"
 import RoleChoicePage from './PAGE/homePage/RoleChoicePage.jsx'
+import ForgotPassword from './PAGE/homePage/ForgotPasswordPage.jsx'
+import ResetPassword from './PAGE/homePage/ResetPassword.jsx'
 
 //this is for admin
 import AdminProtectedRoute from "./PAGE/adminPage/components/routes/AdminProtectedRoute.jsx"
@@ -40,7 +42,8 @@ export default function App() {
         <Route path="/role" element={<RoleChoicePage />} />
         <Route path="/trainee/login" element={<TraineeLoginPage />} />
         <Route path="/trainer/login" element={<TrainerLoginPage />} />
-
+        <Route path="/trainer/ForgetPassword" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         
         <Route path="/trainer/dashboard" element={<TRAINERProtectedRoute><TrainerDashboard/></TRAINERProtectedRoute>} />
         <Route path="/trainer/course" element={<TRAINERProtectedRoute><TrainerCourse/></TRAINERProtectedRoute>}/>

@@ -1,3 +1,4 @@
+
 import React, {useState} from 'react'
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -63,120 +64,187 @@ export default function CAContent() {
     
   }
   return (
-    <div className='grid place-items-center m-3 '>
-      <div className='w-260 h-150 bg-white rounded-lg'>
-        <div className='grid place-items-center m-10 '>
-          {isAccountCreated?<p>Account Created</p>:null}
-          <form action="" className=' flex  flex-wrap  '>
-            <div className='flex flex-col w-6/12 p-2'>
+    <div className="grid place-items-center p-4">
+  <div
+    className="
+      w-full max-w-6xl
+      rounded-2xl
+      bg-white/20
+      backdrop-blur-xl
+      border border-white/20
+      shadow-xl
+      p-10
+    "
+  >
+    {isAccountCreated && (
+      <p className="mb-4 text-center text-green-600 font-semibold">
+        Account Created
+      </p>
+    )}
 
-            
-              <label htmlFor="">First Name</label>
-              <input 
-              className=' w-full h-8 text-lg bg-green-600 rounded p-1 m-1'
-              type="text" 
-              name='first_name'
-              placeholder='FirstName'
-              required
-              onChange={(e)=>{setFirstName(e.target.value)}}
-              value={firstName}/>
-            </div>
-            <div className='flex flex-col w-6/12 p-2'>
-              <label htmlFor="">Surname</label>
+    <form className="flex flex-wrap">
 
-              <input 
-              className='  w-full h-8 text-lg bg-green-600 rounded p-1 m-1'
-              type="text" 
-              name='surname'
-              placeholder='Surname'
-              required
-              onChange={(e)=>{setSurname(e.target.value)}}
-              value={surname}/>
-            </div>
-              
-            <div className='flex flex-col w-full p-2'>
-              <label htmlFor="">Contact No</label>
-
-              <input 
-              className=' w-full h-8 text-lg bg-green-600 rounded p-1 m-1'
-              type="text" 
-              name='surname'
-              placeholder='Contact No'
-              required
-              onChange={(e)=>{setContactNo(e.target.value)}}
-              value={contactNo}/>
-            </div>
-              
-            <div className='flex flex-col w-full p-2'>
-              <label htmlFor="">Username</label>
-              <input 
-              className=' w-full h-8 text-lg bg-green-600 rounded p-1 m-1'
-              type="text" 
-              name="username" 
-              placeholder='username'
-              required
-              onChange={(e)=>{setUsername(e.target.value)}}
-              value={username}/>
-
-            </div>
-              
-              <div className='flex flex-col w-6/12 p-2'>
-                <label htmlFor="">Password {isPasswordMatch?<span className='text-red-500'>*</span>:null}</label>
-                <input 
-                className=' w-full h-8 text-lg bg-green-600 rounded p-1 m-1'
-                type="text" 
-                name="Password"
-                placeholder='Password' 
-                required
-                onChange={(e)=>{setPassword(e.target.value)}}
-                value={password}/>
-              </div>
-            
-            <div className='flex flex-col w-6/12 p-2'>
-                  <label htmlFor="">Confirm Password {isPasswordMatch?<span className='text-red-500'>*</span>:null}</label>
-                  <input 
-                  className=' w-full h-8 text-lg bg-green-600 rounded p-1 m-1'
-                  type="text" 
-                  name="Password"
-                  placeholder='Confirm Password'
-                  required
-                  onChange={(e)=>{setConfirmPassword(e.target.value)}}
-                  value={confirmPassword}/>
-              </div>
-              
-            <div className=' w-full  text-2xl border-4 border-green-600 rounded-lg p-2 mt-4'>
-
-            
-              <FormControl>
-              <FormLabel id="demo-radio-buttons-group-label">Role</FormLabel>
-              <RadioGroup
-              className=''
-                  aria-labelledby="demo-radio-buttons-group-label "
-                  defaultValue="female"
-                  name="radio-buttons-group"
-                  required
-                  value={role}
-                  onChange={(e)=>{setRole(e.target.value)}}
-              >
-
-                  <FormControlLabel  value="TRAINER" control={<Radio />} label="Trainer" />
-                  <FormControlLabel value="TRAINEE" control={<Radio />} label="Trainee" />
-                  
-              </RadioGroup>
-              </FormControl>
-            </div>
-              <div className='w-full flex justify-center'>
-                <button 
-                className={isMouseOver?'m-3 w-50 h-10 text-2xl text-green-500 bg-white border-2  rounded':'m-3 w-50 h-10 text-2xl text-white bg-green-500 rounded' }
-                onMouseOver={()=> setMouseOver(true)}
-                onMouseOut={()=> setMouseOver(false)}
-                onClick={fetchData}>SUBMIT</button>
-              </div>
-                
-                
-          </form>
-        </div>
+      {/* First Name */}
+      <div className="flex flex-col w-full sm:w-1/2 p-2">
+        <label className="text-sm font-medium text-[#2D4F2B]">First Name</label>
+        <input
+          className="
+            w-full h-10
+            rounded-md px-3
+            bg-white/70
+            border border-white/30
+            focus:outline-none focus:ring-2 focus:ring-[#2D4F2B]
+          "
+          type="text"
+          placeholder="First Name"
+          required
+          onChange={(e) => setFirstName(e.target.value)}
+          value={firstName}
+        />
       </div>
-    </div>
+
+      {/* Surname */}
+      <div className="flex flex-col w-full sm:w-1/2 p-2">
+        <label className="text-sm font-medium text-[#2D4F2B]">Surname</label>
+        <input
+          className="
+            w-full h-10
+            rounded-md px-3
+            bg-white/70
+            border border-white/30
+            focus:outline-none focus:ring-2 focus:ring-[#2D4F2B]
+          "
+          type="text"
+          placeholder="Surname"
+          required
+          onChange={(e) => setSurname(e.target.value)}
+          value={surname}
+        />
+      </div>
+
+      {/* Contact */}
+      <div className="flex flex-col w-full p-2">
+        <label className="text-sm font-medium text-[#2D4F2B]">Contact No</label>
+        <input
+          className="
+            w-full h-10
+            rounded-md px-3
+            bg-white/70
+            border border-white/30
+            focus:outline-none focus:ring-2 focus:ring-[#2D4F2B]
+          "
+          type="text"
+          placeholder="Contact No"
+          required
+          onChange={(e) => setContactNo(e.target.value)}
+          value={contactNo}
+        />
+      </div>
+
+      {/* Username */}
+      <div className="flex flex-col w-full p-2">
+        <label className="text-sm font-medium text-[#2D4F2B]">Username</label>
+        <input
+          className="
+            w-full h-10
+            rounded-md px-3
+            bg-white/50
+            border border-white/30
+            text-gray-500
+          "
+          type="text"
+          disabled
+          value={username}
+        />
+      </div>
+
+      {/* Password */}
+      <div className="flex flex-col w-full sm:w-1/2 p-2">
+        <label className="text-sm font-medium text-[#2D4F2B]">
+          Password {isPasswordMatch && <span className="text-red-500">*</span>}
+        </label>
+        <input
+          className="
+            w-full h-10
+            rounded-md px-3
+            bg-white/70
+            border border-white/30
+            focus:outline-none focus:ring-2 focus:ring-[#2D4F2B]
+          "
+          type="password"
+          placeholder="Password"
+          required
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
+        />
+      </div>
+
+      {/* Confirm Password */}
+      <div className="flex flex-col w-full sm:w-1/2 p-2">
+        <label className="text-sm font-medium text-[#2D4F2B]">
+          Confirm Password {isPasswordMatch && <span className="text-red-500">*</span>}
+        </label>
+        <input
+          className="
+            w-full h-10
+            rounded-md px-3
+            bg-white/70
+            border border-white/30
+            focus:outline-none focus:ring-2 focus:ring-[#2D4F2B]
+          "
+          type="password"
+          placeholder="Confirm Password"
+          required
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          value={confirmPassword}
+        />
+      </div>
+
+      {/* Role */}
+      <div className="w-full p-4 mt-4 rounded-xl bg-white/30 border border-white/20">
+        <FormControl>
+          <FormLabel className="text-[#2D4F2B] font-medium">Role</FormLabel>
+          <RadioGroup
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <FormControlLabel value="TRAINER" control={<Radio  sx={{
+        color: "#2D4F2B",
+        "&.Mui-checked": {
+          color: "#2D4F2B",
+        },
+      }} />} label="Trainer" />
+            <FormControlLabel value="TRAINEE" control={<Radio  sx={{
+        color: "#2D4F2B",
+        "&.Mui-checked": {
+          color: "#2D4F2B",
+        },
+      }} />} label="Trainee" />
+          </RadioGroup>
+        </FormControl>
+      </div>
+
+      {/* Submit */}
+      <div className="w-full flex justify-center mt-6">
+        <button
+          className="
+            w-52 h-11
+            rounded-xl
+            font-semibold
+            bg-[#2D4F2B]
+            text-white
+            hover:bg-[#708A58]
+            transition
+          "
+          onClick={fetchData}
+        >
+          SUBMIT
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
   )
 }

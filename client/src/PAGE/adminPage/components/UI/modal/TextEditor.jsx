@@ -33,37 +33,82 @@ export default function TextEditor(props) {
 
 
     return (
-   
-    <div className='w-full h-full absolute bg-white p-3 rounded'>
-    <button onClick={()=>{props.onExit();}}><CloseIcon /></button>
-        {isPostingSuccess
-        ?<p className='m-5'>Successful posting</p>
-        :<div className=" w-full h-11/12 flex flex-col p-4 ">
-            <h1 className="text-3xl font-bold mb-4">Text Editor</h1>
+  <div className="w-full h-full absolute inset-0 bg-white flex flex-col rounded-xl">
 
-            <input 
-                type="text"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="border p-2 mb-2 w-full rounded"
-            />
-            <div className='h-9/12 '>
-                <ReactQuill value={content} onChange={setContent} className=' h-10/12 ' />
-            </div>
-            
-
-            <button
-                onClick={savePost}
-                className="bg-blue-500 text-white w-full h-10 rounded hover:bg-blue-600"
-            >
-                Save Post
-            </button>
-
-            
-        </div>}
+    {/* ===== HEADER ===== */}
+    <div className="flex items-center justify-between px-6 py-4 border-b border-[#6F8A6A]/40">
+      <h1 className="text-xl font-semibold text-[#2D4F2B]">
+        Text Editor
+      </h1>
+      <button
+        onClick={() => props.onExit()}
+        className="w-9 h-9 flex items-center justify-center text-[#2D4F2B]"
+      >
+        <CloseIcon />
+      </button>
     </div>
-    
-    );
-}
 
+    {/* ===== CONTENT ===== */}
+    {isPostingSuccess ? (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-base font-medium text-[#2D4F2B]">
+          ✔ Successfully posted
+        </p>
+      </div>
+    ) : (
+      <div className="flex-1 flex flex-col px-6 py-5 gap-4 bg-white">
+
+        {/* Title */}
+        <input
+          type="text"
+          placeholder="Enter title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="
+            w-full h-11 px-4
+            rounded-lg
+            border border-[#6F8A6A]
+            text-[#2D4F2B]
+            bg-white
+            focus:outline-none
+            focus:ring-2
+            focus:ring-[#FFB823]
+          "
+        />
+
+        {/* Editor */}
+        <div className="flex-1 border border-[#6F8A6A] rounded-xl overflow-hidden bg-white">
+          <ReactQuill
+            value={content}
+            onChange={setContent}
+            className="h-full"
+          />
+        </div>
+
+        {/* ===== FOOTER ===== */}
+        <div className="flex justify-end pt-3">
+          <button
+            type="button"
+            onClick={savePost}
+            className="
+              w-40 h-11
+              rounded-xl
+              font-semibold
+              bg-[#2D4F2B]
+              text-white
+              hover:bg-[#708A58]
+              focus:outline-none
+              focus:ring-2
+              focus:ring-[#FFB823]
+              transition
+            "
+          >
+            Save Post
+          </button>
+        </div>
+
+      </div>
+    )}
+  </div>
+);
+}

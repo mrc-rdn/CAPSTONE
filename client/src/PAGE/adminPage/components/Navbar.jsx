@@ -21,40 +21,115 @@ export default function Navrbar(props) {
   }
 
   return (
-     <div className="h-screen w-1/5 bg-green-700 flex flex-col rounded-tr-xl rounded-br-xl">
-      <div className="flex items-center w-full h-20 bg-green-800 border-b border-white p-4 rounded-tr-lg">
-        <img src="../public/images/logo2.gif" alt="" className="h-12 mr-4" />
-        <h1 className="text-2xl font-bold text-white">E-Kabuhayan</h1>
-      </div>
+     <div
+  className="
+    h-[96%]
+    w-1/5
+    m-4
+    flex flex-col
+    rounded-2xl
+    bg-white/10
+    backdrop-blur-md
+    border border-white/20
+    shadow-xl
+  "
+>
+  {/* HEADER */}
+  <div
+    className="
+      flex items-center
+      w-full h-20
+      bg-white/5
+      backdrop-blur-md
+      border-b border-white/5
+      px-4
+      rounded-t-2xl
+    "
+  >
+    <img src="/images/logo2.gif" alt="" className="h-12 mr-4" />
+    <h1 className="text-2xl font-bold text-[#708A58]">
+  <span className="text-[#2D4F2B]">E</span>-Kabuhayan
+  </h1>
 
-      <nav className="flex flex-col mt-2 p-2 ">
-        <Link to="/admin/dashboard" 
-          className="flex w-full px-2 py-3 items-center gap-2 text-white font-semibold 
-          hover:text-yellow-400 hover:bg-white rounded ">
-          <DashboardIcon sx={{fontSize: 30}} /> Dashboard
-        </Link>
-         <Link to="/admin/statistics" 
-          className="flex w-full px-2 py-3 items-center gap-2 text-white font-semibold 
-          hover:text-yellow-400 hover:bg-white rounded ">
+  </div>
+
+  {/* NAV */}
+  <nav className="flex flex-col mt-3 px-2 gap-1">
+    <Link
+      to="/admin/dashboard"
+      className="
+        flex items-center gap-2
+        px-3 py-3
+        rounded-xl
+        text-[#2D4F2B] font-semibold
+        hover:bg-white/20
+        hover:text-yellow-400
+        transition
+      "
+    >
+      <DashboardIcon sx={{ fontSize: 30 }} /> Dashboard
+    </Link>
+
+    <Link
+      to="/admin/course"
+      className="
+        flex items-center gap-2
+        px-3 py-3
+        rounded-xl
+        text-[#2D4F2B] font-semibold
+        hover:bg-white/20
+        hover:text-yellow-400
+        transition
+      "
+    >
+      <GroupsIcon sx={{ fontSize: 30 }} /> Course
+    </Link>
+     <Link to="/admin/statistics" 
+          className="flex items-center gap-2
+            px-3 py-3
+            rounded-xl
+            text-[#2D4F2B] font-semibold
+            hover:bg-white/20
+            hover:text-yellow-400
+            transition">
           <GroupsIcon sx={{fontSize: 30}} /> Master List
         </Link>
-        <Link to="/admin/course" 
-          className="flex w-full px-2 py-3 items-center gap-2 text-white font-semibold 
-          hover:text-yellow-400 hover:bg-white rounded ">
-          <GroupsIcon sx={{fontSize: 30}} /> Course
-        </Link>
-        <Link to="/admin/messages" 
-          className="flex w-full px-2 py-3 items-center gap-2 text-white font-semibold 
-          hover:text-yellow-400 hover:bg-white rounded ">
-          <MessageIcon sx={{fontSize: 30}} /> Messages
-        </Link>
-        <Link to="/admin/createaccount" 
-          className="flex w-full px-2 py-3 items-center gap-2 text-white font-semibold 
-          hover:text-yellow-400 hover:bg-white rounded ">
-          <PersonIcon sx={{fontSize: 30}} /> Create Account
-        </Link>
-      </nav>
-      <Logout />
-    </div>
+
+    <Link
+      to="/admin/messages"
+      className="
+        flex items-center gap-2
+        px-3 py-3
+        rounded-xl
+        text-[#2D4F2B] font-semibold
+        hover:bg-white/20
+        hover:text-yellow-400
+        transition
+      "
+    >
+      <MessageIcon sx={{ fontSize: 30 }} /> Messages
+    </Link>
+
+    <Link
+      to="/admin/createaccount"
+      className="
+        flex items-center gap-2
+        px-3 py-3
+        rounded-xl
+        text-[#2D4F2B] font-semibold
+        hover:bg-white/20
+        hover:text-yellow-400
+        transition
+      "
+    >
+      <PersonIcon sx={{ fontSize: 30 }} /> Create Account
+    </Link>
+  </nav>
+
+<div className="mt-auto px-2 pb-4">
+  <Logout />
+  </div>
+</div>
+
   )
 }

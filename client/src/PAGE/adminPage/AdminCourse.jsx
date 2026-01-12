@@ -41,8 +41,15 @@ export default function AdminModules() {
     
   return (
     <div className="flex w-screen h-screen ">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+  <img
+    src="/images/plmro.jpg"
+    alt="Dashboard background"
+    className="w-full h-full object-cover scale-105 "
+  />
+</div>
         <Navbar />
-        <div className='w-full bg-gray-200 '>
+        <div className="w-full flex flex-col relative ">
           <Header title="Course"/>
           <div className='flex flex-wrap w-full h-11/12 overflow-y-scroll'>
             

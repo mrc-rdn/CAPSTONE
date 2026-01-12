@@ -37,28 +37,65 @@ export default function UploadProfile(props) {
   return (
     
 
-    <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex items-center justify-center '>
-      <div className='w-130 h-90 bg-white p-3 rounded'>
-        <button onClick={()=>{props.onExit(exit) }}><CloseIcon /></button>
-        <p className="m-3">Upload Profile Picture</p>
-        
-        {isImageUploaded?<p>success Uploading Image</p>
-        :<form onSubmit={handleImageUpload} className="w-full h-full flex flex-col items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+  <div className="w-[520px] max-w-[90%] h-[360px] bg-white/30 backdrop-blur-xl border border-white/30 rounded-2xl shadow-xl p-5 relative">
+
+    <button
+      onClick={()=>{props.onExit(exit)}}
+      className="absolute top-4 right-4 text-gray-700 hover:text-red-500 transition"
+    >
+      <CloseIcon />
+    </button>
+
+    <p className="text-lg font-semibold text-white mb-6 text-center">
+      Upload Profile Picture
+    </p>
+
+    {isImageUploaded
+      ? (
+        <p className="text-green-700 font-medium text-center mt-20">
+          Successfully uploaded image
+        </p>
+      )
+      : (
+        <form
+          onSubmit={handleImageUpload}
+          className="w-full h-full flex flex-col items-center justify-center gap-6"
+        >
+
           <input
-          className="w-10/12 h-10 text-2xl bg-green-500 rounded p-1 m-15"
+            className="w-10/12 h-12 text-sm bg-white/40 backdrop-blur-md border border-white/40 rounded-xl px-3 cursor-pointer"
             type="file"
-            
             onChange={(e) => setImage(e.target.files[0])}
             required
           />
 
-          <button type="submit" disabled={uploading} className="m-3 w-50 h-10 text-2xl text-green-500 bg-white border-2  rounded">
+          <button
+            type="submit"
+            disabled={uploading}
+            className="
+              w-48 h-11
+              rounded-xl
+              font-semibold
+              text-[#2D4F2B]
+              bg-white/50
+              border-2 border-[#2D4F2B]/80
+              hover:bg-[#2D4F2B]
+              hover:text-white
+              transition
+              disabled:opacity-60
+            "
+          >
             {uploading ? "Uploading..." : "Upload"}
           </button>
-        </form>}
-        
 
-      </div> 
-    </div>
+        </form>
+      )
+    }
+
+  </div>
+</div>
+
   );
 }

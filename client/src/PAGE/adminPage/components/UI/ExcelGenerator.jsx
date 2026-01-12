@@ -96,13 +96,26 @@ console.log(result.data)
   };
 
   return (
-    <div>
-      <button
-        onClick={generateExcel}
-        className="m-3 w-60 h-10 text-white bg-green-500 rounded"
-      >
-        Generate Completion Excel
-      </button>
-    </div>
-  );
+  <div>
+    <button
+      onClick={generateExcel}
+      className="
+        m-3
+        w-60 h-11
+        rounded-xl
+        font-semibold
+        bg-[#2D4F2B]
+        text-white
+        hover:bg-[#708A58]
+        focus:outline-none
+        focus:ring-2
+        focus:ring-[#FFB823]
+        transition
+      "
+    >
+      Generate Completion Excel
+    </button>
+  </div>
+);
 }
+

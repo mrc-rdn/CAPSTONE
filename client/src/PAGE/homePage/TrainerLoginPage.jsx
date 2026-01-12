@@ -56,6 +56,8 @@ export default function TrainerLoginPage() {
           value={password}
           className='Email w-100 h-10 border-b-2  text-2xl focus:outline-none mb-5'/>
 
+          <button onClick={()=>{Navigate('/trainer/ForgetPassword')}}>Forget Password</button>
+
           <button 
           onClick={handleLogin} 
           className='w-100 h-10 font-bold mb-5 border-green-800 border-2 text-white rounded-xl text-lg'>

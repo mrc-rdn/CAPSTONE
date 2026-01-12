@@ -1,34 +1,116 @@
-import React from 'react'
+import { useEffect, useState } from "react";
+import SendIcon from "@mui/icons-material/Send";
+import axios from "axios";
+import { API_URL } from "../../../../api.js";
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MessageIcon from '@mui/icons-material/Message';
+import Reply from "./Reply.jsx";
 
-export default function Reply({first_name,surname, profile, shade, color, content}) {
-  const colorMap = {
-    red: {200: 'bg-red-200',300: 'bg-red-300',400: 'bg-red-400',500: 'bg-red-500',600: 'bg-red-600',700: 'bg-red-700', 800: 'bg-red-800'},
-    yellow: {200: 'bg-yellow-200',300: 'bg-yellow-300',400: 'bg-yellow-400',500: 'bg-yellow-500',600: 'bg-yellow-600',700: 'bg-yellow-700',800: 'bg-yellow-800'},
-    green: {200: 'bg-green-200',300: 'bg-green-300',400: 'bg-green-400',500: 'bg-green-500',600: 'bg-green-600',700: 'bg-green-700',800: 'bg-green-800'},
-    orange: {200: 'bg-orange-200',300: 'bg-orange-300',400: 'bg-orange-400',500: 'bg-orange-500',600: 'bg-orange-600',700: 'bg-orange-700',800: 'bg-orange-800'},
-    blue: {200: 'bg-blue-200',300: 'bg-blue-300',400: 'bg-blue-400',500: 'bg-blue-500',600: 'bg-blue-600',700: 'bg-blue-700',800: 'bg-blue-800'},
-    purple: {200: 'bg-purple-200',300: 'bg-purple-300',400: 'bg-purple-400',500: 'bg-purple-500',600: 'bg-purple-600',700: 'bg-purple-700',800: 'bg-purple-800'},
-    pink: {200: 'bg-pink-200',300: 'bg-pink-300',400: 'bg-pink-400',500: 'bg-pink-500',600: 'bg-pink-600',700: 'bg-pink-700',800: 'bg-pink-800'},
-  }
+export default function ReplyList({ commentId, onRefresh }) {
+  const [reply, setReply] = useState("");
+  const [replyData, setReplyData] = useState([]);
+  const [openReply, setOpenReply] = useState(false);
+  const [replyIsOpen, setReplyIsOpen] = useState(false)
 
- const userColorClass = colorMap[color]?.[shade] || 'bg-gray-500';
+  useEffect(() => {
+    const fetchReply = async () => {
+      try {
+        const res = await axios.get(
+          `${API_URL}/admin/${commentId}/reply`,
+          { withCredentials: true }
+        );
+        setReplyData(res.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchReply();
+  }, [commentId, onRefresh]);
+
+  const postReply = async () => {
+    if (!reply.trim()) return;
+
+    try {
+      await axios.post(
+        `${API_URL}/admin/${commentId}/reply`,
+        { content: reply },
+        { withCredentials: true }
+      );
+      setReply("");
+      onRefresh(); // ✅ refresh comments + replies
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(replyData)
+  
   return (
-    <div className='mt-5'>
-      <div className='flex'>
-        {profile
-            ?<img src={profile} alt="" className='w-8 h-8 rounded-full ml-2 border-1' />
-            :<div className='ml-2'>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${userColorClass}`}>
-                    <p>
-                    { first_name.slice(0,1).toUpperCase()}
-                    </p>
-                </div>
-            </div>}
-        <h1 className="ml-3">
-            {first_name} {surname}
-        </h1>
+  <div className="mt-3">
+
+    {/* Reply button */}
+    <button
+      className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 transition"
+      onClick={() => setOpenReply(!openReply)}
+    >
+      <MessageIcon sx={{ fontSize: 16 }} />
+      Reply
+    </button>
+
+    {/* Reply input */}
+    {openReply && (
+      <div className="flex items-start gap-2 mt-3">
+
+        <input
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          placeholder="Add a reply..."
+          className="
+            flex-1 px-3 py-2
+            border border-gray-300 rounded-full
+            text-sm
+            focus:outline-none focus:ring-2 focus:ring-green-600
+          "
+        />
+
+        <button
+          onClick={postReply}
+          className="text-green-600 hover:text-green-700 transition"
+        >
+          <SendIcon sx={{ fontSize: 20 }} />
+        </button>
       </div>
-    <p className="ml-16 break-words w-11/12 mb-3">{content}</p>
+    )}
+
+    {/* Toggle replies */}
+    {replyData.length > 0 && (
+      <button
+        className="flex items-center gap-1 mt-3 text-xs text-gray-500 hover:text-gray-800 transition"
+        onClick={() => setReplyIsOpen(!replyIsOpen)}
+      >
+        {replyIsOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        {replyData.length} {replyData.length > 1 ? "replies" : "reply"}
+      </button>
+    )}
+
+    {/* Replies list */}
+    {replyIsOpen && (
+      <div className="mt-4 pl-6 border-l border-gray-200 space-y-3">
+        {replyData.map((reply, index) => (
+          <Reply
+            key={index}
+            first_name={reply.first_name}
+            surname={reply.surname}
+            profile={reply.profile_pic}
+            color={reply.color}
+            shade={reply.shades}
+            content={reply.content}
+          />
+        ))}
+      </div>
+    )}
+
   </div>
-  )
+);
 }

@@ -13,34 +13,66 @@ export default function Chapter(props) {
     console.log()
   }
 
+   {/* Course Content */}
   return (
-    <div 
-      className={`w-full h-18 bg-green-500 border-gray-200 border-2 flex flex-row p-2 hover:bg-green-500 relative
-        ${props.isActive ? "bg-green-500": "bg-green-600"} `}onClick={handleClick}>
-        <div>
-          <p className='text-2xl font-normal'>{props.title}: </p> 
-          <p className='text-gray-900/60'>{props.description}</p>
-        </div>
-        {props.isEditChapter?
-        <div className='ml-auto flex flex-row'>
-          <div className=' m-3'>
-            <button onClick={()=>{props.isEditChapter
-              ?(props.handleShowEditChapterModal(props.id, props.chapter_no, props.title, props.description), props.onRefresh())
-              :null}}>
-              <EditIcon />
-            </button>
-          </div>
-          
-          <div className=' m-3 mr-4'>
-            <DehazeIcon />
-          </div>
-          <p className='absolute right-2 text-xs top-2'>{props.orderIndex}</p>
-        </div>
-        :null
-        }
-        
+  <div
+  onClick={handleClick}   
+    className={`
+      w-full
+      h-20
+      border border-gray-300
+      flex items-start
+      px-4 py-3
+      transition
+      cursor-pointer
+      overflow-hidden
+      ${props.isActive ? "bg-[#F1F3E0] text-black" : "bg-white hover:bg-[#F1F3E0]"}
+    `}
+  >
+    
+    {/* Text Content */}
+    <div className="flex-1 min-w-0">
+      <p className="text-lg font-medium truncate">
+        {props.title}
+      </p>
+
+      <p className={`text-sm mt-1 leading-snug line-clamp-2 
+        ${props.isActive ? "text-gray-600" : "text-gray-600"}
+      `}>
+        {props.description}
+      </p>
     </div>
 
-    
-  )
+    {/* Actions */}
+    {props.isEditChapter && (
+      <div className="ml-4 flex items-center gap-3 shrink-0">
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            props.handleShowEditChapterModal(
+              props.id,
+              props.chapter_no,
+              props.title,
+              props.description
+            );
+            props.onRefresh();
+          }}
+          className="text-gray-700 hover:text-green-700 transition"
+        >
+          <EditIcon />
+        </button>
+
+        <button className="text-gray-700 hover:text-green-700 transition cursor-move">
+          <DehazeIcon />
+        </button>
+
+        <span className="text-xs text-black">
+          {props.orderIndex}
+        </span>
+
+      </div>
+    )}
+  </div>
+);
 }
