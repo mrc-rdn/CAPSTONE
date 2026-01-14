@@ -36,21 +36,26 @@ export default function Header(props) {
   console.log(results);
 
   return (
-    <div className="flex w-full h-1/12 bg-white">
+    <div className="px-4 pt-4 z-100">
+      <div className="flex w-full h-16 bg-white/10 border border-black/10 rounded-xl shadow-md ">
       <div className="h-full flex items-center ml-3 gap-2 w-full">
-        <h1 className="text-xl font-bold text-green-700">
+        <h1 className="text-xl font-bold text-[#2D4F2B]">
           {props.title}
         </h1>
+
         <div className="w-full flex">
           <div className=" w-6/12 mx-auto relative "> 
             <input
               type="text"
               placeholder="Search..."
-              className="border p-2 pl-5 w-full rounded-full "
+              className="bg-white/60 backdrop-blur-md border border-black/10 
+                         p-2 pl-5 w-full rounded-full 
+                         text-sm text-gray-700 placeholder-gray-500
+                         focus:outline-none focus:ring-2 focus:ring-black/10"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            { results && <div className="absolute  w-full max-h-100 bg-gray-300 overflow-y-scroll">
+            { results && <div className="absolute w-full mt-2 max-h-80 bg-white/80 border border-black/10 rounded-xl shadow-lg overflow-y-auto ">
               <ul className="z-100">
                 {results.map((info, index)=>{
                   return <Profile refresh={refresh} key={index} id={info.id} username={info.username} firstName={info.first_name} surname={info.surname} profile={info.profile_pic}color={info.color}shade={info.shades} />
@@ -66,7 +71,7 @@ export default function Header(props) {
         </div>
         
 
-        
+      </div>
       </div>
     </div>
   );

@@ -4,13 +4,14 @@ import axios from 'axios'
 import Header from "./components/course/Header.jsx"
 import CourseChapters from './components/course/CourseChapters.jsx'
 import { API_URL } from '../../api.js'
-import QuizList from './components/UI/QuizList.jsx'
+import QuizList from './components/Ui/QuizList.jsx'
 import MediaPlayer from './components/Ui/MediaPlayer.jsx'
 import ImagePlayer from './components/Ui/ImagePlayer.jsx'
 import Certificate from './components/Ui/Certificate.jsx'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import AnnouncementModal from './components/Ui/AnnouncementModal.jsx'
 import TextPresenter from './components/Ui/TextPresenter.jsx'
+import LockIcon from '@mui/icons-material/Lock';
 
 
 export default function CourseOverview() {
@@ -142,7 +143,9 @@ export default function CourseOverview() {
             {isCertificate? <Certificate courseId={id} certificateData={certificateData} />: null}
             {isText?<TextPresenter data={textData} />:null}
             {isAnnouncementModal?<AnnouncementModal courseId={id} onExit={handleExitAnnouncementModal} notif={notif}  /> : null}
-            {progresstrack.is_unlocked ?null:<div className="absolute inset-0 bg-gray-400/70 z-10"></div>}
+            {progresstrack.is_unlocked ?null:<div className="absolute inset-0 bg-gray-400/70 z-10 grid place-items-center"><div className='grid place-items-center'>
+              <LockIcon sx={{fontSize:70}} /> <p className='text-2xl font-semibold'>Lock</p>
+              </div></div>}
             {isLesson?<div className='w-full h-full flex justify-center items-center'> <p> No Content </p> </div> : null}
             
           </div>

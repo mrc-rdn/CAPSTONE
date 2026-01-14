@@ -6,9 +6,6 @@ import Chapter from './Chapter.jsx'
 import EditChapterModal from '../UI/modal/EditChapterModal.jsx';
 import { API_URL } from '../../../../api.js';
 import DeleteContent from '../UI/DeleteContent.jsx';
-import CloseIcon from '@mui/icons-material/Close';
-
-
 
 export default function CourseChapters(props) {
   const [isEditChapter, setEditChapter] = useState(false);
@@ -16,7 +13,6 @@ export default function CourseChapters(props) {
   const [EditChapterData, setEditChapterData] = useState({chapterId:"", chapter_index: "", chapter_title:"", chapter_description: ""})
   const [fetchChapters, setFetchChapters] = useState([]);
   const [activeChapterId, setActiveChapterId] = useState(null);
- 
   
   const [refresh, setRefresh]= useState(0);
 
@@ -31,11 +27,9 @@ export default function CourseChapters(props) {
       try {
         const [chapterInfo, chapterItems] = await Promise.all([
           axios.get(`${API_URL}/trainer/course/${props.courseId}`, { withCredentials: true }),// this to fetch all the chapters
-          axios.get(`${API_URL}/trainer/course/1/${props.courseId}`, { withCredentials: true }),
-          
+          axios.get(`${API_URL}/trainer/course/1/${props.courseId}`, { withCredentials: true })
         ]);
-        console.log(chapterItems.data)
-        
+        console.log(chapterInfo.data)
         const chapterId = chapterItems.data.chapterInfo[0].id
         const chapterIndex = chapterItems.data.chapterInfo[0].order_index
         props.handleChaptersInfo(chapterId, chapterIndex) 
@@ -55,7 +49,7 @@ export default function CourseChapters(props) {
     };
     
     fetchingChapters();
-  }, [props.refresh, refresh]);
+  }, [refresh , props.refresh]);
 
 
   // Functions
@@ -71,7 +65,9 @@ export default function CourseChapters(props) {
     }
   }
 
-  
+  const handleActiveChapter = (chapterId) => {
+    setActiveChapterId(chapterId);
+  };
 
   function handleShowEditChapterModal(chapterId, chapter_index, chapter_title, chapter_description ){
     setIsEditChapterModal(true)
@@ -110,95 +106,91 @@ export default function CourseChapters(props) {
       try {
         await axios.put(`${API_URL}/trainer/chapter/reorder`, { orderedChapters });
         console.log('Chapter order saved!');
+        setRefresh(prev => prev + 1)
       } catch (err) {
         console.error('Failed to save chapter order', err);
       }
     };
-
-   
+    
     
   return (
     
-    <div className="ml-auto h-full w-full bg-white  relative shadow-lg overflow-y-scroll">
+      <div className="ml-auto h-full w-full bg-white overflow-y-scroll relative shadow-lg">
             
-      <div className="h-10 w-full bg-white flex items-center sticky top-0 ">
-        <h1 className="text-xs  ml-3 font-bold lg:text-sm  ">Course content</h1>
-        <button
-          onClick={()=>{setEditChapter(!isEditChapter), props.handleEditChapter(isEditChapter)}}
-          className='ml-auto mr-2'
-        ><MoreHorizIcon  />
-        </button>
-        <button className=' p-3 lg:hidden mr-2'
-          onClick={()=>props.handleExitChapters()}
-        >
-          <CloseIcon  />
-        </button>
-      </div>
-      
-      {isEditChapter
-      ?<div>
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="chapterList">
-          {(provided) => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              {fetchChapters.map((item, index) => (
-                <Draggable
-                  key={item.id}
-                  draggableId={String(item.id)}
-                  index={index}
-                >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      className={`${snapshot.isDragging ? "bg-green-300" : ""}`}
-                    >
-                      <Chapter
-                        id={item.id}
-                        title={item.title}
-                        chapter_no={item.order_index}
-                        description={item.description}
-                        handleOpenChapter={handleShowChapter}
-                        handleActiveChapter={()=>setActiveChapterId(item.id)}
-                        handleShowEditChapterModal={handleShowEditChapterModal}
-                        onRefresh={handleRefresh}
-                        isEditChapter={isEditChapter}
-                        isActive={activeChapterId === item.id } 
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
+
+            <div className="h-10 w-full bg-gray-200 flex items-center sticky top-0">  {/*course content header*/}
+              <h1 className="text-large ml-3 font-bold ">Course content</h1>
+              <button
+                onClick={()=>{setEditChapter(!isEditChapter), props.handleEditChapter(isEditChapter)}}
+                className='m-3 ml-auto'
+              ><MoreHorizIcon  />
+              </button>
             </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-      </div>
-      :<div>
-        {fetchChapters.map((item, index) => (
-        
-          <Chapter
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            chapter_no={item.order_index}
-            description={item.description}
-            handleOpenChapter={handleShowChapter }
-            handleActiveChapter={()=>setActiveChapterId(item.id)}
-            isEditChapter={isEditChapter}
-            isActive={activeChapterId === item.id} 
-          />
-        
-        ))
-        }
-      </div>}
-      
-      <div className=''>
-          {isEditChapterModal? <EditChapterModal chapterData={EditChapterData} courseId={props.courseId} onExit={handleExitEditChapterModal} />: null}
-      </div>
-    </div>
+            
+            {isEditChapter
+            ?<div>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="chapterList">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {fetchChapters.map((item, index) => (
+                      <Draggable
+                        key={item.id}
+                        draggableId={String(item.id)}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`${snapshot.isDragging ? "bg-green-300" : ""}`}
+                          >
+                            <Chapter
+                              id={item.id}
+                              orderIndex={item.order_index}
+                              title={item.title}
+                              chapter_no={item.order_index}
+                              description={item.description}
+                              handleOpenChapter={handleShowChapter}
+                              handleActiveChapter={()=>setActiveChapterId(item.id)}
+                              handleShowEditChapterModal={handleShowEditChapterModal}
+                              onRefresh={handleRefresh}
+                              isEditChapter={isEditChapter}
+                              isActive={activeChapterId === item.id } 
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+            </div>
+            :<div>
+              {fetchChapters.map((item, index) => (
+              
+                <Chapter
+                 key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  chapter_no={item.order_index}
+                  description={item.description}
+                  handleOpenChapter={handleShowChapter }
+                  handleActiveChapter={handleActiveChapter}
+                  isEditChapter={isEditChapter}
+                  isActive={activeChapterId === item.id} 
+                />
+              
+              ))
+              }
+            </div>}
+            <div className=''>
+               {isEditChapterModal? <EditChapterModal chapterData={EditChapterData} courseId={props.courseId} onExit={handleExitEditChapterModal} />: null}
+            </div>
+        </div>
         
    
   )

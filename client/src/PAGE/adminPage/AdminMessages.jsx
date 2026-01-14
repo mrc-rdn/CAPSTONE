@@ -1,69 +1,73 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "./components/Navbar.jsx";
-import Header from "./components/message/Header.jsx";
-import ContactList from "./components/message/ContactList.jsx";
-import axios from "axios";
-import { API_URL } from "../../api.js";
+import React, {useEffect, useState} from 'react'
+import Navbar from './components/Navbar.jsx'
+import Header from './components/message/Header.jsx'
+import AddContactModal from './components/message/SelectedProfile.jsx'
+import ContactList from './components/message/ContactList.jsx'
+import axios from 'axios'
+import { API_URL } from '../../api.js'
 import { io } from "socket.io-client";
 
-// ✅ ISANG SOCKET INSTANCE LANG
 const socket = io(API_URL, {
   withCredentials: true,
-  autoConnect: false,
+  autoConnect: false
 });
 
 export default function AdminMessages() {
-  const [userData, setUserData] = useState({});
-  const [refresh, setRefresh] = useState(0);
 
-  const handleRefresh = () => {
-    setRefresh((prev) => prev + 1);
-  };
+  const [userData, setUserData] = useState([])
+  const [refresh, setRefresh] = useState(0)
 
-  // =============================
-  // FETCH USER INFO
-  // =============================
-  useEffect(() => {
-    async function fetchUser() {
+  function handlerefresh(){
+    setRefresh(prev => prev + 1)
+    
+  }
+ 
+    
+ 
+
+
+  useEffect(()=>{
+    async function fetchData(){
       try {
-        const res = await axios.get(`${API_URL}/admin/dashboard`, {
-          withCredentials: true,
-        });
-        setUserData(res.data.usersInfo);
-      } catch (err) {
-        console.log(err);
+        const response = await axios.get(`${API_URL}/admin/dashboard`, {withCredentials: true});
+        setUserData(response.data.usersInfo)
+        
+      } catch (error) {
+        console.log(error)
       }
     }
-    fetchUser();
-  }, []);
+    fetchData()
+    
+  },[])
 
-  // =============================
-  // SOCKET CONNECT (ONCE)
-  // =============================
+  //
   useEffect(() => {
-    if (!userData?.id) return;
-
     socket.connect();
-    socket.emit("join-user", userData.id);
+    console.log(socket)
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
+    });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, [userData?.id]);
+    return () => socket.disconnect();
+  }, []);
+  
 
   return (
-    <div className="flex w-screen h-screen">
-      <Navbar />
-
-      <div className="w-full bg-gray-200">
-        <Header title="message" refresh={handleRefresh} />
-
-        <ContactList
-          userData={userData}
-          socket={socket}
-          refresh={refresh}
-        />
-      </div>
+    <div className="flex w-screen h-screen ">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+  <img
+    src="/images/plmro.jpg"
+    alt="Dashboard background"
+    className="w-full h-full object-cover scale-105 "
+  />
+</div>
+        <Navbar />
+        <div className="w-full h-full flex flex-col relative ">
+          
+          <Header title="message" refresh={handlerefresh}  />
+          
+          <ContactList userData={userData} socket={socket} handlerefresh={refresh} />
+        </div>
     </div>
-  );
+  )
 }

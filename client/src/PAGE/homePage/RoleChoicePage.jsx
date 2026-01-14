@@ -2,52 +2,75 @@ import React,{useState, useEffect} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 
-
-
 export default function RoleChoicePage() {
   
   const navigate = useNavigate();
 
-   
-
   function handleRoleSelection(role){
-
     navigate(`/${role}/login`);
   }
   
   return (
     <div className=''>
-      <div className='flex justify-between'>
-        <div>
-          <header className='absolute z-2 flex items-center h-30'>
-            <img src="./public/images/logo2.gif" alt="" className="h-20 ml-10 mr-5"/>
-            <h1 className='text-3xl font-bold text-green-800'>E-Kabuhayan</h1>
-          </header>
-          <img src="../public/images/plrmo-office.png" alt="" className='h-full absolute z-1' />
-        </div>
-        
-        <div className="w-130 bg-green-700 h-screen z-2 flex items-center flex-col pt-20">
-          <img src="./public/images/logo2.gif" alt="" className="h-30 mb-3"/>
-          <h1 className='text-3xl text-white mb-3'>Hi, TRAINEE!</h1>
+      <div className='relative h-screen w-full overflow-hidden'>
 
-          <div className='flex items-center justify-center h-10'>
-            <span className='text-3xl text-white'>↓</span>
-            <p className='text-1xl text-white mt-1 ml-1'>Please click or tap your destination.</p>
+        {/* BLURRED MAIN BACKGROUND */}
+        <img
+          src="./public/images/plmro.jpg"
+          alt=""
+          className='absolute inset-0 w-full h-full object-cover scale-110 blur-md'
+        />
+
+        {/* OVERLAY */}
+        <div className="absolute inset-0 bg-black/20" />
+
+        {/* MAIN CONTENT – CENTERED */}
+        <div className="relative z-10 h-full flex items-center justify-center px-4">
+
+          {/* IMAGE CONTAINER */}
+          <div className="relative 
+                          w-full max-w-[400px]
+                          h-[520px]
+                          rounded-2xl overflow-hidden shadow-2xl">
+
+            {/* CONTAINER OVERLAY */}
+            <div className="absolute inset-0 bg-black/40" />
+
+            {/* CONTENT (UNCHANGED LOGIC) */}
+            <div className="relative z-10 h-full flex flex-col items-center justify-center p-10">
+
+              <img src="../public/images/logo2.gif" alt="" className="h-24 mb-4"/>
+
+              <h1 className='text-3xl font-bold text-[#FFF1CA] mb-2'>
+                Welcome!
+              </h1>
+
+              <p className='text-[#FFF1CA] mb-6'>
+                Please choose your role.
+              </p>
+
+              <button 
+                onClick={()=>{handleRoleSelection("trainer")}}
+                className='w-full h-12 bg-[#FFF1CA] rounded-xl mb-3 font-semibold text-[#2D4F2B]
+                transition-all duration-200
+                hover:bg-[#708A58] hover:-translate-y-0.5 hover:shadow-md'>
+                TRAINER
+              </button>
+
+              <button 
+                onClick={()=>{handleRoleSelection("trainee")}}
+                className='w-full h-12 bg-[#FFF1CA] rounded-xl mb-4 font-semibold text-[#2D4F2B]
+                transition-all duration-200
+                hover:bg-[#708A58] hover:-translate-y-0.5 hover:shadow-md'>
+                TRAINEE
+              </button>
+
+              <button className='text-[#FFB823]/80 font-bold'>
+                <Link to="/">BACK</Link>
+              </button>
+
+            </div>
           </div>
-
-            <button 
-            onClick={()=>{handleRoleSelection("trainer")}}
-            className='w-100 h-12 bg-white m-3'>
-            TRAINER
-            </button>
-
-            <button 
-            onClick={()=>{handleRoleSelection("trainee")}}
-            className='w-100 h-12 bg-white m-3'>
-            TRAINEE
-            </button>
-
-            <button className='text-red-800 font-bold'><Link to="/">BACK</Link></button>
         </div>
       </div>
     </div>

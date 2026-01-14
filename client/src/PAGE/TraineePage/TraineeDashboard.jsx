@@ -52,79 +52,116 @@ export default function AdminDashboard() {
   const userColorClass = colorMap[data.color]?.[data.shade] || 'bg-gray-500';
   const handleUpcomingEventData = (data) =>{
     setUpcomingEventData(data)
-    console.log(data)
-  }
-
-  return (
-    <div className="flex w-screen h-screen ">
-        <Navbar />   
-      <div className={`w-full bg-gray-200/50 flex flex-col`}>
-        <div className='flex w-full h-1/12 bg-white '>
-          <div className='h-full flex items-center w-full'>
-            <h1 className='text-xl font-bold text-green-700 ml-3'>Dashboard</h1>
-            
-            <Profile  data={data} userColorClass={userColorClass} />
-          </div>
-        </div>
-      <div className='h-11/12 w-full overflow-y-scroll'>
-        
-        <div className='m-3 h-full flex gap-8 p-8'>
-          <div className='w-8/12 h-full flex flex-col gap-8'>
-            <div className='w-full flex flex-col items-center'>
-              <Dcontent  traineeCount={data.traineeCount} trainerCount={data.trainerCount} coursesCount={data.coursesCount}/>
-            </div>
-            <div className='w-full h-8/12 bg-green-700 rounded-lg border-2 border-gray-200'
-              style={{boxShadow: "3px 3px 5px rgba(0,0,0,0.1)"}}>
-              <div className='w-30 h-10 flex items-center justify-center'>
-                <p className='text-white text-lg '>Courses</p>
-              </div>
-              
-              <div className='bg-green-200 w-full h-10/12 rounded-br-md flex flex-wrap justify-center'>
-                {courses.length > 0 ? (courses.map((course)=>{
-                    return(
-                    <Courses key={course.id} course={course} />
-                    
-                    )
-                  })
-                  ): (<p>No Course Found</p>)
-                }
-              </div>
-
-
-            </div>
-            
-          </div>
-          <div className='w-4/12 flex flex-col gap-8'>
-            <div className='w-full h-100'>
-              <CalendarTodo handleUpcomingEventData={handleUpcomingEventData} onRefresh={handleRefresh} />
-            </div>
-            
-            <div className='h-5/12 rounded-lg bg-white flex items-center flex-col border-2 border-gray-200'
-              style={{boxShadow: "3px 3px 5px rgba(0,0,0,0.1)"}}>
-              <div className='w-full'>
-                <p className=' my-3 ml-5 font-bold text-lg text-green-600'>Upcoming</p>
-              </div>
-              
-              <div className='h-35 w-11/12 overflow-y-scroll '>
-                {upcomingEventsData.map((item, index)=>{
-                    return <UpcomingEvents  key={index} text={item.text} eventDate={item.event_date} color={item.color} refresh={refresh}/>
-                  })
-
-                }
-              </div>
-            </div>
-          
-
-          </div>
-        </div>
-          
-        </div>
-      </div>
-        
-      
-      
     
-        
-    </div>
+  }
+console.log(courses)
+  return (
+   <div className="flex w-screen h-screen">
+         <div className="absolute inset-0 -z-10 overflow-hidden">
+           <img
+             src="/images/plmro.jpg"
+             alt="Dashboard background"
+             className="w-full h-full object-cover scale-105 "
+           />
+         </div>
+   
+   
+         <Navbar />
+         <div className="w-full flex flex-col relative ">
+   
+           <div className="absolute inset-0 bg-white/5 -z-0"></div>
+   
+           <div className="px-4 pt-4">
+             <div className="flex w-full h-16 backdrop-blur-md bg-[#2D4F2B] 
+                 border border-black/10 rounded-xl shadow-md">
+               <div className="h-full flex items-center w-full">
+                 <h1 className="text-xl font-bold text-white ml-3">Dashboard</h1>
+                 <Profile data={data} userColorClass={userColorClass} />
+               </div>
+             </div>
+           </div>
+   
+           <div className="h-[calc(100%-4rem)] w-full overflow-y-scroll relative z-10 px-4">
+   
+   
+   
+             <div className='m-3 h-full flex gap-8 p-5'>
+               <div className='w-8/12 h-full flex flex-col gap-8'>
+                 
+                 <div
+                   className=" w-full h-8/12 rounded-lg border border-white/5 bg-white/30 backdrop-blur-md"
+                   style={{ boxShadow: "3px 3px 5px rgba(0,0,0,0.1)" }}
+                 >
+                   <div className="w-30 h-10 flex items-center justify-center ">
+                     <p className="text-[#2D4F2B] text-lg font-bold">Courses</p>
+                   </div>
+   
+   
+                   <div className="w-full h-10/12 rounded-br-md 
+                                  justify-center
+                                 bg-white/50 backdrop-blur-md
+                                 border border-white/5">
+   
+                     {courses.length > 0 ? (courses.map((course) => {
+                       return (
+                         <Courses key={course.id} course={course} />
+   
+                       )
+                     })
+                     ) : (<p>No Course Found</p>)
+                     }
+                   </div>
+   
+   
+                 </div>
+                 <div className='w-full h-6/12 flex flex-col items-center'>
+                   <Dcontent courseId={courses[0]} />
+                 </div>
+   
+               </div>
+               <div className='w-4/12 flex flex-col gap-8'>
+                 <div className='w-full h-100'>
+                   <CalendarTodo handleUpcomingEventData={handleUpcomingEventData} onRefresh={handleRefresh} />
+                 </div>
+   
+                 <div
+                   className="
+                     h-5/12
+                     rounded-2xl
+                     flex items-center flex-col
+                     backdrop-blur-md
+                     bg-white/15
+                     border border-white/30
+                     shadow-xl
+                   "
+                 >
+                   <div className="w-full">
+                     <p className="my-3 ml-5 font-bold text-lg text-[#2D4F2B]">
+                       Upcoming
+                     </p>
+                   </div>
+   
+   
+                   <div className='h-35 w-11/12 overflow-y-scroll '>
+                     {upcomingEventsData.map((item, index) => {
+                       return <UpcomingEvents key={index} text={item.text} eventDate={item.event_date} color={item.color} refresh={refresh} />
+                     })
+   
+                     }
+                   </div>
+                 </div>
+   
+   
+               </div>
+             </div>
+   
+           </div>
+         </div>
+   
+   
+   
+   
+   
+       </div>
   )
 }

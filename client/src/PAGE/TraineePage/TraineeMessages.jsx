@@ -52,18 +52,21 @@ export default function AdminMessages() {
   }, [userData?.id]);
 
   return (
-    <div className="flex w-screen h-screen">
-      <Navbar />
-
-      <div className="w-full bg-gray-200">
-        <Header title="message" refresh={handleRefresh} />
-
-        <ContactList
-          userData={userData}
-          socket={socket}
-          refresh={refresh}
-        />
-      </div>
-    </div>
-  );
-}
+     <div className="flex w-screen h-screen ">
+       <div className="absolute inset-0 -z-10 overflow-hidden">
+   <img
+     src="/images/plmro.jpg"
+     alt="Dashboard background"
+     className="w-full h-full object-cover scale-105 "
+   />
+ </div>
+         <Navbar />
+         <div className="w-full h-full flex flex-col relative overflow-hidden ">
+           
+           <Header title="message" refresh={handleRefresh}  />
+           
+           <ContactList userData={userData} socket={socket} refresh={refresh} />
+         </div>
+     </div>
+   )
+ }

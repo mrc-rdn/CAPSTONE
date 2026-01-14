@@ -4,27 +4,32 @@ import axios from 'axios';
 import { API_URL } from '../../../../api.js';
 
 export default function DeleteContent(props) {
-    const {isVideo, isQuiz, quizData, videoData} = props
+    const {isVideo, isQuiz, isCertificate,isText, videoData, quizData, certificateData, textData} = props
+    
     const handleDelete = async() => {
         
-        
-        try {
-            const res = await axios.delete(`${API_URL}/trainer/course/deletecontent`, {
-                data: {
-                    isVideo,
-                    isQuiz,
-                    quizData,
-                    videoData
-                },
-                withCredentials: true
-                })
-                props.onRefresh()
-            console.log(res)
-        } catch (error) {
-            console.log(error)
-        }
+      try {
+        const res = await axios.delete(`${API_URL}/trainer/course/deletecontent`, {
+          data: {
+            isVideo,
+            isQuiz,
+            isCertificate,
+            isText,
+            quizData,
+            videoData,
+            certificateData,
+            textData
+          },
+            withCredentials: true
+          })
+
+        props.onRefresh();
+      } catch (error) {
+        console.log(error)
+      }
     }
   return (
+    
     <div className='absolute inset-0 z-100 bg-gray-500/40 w-full h-full flex justify-center items-center'>
       <button 
       onClick={handleDelete}
@@ -33,5 +38,6 @@ export default function DeleteContent(props) {
         DELETE CONTENT
         </button>
     </div>
+  
   )
 }

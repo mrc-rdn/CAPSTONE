@@ -4,13 +4,13 @@ export default function About() {
   return (
     <div>
         {/* About */}
-          <section id="aboutus" className="py-24 bg-gray-50">
+          <section id="aboutus" className="py-24 bg-[#F1F3E0]">
             <div className="max-w-[1200px] mx-auto px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 
                 {/* Content */}
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6">
+                  <h2 className="text-3xl md:text-4xl font-extrabold text-[#2D4F2B] mb-6">
                     About E-Kabuhayan
                   </h2>
                   <p className="text-gray-500 mb-4">
@@ -58,7 +58,7 @@ export default function About() {
           </section>
 
             {/* Footer */}
-            <footer className="bg-green-600 text-green-100 py-8">
+            <footer className="bg-[#2D4F2B] text-green-100 py-8">
               <div className="max-w-5xl mx-auto px-4 lg:px-6">
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
@@ -67,17 +67,17 @@ export default function About() {
                   <div className="space-y-2">
                     <div className="justify-center gap-2 text-sm font-semibold text-white">
                       <i className="fas fa-book-open"></i>
-                     <h3 className="text-white font-semibold text-sm mb-1">E-Kabuhayan</h3>
+                     <h3 className="text-[#F1F3E0] font-semibold text-sm mb-1">E-Kabuhayan</h3>
                     </div>
-                    <p className="text-gray-50 text-sm">
+                    <p className="text-[#F1F3E0]/90 text-sm">
                       Empowering communities through accessible, quality skills training and lifelong learning opportunities.
                     </p>
                   </div>
 
                   {/* links */}
                   <div>
-                    <h3 className="text-white font-semibold text-sm mb-2">Quick Links</h3>
-                    <ul className="space-y-1 text-gray-50 text-sm">
+                    <h3 className="text-[#F1F3E0] font-semibold text-sm mb-2">Quick Links</h3>
+                    <ul className="space-y-1 text-[#F1F3E0]/90 text-sm">
                       {["Home", "Features", "Success Stories", "FAQs", "About Us"].map((link, idx) => (
                         <li key={idx}>
                           <a
@@ -93,8 +93,8 @@ export default function About() {
 
                   {/* courses */}
                   <div>
-                    <h3 className="text-white font-semibold text-sm mb-2">Programs</h3>
-                    <ul className="space-y-1 text-gray-50 text-sm">
+                    <h3 className="text-[#F1F3E0] font-semibold text-sm mb-2">Programs</h3>
+                    <ul className="space-y-1 text-[#F1F3E0]/90 text-sm">
                       {["Food Processing", "Pastry Making", "Dressmaking", "Electrical Work", "Handicrafts"].map((program, idx) => (
                         <li key={idx}>
                           <a href="#" className="hover:text-white transition-colors">{program}</a>
@@ -105,8 +105,8 @@ export default function About() {
 
                   {/* contact */}
                   <div>
-                    <h3 className="text-white font-semibold text-sm mb-2">Contact</h3>
-                    <ul className="space-y-1 text-gray-50 text-sm">
+                    <h3 className="text-[#F1F3E0] font-semibold text-sm mb-2">Contact</h3>
+                    <ul className="space-y-1 text-[#F1F3E0]/90 text-sm">
                       <li className="flex items-center gap-2">
                         <i className="fas fa-phone"></i>
                         <span>(123) 456-7890</span>
@@ -125,7 +125,7 @@ export default function About() {
                 </div>
 
                 {/* copyright */}
-                <div className="text-center font-semibold text-gray-50 text-sm">
+                <div className="text-center font-semibold text-[#F1F3E0] text-sm">
                   &copy; 2025 E-Kabuhayan LMS. All rights reserved. Powered by PLRMO.
                 </div>
 

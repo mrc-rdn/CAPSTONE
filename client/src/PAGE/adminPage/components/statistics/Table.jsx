@@ -1,37 +1,45 @@
-import React from 'react'
+import React , {useState} from 'react'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import TableRow from './TableRow.';
 
 export default function Table(props) {
+  console.log(props.result)
+  
   return (
-     <div className='w-full h-100 overflow-y-scroll gird place-items-center'>
+     <div className='w-full h-70 overflow-y-scroll gird place-items-center'>
         
-          <table className="w-11/12 h-1/12 bg-white shadow-md rounded-lg overflow-hidden border-1 m-2 relative ">
-            <thead className="bg-green-600 text-white sticky">
+          <table className="w-11/12 h-1/12 bg-white/10  shadow-xl rounded-xl overflow-hidden border border-black/10 m-2 relative">
+            <thead className="bg-gradient-to-r from-green-700 to-green-600 text-white sticky top-0 shadow">
                 <tr>
-                <th>no</th>
+                <th className="py-3 px-4 text-center">#</th>
                 <th className="py-3 px-6 text-left">ID</th>
                 <th className="py-3 px-6 text-left">Name</th>
-                <th className="py-3 px-6 text-center">Role </th>
-                <th className="py-3 px-6 text-center">View </th>
-                
-              
+                <th className="py-3 px-6 text-center">Role</th>
+                <th className="py-3 px-6 text-center">View</th>
                 </tr>
             </thead>
-            <tbody className="text-gray-700">
+            <tbody className="text-gray-700 divide-">
             {(props.list.map((info, index)=>{
                 return(
-                <tr className="border-b hover:bg-gray-100 transition duration-300 " key={index}>
-                     <th>{index}</th>
-                    <td className="py-4 px-6 border-x-1">{info.id}</td>
-                    <td className="py-4 px-6 border-x-1">{info.surname.charAt(0).toUpperCase() + info.surname.slice(1)} {info.first_name.charAt(0).toUpperCase()+ info.first_name.slice(1)} </td>
-                    <td className="py-4 px-6 border-x-1">{info.role}</td>
-                    <td className="py-4 px-6 border-x-1 ">< KeyboardArrowDownIcon /></td>
-                    
-                    
-                </tr>)
-                }))}
+                <TableRow 
+                  key={index} 
+                  index={index} 
+                  id={info.id} 
+                  first_name={info.first_name} 
+                  surname={info.surname} 
+                  role={info.role}
+                  profile={info.profile_pic} 
+                  color={info.color} 
+                  shade={info.shades} 
+                  result={props.result} 
+                  info={info} />
+                
+                )
+            }))}
+           
             </tbody>
           </table >
+          
         </div>
   )
 }

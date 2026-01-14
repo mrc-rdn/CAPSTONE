@@ -29,7 +29,8 @@ export default function AdminMessages() {
         const res = await axios.get(`${API_URL}/trainer/dashboard`, {
           withCredentials: true,
         });
-        setUserData(res.data.userInfo);
+        console.log(res.data)
+        setUserData(res.data.usersInfo);
       } catch (err) {
         console.log(err);
       }

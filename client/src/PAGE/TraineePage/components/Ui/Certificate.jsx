@@ -195,9 +195,9 @@ export default function Certificate(props) {
           {/* Button to download */}
           <button
             onClick={() => {window.print(), handleprogress()}}
-            className="mt-6 px-6 py-2 bg-green-700 text-white rounded"
+            className="mt-6 px-6 py-2 bg-[#2D4F2B] text-white rounded"
           >
-            Print / Save as PDF
+            Print 
           </button>
         </div>
       </div>

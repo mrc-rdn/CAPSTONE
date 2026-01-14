@@ -64,21 +64,28 @@ export default function Header(props) {
 
     
   return (
-    <div className="flex w-full h-full bg-green-700 items-center text-white ">
-        <Link to="/trainee/course">
-            <button className="ml-5 text-sm sm:text-lg">
-            <ArrowBackIcon />
-            </button>
+      <div className="flex w-full h-full bg-[#2D4F2B] items-center text-white">
 
-        </Link>
+    {/* Back button */}
+    <Link to="/trainee/course">
+      <button className="ml-5 text-large hover:text-[#FFB823] transition">
+        <ArrowBackIcon />
+      </button>
+    </Link>
 
-        <h1 className="text-sm sm:text-xl font-medium ml-10">{deslugify(props.courseTitle)}</h1>
-        <div className='relative ml-auto flex items-center mr-3'>
-          <CircularProgress  variant="determinate" value={result[0]?.percentage} />
-          <span className='absolute top-3 left-2.5 text-xs'>{result?result[0]?.percentage: '0'}%</span>
-          <h1 className='ml-3'>Your Progress</h1>
-        </div>
-        <div className=' relative'>
+    {/* Title */}
+    <h1 className="text-xl font-medium ml-20 truncate">
+      {deslugify(props.courseTitle)}
+    </h1>
+
+
+    <div className='relative ml-auto flex items-center mr-3'>
+      <CircularProgress  variant="determinate" value={result[0]?.percentage} />
+      <span className='absolute top-3 left-1.5 text-xs'>{result?result[0]?.percentage: '0'}%</span>
+      <h1 className='ml-3'>Your Progress</h1>
+    </div>
+    {/* Actions */}
+    <div className=' relative'>
           <button
           onClick={() => {props.handleOpenAnnouncementModal(notifications)}}
           className=" m-3 p-3  m-3 hover:border-b-3 p-3 transition-all duration-80 ease-in-out"
@@ -94,10 +101,7 @@ export default function Header(props) {
           
 
         </div>
-        
-       
 
-    </div>
-      
-  )
+  </div>
+);
 }

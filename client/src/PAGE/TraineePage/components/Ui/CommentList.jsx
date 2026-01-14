@@ -18,36 +18,61 @@ export default function CommentList({ comment, userId, deleteComment, onRefresh,
  const userColorClass = colorMap[color]?.[shade] || 'bg-gray-500';
  console.log(comment)
   return (
-    <li>
-      <div className="m-3 p-3 border rounded">
-        <div className="flex items-center">
-          {profile
-            ?<img src={profile} alt="" className='w-8 h-8 rounded-full ml-2 border-1' />
-            :<div className='ml-2'>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${userColorClass}`}>
-                    <p>
-                    { comment.first_name.slice(0,1).toUpperCase()}
-                    </p>
-                </div>
-            </div>}
-          <h1 className="ml-3">
-            {comment.first_name} {comment.surname}
-          </h1>
+   <li className="flex gap-3 mb-6">
 
-          {comment.user_id === userId && (
-            <button className="ml-auto" onClick={() => deleteComment(comment.id)}>
-              <DeleteIcon />
-            </button>
-          )}
+    {/* Avatar */}
+    <div className="flex-shrink-0">
+      {profile ? (
+        <img
+          src={profile}
+          alt=""
+          className="w-10 h-10 rounded-full object-cover"
+        />
+      ) : (
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm ${userColorClass}`}
+        >
+          {comment.first_name.slice(0, 1).toUpperCase()}
         </div>
+      )}
+    </div>
 
-        <p className="ml-16 break-words w-11/12 mb-3">{comment.content}</p>
+    {/* Content */}
+    <div className="flex-1">
 
+      {/* Name + delete */}
+      <div className="flex items-center gap-2 mb-0.5">
+        <span className="font-medium text-sm text-gray-900">
+          {comment.first_name} {comment.surname}
+        </span>
+
+        {comment.user_id === userId && (
+          <button
+            className="ml-auto text-gray-500 hover:text-red-600 transition"
+            onClick={(e) => {
+              e.stopPropagation();       
+              deleteComment(comment.id);
+            }}
+          >
+            <DeleteIcon fontSize="small" />
+          </button>
+        )}
+      </div>
+
+      {/* Comment text */}
+      <p className="text-sm text-gray-900 leading-5 break-words">
+        {comment.content}
+      </p>
+
+      {/* Replies */}
+      <div className="mt-4">
         <ReplyList
           commentId={comment.id}
           onRefresh={onRefresh}
         />
       </div>
-    </li>
-  );
+
+    </div>
+  </li>
+);
 }

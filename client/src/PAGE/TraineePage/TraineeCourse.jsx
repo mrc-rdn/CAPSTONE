@@ -39,31 +39,39 @@ export default function TraineeCourse() {
 
   return (
     <div className="flex w-screen h-screen">
-            
-      <Navbar/>
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <img
+          src="/images/plmro.jpg"
+          alt="Dashboard background"
+          className="w-full h-full object-cover scale-105 "
+        />
+      </div>
+              <Navbar />
+              <div className="w-full flex flex-col relative ">
+                <Header title="Course"/>
+                <div className='flex flex-wrap w-full h-11/12 overflow-y-scroll'>
+                  
+                  {courses.length > 0 ? (courses.map((course)=>{
+                    return(
+                    <Course 
+                    
+                    id={course.id}
+                    key={course.id}
+                    title={course.title} 
+                    description={course.description} 
+                    
+                    />
+                    
+                    )
+                  })
+                  ): (<p>No Course Found</p>)
+                }
+                </div>
+                
       
-      <div className='w-full bg-gray-200'>
-        <Header title="Course" />
-        
-        <div className='flex flex-wrap w-full '>
-        
-          {courses.length > 0 ? (courses.map((course)=>{
-            return(
-            <Course 
-            id={course.id}
-            key={course.id}
-            title={course.title} 
-            description={course.description} 
-            handleOpen={handleSelectedCourse}
-            />
-            
-            )
-          })
-          ): (<p>No Courses Found You are not currently enrolled in any courses</p>)
-        }
-        </div>
-        
-      </div>      
+                
+                
+              </div> 
       
     </div>
       

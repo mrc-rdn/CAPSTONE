@@ -17,28 +17,49 @@ export default function Profile(props) {
     console.log(props.data)
 
 return (
-    <div className='ml-auto flex items-center'>
-        
-        <div 
-            className='mr-4 flex items-center'
-            onClick={handleEditProfile}>
-                
-            
-            {picture.profile_pic
-            ?<img src={picture.profile_pic} alt="" className='w-11 h-11 rounded-full ml-2 border-1' />
-            :<div className='ml-2'>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${props.userColorClass}`}>
-                    <p>
-                    {props.data.usersInfo && props.data.usersInfo && props.data.usersInfo.first_name.slice(0,1).toUpperCase()}
-                    </p>
-                </div>
-            </div>}
-            <p className='ml-2 text-xs'>
-                {props.data.username && props.data.username}
-            </p>
+    <div className="ml-auto flex items-center">
+            <div
+                className="
+                    mr-1
+                    flex items-center gap-2
+                    px-3 py-1.5
+                    rounded-xl
+                    
+                    backdrop-blur-md
+                    border border-white/5
+                    cursor-pointer
+                    hover:bg-white/50
+                    transition
+                    "
+                onClick={handleEditProfile}
+            >
+                {picture.profile_pic ? (
+                    <img
+                        src={picture.profile_pic}
+                        alt=""
+                        className="w-11 h-11 rounded-full border border-white/10 object-cover"
+                    />
+                ) : (
+                    <div
+                        className={`
+          w-11 h-11
+          rounded-xl
+          flex items-center justify-center
+          text-white font-semibold
+          ${props.userColorClass}
+        `}
+                    >
+                        {props.data.usersInfo &&
+                            props.data.usersInfo.first_name.slice(0, 1)}
+                    </div>
+                )}
+
+                <p className="text-sm text-white font-medium">
+                    {props.data.username && props.data.username}
+                </p>
+            </div>
         </div>
 
-    </div>
-    
-  )
+
+    )
 }

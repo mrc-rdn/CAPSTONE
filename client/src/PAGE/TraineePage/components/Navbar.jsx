@@ -1,4 +1,4 @@
-import React, {useState , useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Logout from './Logout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -9,104 +9,107 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 export default function Navrbar(props) {
   const [navigation, setNavigation] = useState("dashboard");
-  const [viewData , setViewData] = useState(null)
+  const [viewData, setViewData] = useState(null)
   const [isOpenChapters, setIsOpenChapters] = useState(false)
 
-  function handleNavigation(routes){
+  function handleNavigation(routes) {
     console.log(routes)
     setNavigation(routes)
-   
+
   }
 
-  const handleOpenChapters = ()=>{
+  const handleOpenChapters = () => {
 
   }
 
   return (
-     <div className="h-screen lg:w-1/5 bg-green-700 flex flex-col ">
-      
-      <div className='hidden lg:block'>
-        <div className="flex items-center w-full h-20 bg-green-800 border-b border-white p-4">
-          <img src="../public/images/logo2.gif" alt="" className="h-12 mr-4" />
-          <h1 className="text-2xl font-bold text-white">E-Kabuhayan</h1>
-        </div>
+    <div
+      className="
+    h-[96%]
+    w-1/5
+    m-4
+    flex flex-col
+    rounded-2xl
+    bg-white/10
+    backdrop-blur-md
+    border border-white/20
+    shadow-xl
+  "
+    >
+      {/* HEADER */}
+      <div
+        className="
+      flex items-center
+      w-full h-20
+      bg-white/5
+      backdrop-blur-md
+      border-b border-white/5
+      px-4
+      rounded-t-2xl
+    "
+      >
+        <img src="/images/logo2.gif" alt="" className="h-12 mr-4" />
+        <h1 className="text-2xl font-bold text-[#708A58]">
+          <span className="text-[#2D4F2B]">E</span>-Kabuhayan
+        </h1>
 
-        <nav className="flex flex-col gap-6 mt-6 px-4 ">
-          <Link to="/trainee/dashboard" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
-            <DashboardIcon sx={{fontSize: 35}} /> Dashboard
-          </Link>
-          <Link to="/trainee/course" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
-            <GroupsIcon sx={{fontSize: 35}} /> Course
-          </Link>
-          <Link to="/trainee/messages" className="flex items-center gap-2 text-white font-semibold hover:text-green-200">
-            <MessageIcon sx={{fontSize: 35}} /> Messages
-          </Link>
-          
-        </nav>
+      </div>
+
+      {/* NAV */}
+      <nav className="flex flex-col mt-3 px-2 gap-1">
+        <Link
+          to="/trainee/dashboard"
+          className="
+        flex items-center gap-2
+        px-3 py-3
+        rounded-xl
+        text-[#2D4F2B] font-semibold
+        hover:bg-white/20
+        hover:text-yellow-400
+        transition
+      "
+        >
+          <DashboardIcon sx={{ fontSize: 30 }} /> Dashboard
+        </Link>
+
+        <Link
+          to="/trainee/course"
+          className="
+        flex items-center gap-2
+        px-3 py-3
+        rounded-xl
+        text-[#2D4F2B] font-semibold
+        hover:bg-white/20
+        hover:text-yellow-400
+        transition
+      "
+        >
+          <GroupsIcon sx={{ fontSize: 30 }} /> Course
+        </Link>
+        
+
+        <Link
+          to="/trainee/messages"
+          className="
+        flex items-center gap-2
+        px-3 py-3
+        rounded-xl
+        text-[#2D4F2B] font-semibold
+        hover:bg-white/20
+        hover:text-yellow-400
+        transition
+      "
+        >
+          <MessageIcon sx={{ fontSize: 30 }} /> Messages
+        </Link>
+
+        
+      </nav>
+
+      <div className="mt-auto px-2 pb-4">
         <Logout />
       </div>
-      
-      <div className='block lg:hidden w-20 h-full'>
-        <div className="flex items-center w-full h-20 bg-green-800 border-b border-white p-4">
-          <img src="../public/images/logo2.gif" alt="" className="h-12 mr-4" />
-          
-        </div>
-
-        <nav className="flex flex-col gap-6 mt-6 items-center ">
-          <Link
-            to="/trainee/dashboard"
-            className="
-              group
-              relative
-              flex items-center
-              text-white font-semibold
-            "
-          >
-            {/* ICON */}
-            <DashboardIcon sx={{ fontSize: 35 }} />
-
-            {/* SLIDE-IN TEXT */}
-            <span
-              className="w-30 h-16 absolute left-14 bg-green-700 text-white px-2  py-5 text-lg whitespace-nowrap font-semibold
-              opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 ease-out pointer-events-none
-              "
-            >
-              Dashboard
-            </span>
-          </Link>
-
-
-          <Link to="/trainee/course" className="
-              group
-              relative
-              flex items-center
-              text-white font-semibold
-            ">
-            <GroupsIcon sx={{fontSize: 35}} />
-            <span
-              className="w-30 h-16 absolute left-14 bg-green-700 text-white px-2 py-5 text-lg whitespace-nowrap font-semibold
-              opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 ease-out pointer-events-none
-              "
-            >
-              Course
-            </span>
-          </Link>
-          <Link to="/trainee/messages" className="group relative flex items-center text-white font-semibold
-            ">
-            <MessageIcon sx={{fontSize: 35}} />
-            <span
-              className="w-30 h-16 absolute left-14 bg-green-700 text-white px-2  py-5 text-lg whitespace-nowrap font-semibold
-              opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 ease-out pointer-events-none
-              "
-            >
-              Messages
-            </span>
-          </Link>
-          
-        </nav>
-        <Logout />
-      </div>
-      
     </div>
+
   )
 }

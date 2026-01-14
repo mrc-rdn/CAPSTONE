@@ -51,7 +51,7 @@ function Comments({ videoId }) {
   const deleteComment = async (id) => {
     try {
       await axios.post(
-        `${API_URL}/trainee/deletecomment`,
+        `${API_URL}/admin/deletecomment`,
         { commentId: id },
         { withCredentials: true }
       );

@@ -8,21 +8,35 @@ export default function Course(props) {
       } 
       
   return (
-    <div className=''>
-      <div className=' shadow-[4px_4px_0px_0px_rgba(128,128,128,1)] w-65 h-50 bg-green-700 m-4 rounded-xl p-3 '>
-        
-        <p className='text-3xl font-bold text-white'>{props.title}</p>
-        <p className='text-gray-200 m-1'>{props.description}</p>
+    <div>
+  
 
-        <p className='text-white w-25 h-10 flex items-center justify-center border rounded-xl mb-3 mt-3'>Student</p>
-        <Link to={`/trainee/course/${props.id}/${slugify(props.title)}`}>
-        <button 
-        className='w-full h-10 bg-white rounded-lg '
-        >
-          ENTER SUBJECT
-        </button>
-        </Link>
-      </div>
+  <div className="w-65 h-50 m-4 p-4 rounded-2xl bg-white/25 backdrop-blur-md border border-white/30 shadow-lg flex flex-col justify-between">
+
+    <div>
+      <p className="text-2xl font-bold text-[#2D4F2B]">
+        {props.title}
+      </p>
+
+      <p className="text-sm text-[#5F7A61] mt-1">
+        {props.description}
+      </p>
     </div>
+
+    <div className="flex justify-between mt-4">
+      <p className="w-28 h-9 flex items-center justify-center rounded-xl bg-white/40 text-[#2D4F2B] text-sm font-medium">
+         Student
+      </p>
+
+      
+    </div>
+
+    <Link to={`/trainee/course/${props.id}/${slugify(props.title)}`}>
+      <button className="w-full h-10 mt-4 rounded-xl bg-white/70 text-[#2D4F2B] font-semibold hover:bg-green-600 hover:text-white transition">
+        ENTER SUBJECT
+      </button>
+    </Link>
+  </div>
+</div>
   )
 }

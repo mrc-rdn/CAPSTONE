@@ -12,6 +12,7 @@ import Features from './components/Features.jsx'
 import SuccessStories from './components/SuccessStories.jsx'
 import FAQ from './components/FAQ.jsx'
 import About from "./components/About.jsx";
+import ChatBotModal from "./components/ChatBotModal.jsx";
 
 
 
@@ -45,24 +46,21 @@ export default function LandingPage() {
       window.addEventListener("scroll", handleScroll);
       return () => window.removeEventListener("scroll", handleScroll);
     }, []);
-   
-
- 
-  
+    
   
   return (
     <div>
       <Navbar />
       
-
+    <ChatBotModal />
         {/* Empowering lives */}
-      <section className="py-24 bg-white" id="empowering">
+      <section className="py-24 bg-[#F1F3E0]" id="empowering">
         <div className="max-w-[1200px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h1 className="text-2xl md:text-[2.75rem] font-extrabold text-gray-800 mb-6 leading-tight md:text-[2rem]">
+            <h1 className="text-2xl md:text-[2.75rem] font-extrabold text-[#2D4F2B] mb-6 leading-tight md:text-[2rem]">
               Empowering Lives Through <span className="text-primary">Community Learning</span>
             </h1>
-            <p className="text-sm md:text-lg text-gray-500 mb-8 leading-relaxed">
+            <p className="text-sm md:text-lg text-[#2D4F2B] mb-8 leading-relaxed">
               E-Kabuhayan LMS provides accessible, quality training for Barangay San Isidro residents to develop skills and improve livelihoods.
             </p>
         

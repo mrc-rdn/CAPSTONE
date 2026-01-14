@@ -13,7 +13,7 @@ export default function Reply({first_name,surname, profile, shade, color, conten
 
  const userColorClass = colorMap[color]?.[shade] || 'bg-gray-500';
   return (
-    <div className='mt-5'>
+     <div className='mt-5'>
       <div className='flex'>
         {profile
             ?<img src={profile} alt="" className='w-8 h-8 rounded-full ml-2 border-1' />

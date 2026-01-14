@@ -130,11 +130,11 @@ export default function EditUserInfo(props) {
 
                         {/* Contact */}
                         <div className="flex flex-col w-full">
-                            <label className="text-sm font-medium mb-1">Contact No</label>
+                            <label className="text-sm font-medium mb-1">Email</label>
                             <input
                                 className="w-full h-10 text-sm bg-white/30 backdrop-blur-md border border-white/40 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-green-400"
                                 type="text"
-                                placeholder="Contact No"
+                                placeholder="Email"
                                 onChange={(e) => { setContactNo(e.target.value) }}
                                 value={contactNo}
                             />

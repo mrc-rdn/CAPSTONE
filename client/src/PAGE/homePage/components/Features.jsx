@@ -10,16 +10,16 @@ export default function Features() {
   return (
     <div>
          {/* Features */}
-      <section id="features" className="py-24 bg-green-600">
-        <div className="max-w-[1200px] mx-auto px-8">
+      <section id="features" className="py-24 bg-[#F1F3E0]">
+        <div className="max-w-[1200px] mx-auto px-6 ">
 
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white ">
-              What We Offer On <span className='md:text-4xl font-extrabold text-4xl text-yellow-400 mb-4 text-primary'>E</span><span className='md:text-4xl font-extrabold text-4xl text-yellow-400 mb-4 text-primary'>-Kabuhayan</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#2D4F2B] ">
+              What We Offer On <span className='md:text-4xl font-extrabold text-4xl text-yellow-400 mb-4 text-primary'>E</span><span className='md:text-4xl font-extrabold text-4xl text-[#FFB823] mb-4 text-primary'>-Kabuhayan</span>
             </h2> 
             
-            <p className="text-white text-sm mt-5  md:text-xl">
+            <p className="text-[#2D4F2B] text-sm mt-5  md:text-xl">
               Our platform provides everything you need to develop skills, track progress, and achieve your goals.
             </p>
           </div>
@@ -29,8 +29,8 @@ export default function Features() {
 
             {/* Skill dev */}
             <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl shadow-white/30 hover:p-5 transition-all">
-              <School className="text-yellow-400 text-4xl mb-4" />
-              <h3 className="font-semibold text-xl mb-2 ">Skill Development</h3>
+              <School className="text-[#2D4F2B] text-4xl mb-4" />
+              <h3 className="font-semibold text-xl mb-2 text-[#2D4F2B]">Skill Development</h3>
               <p className="text-gray-500 text-sm">
                 Access quality training modules designed for practical skill acquisition in various industries.
               </p>
@@ -38,8 +38,8 @@ export default function Features() {
 
             {/* Training calendar */}
             <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl shadow-white/30 hover:p-5 transition-all">
-              <CalendarToday className="text-yellow-400 text-4xl mb-4" />
-              <h3 className="font-semibold text-xl mb-2 ">Training Calendar</h3>
+              <CalendarToday className="text-[#2D4F2B] text-4xl mb-4" />
+              <h3 className="font-semibold text-xl mb-2 text-[#2D4F2B]">Training Calendar</h3>
               <p className="text-gray-500 text-sm">
                 Stay updated with upcoming workshops, sessions, and important events.
               </p>
@@ -47,8 +47,8 @@ export default function Features() {
 
             {/* Community learning */}
             <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl shadow-white/30 hover:p-5 transition-all">
-              <Group className="text-yellow-400 text-4xl mb-4" />
-              <h3 className="font-semibold text-xl mb-2">Community Learning</h3>
+              <Group className="text-[#2D4F2B] text-4xl mb-4" />
+              <h3 className="font-semibold text-xl mb-2 text-[#2D4F2B]">Community Learning</h3>
               <p className="text-gray-500 text-sm">
                 Connect with fellow trainees, share experiences, and learn collaboratively.
               </p>
@@ -56,8 +56,8 @@ export default function Features() {
 
             {/* Progress tracking */}
             <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl shadow-white/30 hover:p-5 transition-all">
-              <TrendingUp className="text-yellow-400 text-4xl mb-4" />
-              <h3 className="font-semibold text-xl mb-2">Progress Tracking</h3>
+              <TrendingUp className="text-[#2D4F2B] text-4xl mb-4" />
+              <h3 className="font-semibold text-xl mb-2 text-[#2D4F2B]">Progress Tracking</h3>
               <p className="text-gray-500 text-sm">
                 Monitor your learning journey with intuitive progress indicators for each module.
               </p>
@@ -65,17 +65,17 @@ export default function Features() {
 
             {/* Success stories */}
             <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl shadow-white/30 hover:p-5 transition-all">
-              <EmojiEvents className="text-yellow-400 text-4xl mb-4" />
-              <h3 className="font-semibold text-xl mb-2">Success Stories</h3>
+              <EmojiEvents className="text-[#2D4F2B] text-4xl mb-4" />
+              <h3 className="font-semibold text-xl mb-2 text-[#2D4F2B]">Integrated Chatbot Support</h3>
               <p className="text-gray-500 text-sm">
-                Get inspired by real success stories from trainees who secured jobs or started businesses.
+                Assists users by answering inquiries, guiding system navigation, and providing basic technical support.
               </p>
             </div>
 
             {/* Learning resources */}
             <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl shadow-white/30 hover:p-5 transition-all">
-              <MenuBook className="text-yellow-400 text-4xl mb-4" />
-              <h3 className="font-semibold text-xl mb-2">Learning Resources</h3>
+              <MenuBook className="text-[#2D4F2B] text-4xl mb-4" />
+              <h3 className="font-semibold text-xl mb-2 text-[#2D4F2B]">Learning Resources</h3>
               <p className="text-gray-500 text-sm">
                 Access a variety of learning materials including videos, PDFs, and interactive lessons.
               </p>

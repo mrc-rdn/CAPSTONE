@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
-import Header from './components/Header'
+
 import Dcontent from './components/dashboard/DContent.jsx'
 import CalendarTodo from './components/dashboard/CalendarTodo.jsx'
 import axios from 'axios'
 import { API_URL } from '../../api'
 import Profile from './components/dashboard/Profile.jsx'
-import Course from './components/course/Course.jsx'
+
 import UpcomingEvents from './components/dashboard/UpcomingEvents.jsx'
 import Courses from './components/dashboard/courses.jsx'
 
@@ -72,10 +72,10 @@ export default function AdminDashboard() {
         <div className="absolute inset-0 bg-white/5 -z-0"></div>
 
         <div className="px-4 pt-4">
-          <div className="flex w-full h-16 backdrop-blur-md bg-[#2D4F2B] 
+          <div className="flex w-full h-16 backdrop-blur-md bg-
               border border-black/10 rounded-xl shadow-md">
             <div className="h-full flex items-center w-full">
-              <h1 className="text-xl font-bold text-white ml-3">Dashboard</h1>
+              <h1 className="text-xl font-bold text-[#2D4F2B]  ml-3">Dashboard</h1>
               <Profile data={data} userColorClass={userColorClass} />
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
 
                 <div className="w-full h-10/12 rounded-br-md 
                               flex flex-wrap justify-center
-                              bg-white/50 backdrop-blur-md
+                               backdrop-blur-md
                               border border-white/5">
 
                   {courses.length > 0 ? (courses.map((course) => {

@@ -20,6 +20,7 @@ export default function TextEditor(props) {
             const res = await axios.post(`${API_URL}/admin/texteditor`,
                 { title:title, courseId: props.courseId, chapterId: props.chapterInfo.chapterId, content: content },
                 {withCredentials:true});
+                console.log(res.data)
             setPosts([res.data, ...posts]);
             setTitle('');
             setContent('');

@@ -3,25 +3,49 @@ import CheckIcon from '@mui/icons-material/Check';
 
 export default function QuizMultipleChoice({ type_question, question, choices,  no }) {
   return (
-    <div className='w-11/12 h-50 bg-green-700 text-white p-2 mt-2 mb-2 p-3 rounded-md'>
-        <h1>{type_question==="multiple_choice"&& "Multiple Choice"}</h1>
-        <div className='flex'>
-            <h1>{no}.</h1>
-            <p className='ml-1'>{question}</p>
-        </div>
-      
-      
-      <ul>
-        {choices.map((choice, index) => (
-          <li key={index} className='m-2 ml-2'>
-            <label>
-              <input className='mr-1 ' type="radio" name={`q-${question}`} />
-              {choice.text}
-              {choice.is_correct && <span className="text-green-500"> <CheckIcon /> </span>}
-            </label>
-          </li>
-        ))}
-      </ul>
+     <div className="w-full bg-gray-50 border border-gray-300 p-5 mt-3 mb-3 rounded-lg shadow-sm">
+
+    {/* Question Type */}
+    <p className="text-base font-bold text-gray-500">
+      {type_question === "multiple_choice" && "Multiple Choice"}
+    </p>
+
+    {/* Question */}
+    <div className="flex items-start gap-2 mb-4">
+      <span className="font-semibold text-gray-700">
+        {no}.
+      </span>
+      <p className="text-black leading-relaxed">
+        {question}
+      </p>
     </div>
+
+    {/* Choices */}
+    <ul className="space-y-3">
+      {choices.map((choice, index) => (
+        <li
+          key={index}
+          className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-md hover:bg-gray-100 transition"
+        >
+          <input
+            type="radio"
+            name={`q-${question}`}
+            className="accent-green-600"
+          />
+
+          <span className="text-black flex-1">
+            {choice.text}
+          </span>
+
+          {choice.is_correct && (
+            <span className="text-green-600">
+              <CheckIcon />
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+
+  </div>
   );
 }

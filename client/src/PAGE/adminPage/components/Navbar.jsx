@@ -9,6 +9,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MessageIcon from '@mui/icons-material/Message';
 import PersonIcon from '@mui/icons-material/Person';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 export default function Navrbar(props) {
   const [navigation, setNavigation] = useState("dashboard");
@@ -92,7 +93,7 @@ export default function Navrbar(props) {
             hover:bg-white/20
             hover:text-yellow-400
             transition">
-          <GroupsIcon sx={{fontSize: 30}} /> Master List
+          <FormatListBulletedIcon sx={{fontSize: 30}} /> Master List
         </Link>
 
     <Link

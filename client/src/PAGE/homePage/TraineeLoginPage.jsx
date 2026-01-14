@@ -1,68 +1,133 @@
-import React,{useEffect, useState} from 'react'
-import {Link, useNavigate} from "react-router-dom"
-import '/public/styles.css'
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { API_URL } from '../../api.js';
+import { API_URL } from "../../api.js";
 
 export default function TraineeLoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const customeStyle = {
-    border: "1px solid black"
-  }
-
-
-  async function handleLogin (event){
-    event.preventDefault();
-    console.log(API_URL)
+  async function handleLogin(e) {
+    e.preventDefault();
     try {
-      const res = await axios.post(`${API_URL}/trainee/login`, {
-        username: username,
-        password: password,
-      }, { withCredentials: true })
-      console.log(res.data)
-
-      if(res.data.success){
-        Navigate(res.data.redirectTo)
+      const res = await axios.post(
+        `${API_URL}/trainee/login`,
+        { username, password },
+        { withCredentials: true }
+      );
+console.log(res.data)
+      if (res.data.success) {
+        navigate(res.data.redirectTo);
       }
-
-
     } catch (error) {
-      console.log(error.message)
+      console.error(error.message);
     }
   }
 
   return (
-         <div className="w-full h-screen flex justify-center items-center">
-              <div className='w-130 h-150 bg-green-500 flex flex-col items-center justify-center rounded'>
-                <h1 className='text-4xl mb-10 text-white'>Welcome Trainee</h1>
-                <form action="" className=' flex flex-col '> 
-                  <label className='mb-3'>Email</label>
-                  <input 
-                  type="text" 
-                  onChange={(e)=>{ setUsername(e.target.value)}}
-                  placeholder='✏️ Username' 
-                  className='Email w-100 h-10 border-b-2 text-2xl focus:outline-none mb-5 '/>
+    <div className="relative h-screen w-full overflow-hidden">
 
-                  <label className='mb-3'>password</label>
-                  <input 
-                  type="password" 
-                  onChange={(e)=>{ setPassword(e.target.value)}}
-                  placeholder='🔒 Password' 
-                  className='Email w-100 h-10 border-b-2 text-2xl focus:outline-none mb-5'/>
+      {/* BLURRED BACKGROUND */}
+      <img
+        src="/images/plmro.jpg"
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover scale-110 blur-md"
+      />
+      <div className="absolute inset-0 bg-black/30" />
 
-                  <button 
-                  onClick={handleLogin}
-                  className='w-100 h-10 bg-white font-bold mb-5'>
-                  Login
-                  </button>
+      {/* CENTER CONTENT */}
+      <div className="relative z-10 h-full flex items-center justify-center px-4">
 
-                </form>
-                <button><Link to="/">Back</Link></button>
-              </div>
-              
-            </div>
-  )
+        {/* CARD */}
+        <div
+          className="
+            relative
+            w-full max-w-[400px]
+            h-[520px]
+            rounded-2xl
+            overflow-hidden
+            shadow-2xl
+          "
+        >
+          {/* CARD OVERLAY */}
+          <div className="absolute inset-0 bg-black/40" />
+
+          {/* CONTENT */}
+          <div className="relative z-10 h-full flex flex-col items-center justify-center p-10">
+
+            {/* LOGO */}
+            <img
+              src="/images/logo2.gif"
+              alt="Logo"
+              className="h-24 mb-4"
+            />
+
+            <h1 className="text-3xl font-bold text-[#FFF1CA] mb-2">
+              Welcome back!
+            </h1>
+
+            <p className="text-[#FFF1CA] mb-6">
+              Trainee Login
+            </p>
+
+            <form onSubmit={handleLogin} className="w-full space-y-4">
+
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="
+                  w-full h-12 px-4
+                  rounded-xl
+                  border border-gray-300
+                  text-[#FFF1CA]/60
+                  focus:outline-none
+                  focus:ring-2 focus:ring-yellow-400
+                "
+                required
+              />
+
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="
+                  w-full h-12 px-4
+                  rounded-xl
+                  border border-gray-300
+                  text-[#FFF1CA]/60
+                  focus:outline-none
+                  focus:ring-2 focus:ring-yellow-400
+                "
+                required
+              />
+              <button className="" onClick={()=>{navigate('/trainer/ForgetPassword')}}>Forget Password</button>  
+              <button
+                type="submit"
+                className="
+                  w-full h-12
+                  bg-[#FFF1CA]
+                  rounded-xl
+                  font-semibold
+                  text-[#2D4F2B]
+                  hover:bg-[#ffe7a3]
+                  transition
+                "
+              >
+                LOG IN
+              </button>
+            </form>
+
+            <button className="mt-6 text-[#FFB823]/80 font-bold">
+              <Link to="/">BACK</Link>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

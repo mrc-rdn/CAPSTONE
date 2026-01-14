@@ -5,16 +5,15 @@ import { Link } from "react-router-dom";
 export default function HeroEnroll() {
   return (
     <Link
-      to="/role"
-      className="
-        inline-flex items-center gap-2
-        bg-green-600 text-white px-10 py-4
+      to="https://www.facebook.com/PLRMO"
+      className="inline-flex items-center gap-2
+        bg-[#2D4F2B] text-white px-10 py-4
         rounded-xl font-bold text-lg
         transition-all shadow-lg
         hover:bg-primary-dark hover:-translate-y-1 hover:shadow-2xl
       "
     >
-      Enroll Now 
+      Inquire →
     </Link>
   );
 }
@@ -27,15 +26,15 @@ export function EmpowerEnroll() {
       {/* Enroll Now */}
       <a
         href="role"
-        className="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-3 md:px-7 md:py-3.5 rounded-lg font-semibold transition-all border-2 border-primary hover:bg-primary hover:text-white md:w-full md:justify-center"
+        className="inline-flex items-center gap-2 bg-[#2D4F2B] text-white px-3 py-3 md:px-7 md:py-3.5 rounded-lg font-semibold transition-all border-2 border-primary hover:bg-primary hover:text-white md:w-full md:justify-center"
       >
-        Enroll Now →
+        Inquire →
       </a>
 
       {/* Learn More */}
       <a
         href="#features"
-        className="inline-flex items-center gap-2 bg-yellow-400 text-white px-3 py-3 md:px-7 md:py-3.5 rounded-lg font-semibold transition-all border-2 border-primary hover:bg-primary hover:text-white md:w-full md:justify-center"
+        className="inline-flex items-center gap-2 bg-[#FFB823] text-white px-3 py-3 md:px-7 md:py-3.5 rounded-lg font-semibold transition-all border-2 border-primary hover:bg-primary hover:text-white md:w-full md:justify-center"
       >
         Learn More →
       </a>

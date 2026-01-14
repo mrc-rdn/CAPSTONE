@@ -36,12 +36,12 @@ export default function QuizList(props) {
   // STORE USER ANSWERS
   const [userAnswers, setUserAnswers] = useState({});
 
-  const handleAnswer = (answer, index) => {
-    setUserAnswers(prev => ({
-      ...prev,
-      [index]: answer
-    }));
-  };
+const handleAnswer = (answer, questionId) => {
+  setUserAnswers(prev => ({
+    ...prev,
+    [questionId]: answer
+  }));
+};
 
   
   // FINAL SCORE
@@ -52,7 +52,7 @@ export default function QuizList(props) {
     let tempResults = [];
 
     groupedQuizzes.forEach((quiz, index) => {
-    const userAns = userAnswers[index + 1];
+    const userAns = userAnswers[quiz.question_id];
     let correctAns = "";
 
     if (quiz.type === "fill_blank") {
@@ -70,22 +70,35 @@ export default function QuizList(props) {
       });
     }
 
-    if (quiz.type === "multiple_choice") {
-      const correct = quiz.choices.find(c => c.is_correct === true);
-      correctAns = correct.text;
-      const isCorrect = userAns === correct.text;
-      if (isCorrect) score++;
+  if (quiz.type === "multiple_choice") {
+    const correct = quiz.choices.find(c => c.is_correct === true);
 
+    if (!correct) {
+      console.error("No correct answer found for question:", quiz.question_id);
       tempResults.push({
         no: index + 1,
         question_id: quiz.question_id,
         question: quiz.question_text,
         userAnswer: userAns || "",
-        correctAnswer: correctAns,
-        isCorrect: isCorrect
+        correctAnswer: "No correct answer set",
+        isCorrect: false
       });
+      return; // continue sa next iteration
     }
-  });
+    const correctAns = correct.text;
+    const isCorrect = userAns === correctAns;
+    if (isCorrect) score++;
+
+    tempResults.push({
+      no: index + 1,
+      question_id: quiz.question_id,
+      question: quiz.question_text,
+      userAnswer: userAns || "",
+      correctAnswer: correctAns,
+      isCorrect
+    });
+  }
+});
 
     // Save results to state
     setResults(tempResults);
@@ -109,6 +122,8 @@ export default function QuizList(props) {
         {withCredentials: true}),
         axios.post(`${API_URL}/trainee/chapterprogress/${props.courseId}/${props.quizData[0].chapter_id}`,{}, {withCredentials:true})
       ]); 
+
+      console.log(quizanswer.data)
       console.log(progress.data)
       setResultFecth(quizanswer.data.data)
       setRefresh(prev => prev + 1)
@@ -138,7 +153,7 @@ export default function QuizList(props) {
 
     isAnswered();
   }, [refresh]);
-
+console.log(groupedQuizzes)
 
   return (
   <div className='w-full h-full flex flex-col items-center overflow-y-scroll p-5'>
@@ -154,6 +169,7 @@ export default function QuizList(props) {
               <QuizFillBlank
                 key={index}
                 no={index + 1}
+                questionId={quiz.question_id}
                 type_question={quiz.type}
                 question={quiz.question_text}
                 answers={handleAnswer}
@@ -164,6 +180,7 @@ export default function QuizList(props) {
               <QuizMultipleChoice
                 key={index}
                 no={index + 1}
+                questionId={quiz.question_id}
                 type_question={quiz.type}
                 question={quiz.question_text}
                 choices={quiz.choices}
@@ -175,7 +192,7 @@ export default function QuizList(props) {
 
         {/* SUBMIT BUTTON */}
         <button
-        className='m-3 w-50 h-10 text-2xl text-white bg-green-500 rounded mx-auto'
+        className='m-3 w-50 h-10 text-2xl text-white bg-[#2D4F2B] rounded mx-auto'
         onClick={handleCheck}>Submit</button>
       </>
     </div>}
@@ -187,9 +204,9 @@ export default function QuizList(props) {
     <div className="w-full mt-5 p-3 bg-gray-100 rounded">
       <h2 className="font-bold text-lg mb-2">Results</h2>
 
-      {resultFetch.map((item,index) => (
-        <CheckedAnswers  key={index} item={item} />
-      ))}
+      
+        <CheckedAnswers item={resultFetch} groupQuizzes={groupedQuizzes} />
+      
     </div>
   )}
   </div>}

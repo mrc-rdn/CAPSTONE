@@ -20,22 +20,47 @@ export default function Profile(props) {
         setIsModalOpen(exit)
     }
   return (
-<div>
-    <li className='w-full h-15 flex justify-center items-center' onClick={()=>{setIsModalOpen(true)}}>{props.profile
-        ?<img src={props.profile} alt="" className='w-11 h-11 rounded-full ml-2 border-1' />
-        :<div className='ml-2'>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${userColorClass}`}>
-                <p>
-                {props.firstName.slice(0,1).toUpperCase()}
-                </p>
-            </div>
-        </div>}
-        <div className='w-full flex m-1'>
-            <p className='ml-1 mr-1'>{props.username} </p> 
+  <div>
+    <li
+      className="w-full h-16 flex items-center gap-3 px-3 cursor-pointer rounded-lg hover:bg-gray-100 transition"
+      onClick={() => {
+        setIsModalOpen(true);
+      }}
+    >
+      {props.profile ? (
+        <img
+          src={props.profile}
+          alt=""
+          className="w-11 h-11 rounded-full border border-gray-300 object-cover"
+        />
+      ) : (
+        <div className="flex-shrink-0">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${userColorClass}`}
+          >
+            {props.firstName.slice(0, 1).toUpperCase()}
+          </div>
         </div>
-       
+      )}
+
+      <div className="w-full flex flex-col">
+        <p className="text-sm font-medium text-gray-800">
+          {props.username}
+        </p>
+      </div>
     </li>
-    {isModalOpen? <SelectedProfile onExit={handleExitModal} id={props.id} username={props.username} firstName={props.firstName} surname={props.surname} profile={props.profile} userColorClass={userColorClass}  />: null}
-</div>
-  )
+
+    {isModalOpen ? (
+      <SelectedProfile
+        onExit={handleExitModal}
+        id={props.id}
+        username={props.username}
+        firstName={props.firstName}
+        surname={props.surname}
+        profile={props.profile}
+        userColorClass={userColorClass}
+      />
+    ) : null}
+  </div>
+);
 }

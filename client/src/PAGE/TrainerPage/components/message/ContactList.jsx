@@ -126,7 +126,7 @@ export default function ContactList({ userData, socket, refresh }) {
       console.log("send message error:", err);
     }
   };
-console.log(contacts)
+console.log(userData)
   // =============================
   // AUTO SCROLL
   // =============================

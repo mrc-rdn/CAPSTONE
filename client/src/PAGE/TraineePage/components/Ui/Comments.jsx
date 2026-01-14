@@ -62,49 +62,103 @@ function Comments({ videoId }) {
   };
 console.log(comments)
   return (
-    <div className="w-full">
-      <h3 className="text-sm font-bold mb-3">
-        {} Comments
-      </h3>
+  <div className="w-full">
 
-      <input
-        value={input}
-        onClick={() => setCommenting(true)}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Write a comment..."
-        className="w-full px-3 py-2 border-b-2"
-      />
+    {/* Comment count */}
+    <h3 className="text-xl font-semibold text-gray-900 mb-6">
+      {comments.length} Comments
+    </h3>
 
-      {isCommenting && (
-        <div>
-          <button className="w-20  px-4 py-2 border rounded-lg"
-            onClick={() => { setInput(""); setCommenting(false); }}>
-            Cancel
-          </button>
-          <button className="w-20 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg m-3"
-           onClick={addComment}
-           >
-            Post
-          </button>
-        </div>
-      )}
+  {/* Add comment */}
+<div className="flex gap-4 mb-6">
+  <div className="flex-1">
+    <input
+      value={input}
+      onClick={() => setCommenting(true)}
+      onChange={(e) => setInput(e.target.value)}
+      placeholder="Add a comment..."
+      className="
+        w-full
+        pb-2
+        border-b border-gray-300
+        text-sm text-gray-900
+        placeholder-gray-500
+        bg-transparent
+        focus:outline-none
+        focus:border-[#2D4F2B]
+      "
+    />
 
-      <ul>
-        {comments.map((comment) => (
-          <CommentList
-            key={comment.id}
-            comment={comment}
-            profile={comment.profile_pic}
-            color={comment.color}
-            shade={comment.shades}
-            userId={userId}
-            deleteComment={deleteComment}
-            onRefresh={triggerRefresh}
-          />
-        ))}
-      </ul>
-    </div>
-  );
+    {isCommenting && (
+      <div className="flex justify-end gap-2 mt-3">
+
+        {/* Cancel */}
+        <button
+          onClick={() => {
+            setInput("");
+            setCommenting(false);
+          }}
+          className="
+            px-4 h-10
+            rounded-lg
+            text-sm font-medium
+            text-[#2D4F2B]
+            border border-[#2D4F2B]
+            hover:bg-[#2D4F2B]
+            hover:text-white
+            transition
+          "
+        >
+          Cancel
+        </button>
+
+        {/* Comment */}
+        <button
+          onClick={addComment}
+          disabled={!input.trim()}
+          className="
+            px-5 h-10
+            rounded-xl
+            text-sm font-semibold
+            bg-[#2D4F2B]
+            text-white
+            hover:bg-[#2D4F2B]
+            focus:outline-none
+            focus:ring-2
+            focus:ring-[#FFB823]
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+            transition
+          "
+        >
+          Comment
+        </button>
+
+      </div>
+    )}
+  </div>
+</div>
+
+
+
+    {/* Comment list */}
+    <ul className="space-y-4">
+      {comments.map((comment) => (
+        <CommentList
+          key={comment.id}
+          comment={comment}
+          profile={comment.profile_pic}
+          color={comment.color}
+          shade={comment.shades}
+          userId={userId}
+          deleteComment={deleteComment}
+          onRefresh={triggerRefresh}
+        />
+      ))}
+    </ul>
+
+  </div>
+);
 }
 
 export default Comments;

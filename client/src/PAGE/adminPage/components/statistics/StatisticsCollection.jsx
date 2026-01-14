@@ -36,7 +36,7 @@ export default function StatisticsCollection() {
   useEffect(() => {
     const fetchData = async ()=>{
 
-        const [fetchData, publish, traineeProgress, courses, masterlist, courseMasterList] = await Promise.all([
+        const [fetchData, publish, traineeProgress, courses, masterlist] = await Promise.all([
             axios.get(`${API_URL}/admin/dashboard`, {withCredentials: true}),
             axios.get(`${API_URL}/admin/publishcountcourses`, {withCredentials: true}),
             axios.get(`${API_URL}/admin/MasterList/traineeprogress`, {withCredentials: true}),
@@ -54,7 +54,7 @@ export default function StatisticsCollection() {
         setPublishCount(publish.data.data)
         setProgress(traineeProgress.data.data)
         setListData(masterlist.data.data)
-        setCourseData(courseMasterList.data.data)
+       
     }
 
         fetchData()
@@ -68,6 +68,7 @@ export default function StatisticsCollection() {
       if (!users[userId]) {
         users[userId] = {
           user_id: userId,
+          courseTitle: item.title,
           first_name: item.first_name,
           surname: item.surname,
           total: 0,
@@ -98,7 +99,7 @@ export default function StatisticsCollection() {
 
 
   const notStarted = trainee - completed - ongoing;
-  console.log(ongoingtrainee)
+  console.log(result)
   const data = [
     { id: 'Completed', label: 'Completed', value: completed, color: '#00B894' },
     { id: 'Ongoing', label: 'Ongoing', value: ongoing, color: '#0984e3' },
@@ -107,9 +108,9 @@ export default function StatisticsCollection() {
 
   const total = completed + ongoing + notStarted;
   const percentage = ((completed / total) * 100).toFixed(1);
-console.log(courseId)
+
   return (
-    <div className="p-5 bg-slate-100 min-h-screen">
+    <div className="min-h-screen">
       <h1 className="text-2xl font-bold mb-3">System statistics overview</h1>
       
 
@@ -202,7 +203,10 @@ console.log(courseId)
             <option value="">All Courses</option>
             {courses.map((info, index)=>{ return (<option key={index} value={info.id}>{info.title}</option>)})}
         </select>
-        <Table list={listData}/>
+        
+            <Table list={listData} result={result} users={progress}/>
+        
+        
     </div>
   );
 }

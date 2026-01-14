@@ -8,8 +8,8 @@ export default function Certificate(props) {
     useEffect(()=>{
         async function fetchdata (){
             try {
-                const result = await axios.get(`${API_URL}/admin/dashboard`, {withCredentials:true})
-                setdata(result.data.usersInfo[0])
+                const result = await axios.get(`${API_URL}/trainer/dashboard`, {withCredentials:true})
+                setdata(result.data.usersInfo)
                 console.log(result.data)
             } catch (error) {
                 console.log(error)

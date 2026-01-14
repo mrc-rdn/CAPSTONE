@@ -31,38 +31,72 @@ export default function SelectedProfile(props) {
 
 
   return (
-    <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex items-center justify-center z-1000 '>
-      <div className='w-4/12 h-60 bg-white p-5 rounded'>
-        <div className='flex items-center'>
-          <button onClick={handleExit}><CloseIcon /></button>
-          {isAdded && <p className='text-gray-500 ml-10'>{isAdded}<span className='text-red-500'>*</span></p>}
-        </div>
-        
-        <h1  className='text-2xl mt-3 mb-3 '>Profile</h1>
-      <div className='flex items-center'>{props.profile
-        ?<img src={props.profile} alt="" className='w-30 h-30 rounded-full ml-2 border-1' />
-        :<div className='ml-2'>
-            <div className={`w-30 h-30 rounded-full flex items-center justify-center ${props.userColorClass}`}>
-                <p className='text-3xl'>
-                {props.firstName.slice(0,1).toUpperCase()}
-                </p>
-            </div>
-        </div>}
-        <div className='w-full flex flex-col m-3'>
-          <p className='ml-1 mr-1 mb-2 text-2xl font-semibold'>{props.firstName} {props.surname}</p>
-          <div>
-            
-            <p className='ml-1 mr-1 mb-1 text-sm'>username: {props.username}</p> 
-            <p className='ml-1 mr-1 text-xs '>Id: {props.id} </p>
-          </div>
-          
-        </div>
-        <button className='w-70 bg-green-700 h-15 rounded-xl white text-white' onClick={handleSubmit}>{isContactAdded? 'Added': 'Add Contact'}</button>
-      </div>
-        
-        
+ <div className="w-full h-full bg-black/40 backdrop-blur-sm fixed inset-0 flex items-center justify-center z-1000">
+    <div className="w-4/12 bg-white rounded-2xl shadow-xl p-6">
 
-      </div> 
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={handleExit}
+          className="p-2 rounded-full hover:bg-gray-100 transition"
+        >
+          <CloseIcon />
+        </button>
+
+        {isAdded && (
+          <p className="text-sm text-gray-500">
+            {isAdded}
+            <span className="text-red-500">*</span>
+          </p>
+        )}
+      </div>
+
+      <h1 className="text-2xl font-semibold text-gray-800 mb-4">
+        Profile
+      </h1>
+
+      {/* Profile */}
+      <div className="flex items-center gap-5">
+        {props.profile ? (
+          <img
+            src={props.profile}
+            alt=""
+            className="w-28 h-28 rounded-full object-cover border border-gray-300"
+          />
+        ) : (
+          <div
+            className={`w-28 h-28 rounded-full flex items-center justify-center text-white text-3xl font-bold ${props.userColorClass}`}
+          >
+            {props.firstName.slice(0, 1).toUpperCase()}
+          </div>
+        )}
+
+        <div className="flex flex-col">
+          <p className="text-xl font-semibold text-gray-900">
+            {props.firstName} {props.surname}
+          </p>
+
+          <p className="text-sm text-gray-500 mt-1">
+            username: {props.username}
+          </p>
+
+          <p className="text-xs text-gray-400">
+            ID: {props.id}
+          </p>
+        </div>
+      </div>
+
+      {/* Action */}
+      <div className="mt-6">
+        <button
+          onClick={handleSubmit}
+          className="w-full py-3 rounded-xl bg-[#2D4F2B] hover:bg-[#244022] transition text-white font-semibold shadow-md"
+        >
+          {isContactAdded ? 'Added' : 'Add Contact'}
+        </button>
+      </div>
+
     </div>
-  )
+  </div>
+);
 }

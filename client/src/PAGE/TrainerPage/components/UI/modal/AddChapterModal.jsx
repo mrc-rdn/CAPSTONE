@@ -39,54 +39,109 @@ export default function AddChapterModal(props) {
     }
 
   return (
-    <div className='w-full h-full bg-gray-500/40 fixed inset-0 flex items-center justify-center z-200  '>
-      <div className='w-10/12 h-100 bg-white p-3 rounded lg:w-4/12'>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="w-full max-w-xl bg-white rounded-xl shadow-lg">
 
+      {/* ===== HEADER ===== */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#6F8A6A]/40">
+        <h1 className="text-xl font-semibold text-[#2D4F2B]">
+          Create Chapter
+        </h1>
 
-        <button onClick={()=>{props.onExit(exit);}}><CloseIcon /></button>
-        <h1  className='text-2xl mt-3 mb-3 '>Create Chapter</h1>
-       {isChapterAdded
-       ?<h1>Chapter is Added</h1>
-       :<form  
-        className='flex flex-col items-center '>
-          <div className='w-10/12 flex flex-col m-3 '>
-            <label >Chapter Title</label>
-            <input 
-            className='w-full h-10 text-2xl bg-green-500 rounded p-1'
-            onChange={(e)=>{setChapterTitle(e.target.value) }}
-            type="text" 
-            maxLength="25"
-            required
-            placeholder='Chapter title'
-            value={chapterTitle} />
-          </div>
-            
-          <div className='w-10/12 flex flex-col m-3'>
-            <label>Description</label>
-            <input 
-            className='w-full h-10 text-2xl bg-green-500 rounded p-1'
-            onChange={(e)=>{setDescription(e.target.value)}}
-            type="text" 
-            maxLength='40'
-            required
-            placeholder='Description' 
-            value={description}/>  
-           
-          </div>
-                                 
+        {/* Exit */}
+        <button
+          onClick={() => props.onExit(exit)}
+          className="w-9 h-9 flex items-center justify-center text-[#2D4F2B]"
+        >
+          <CloseIcon />
+        </button>
+      </div>
 
-            <button
-              className={isMouseOver?'m-3 w-50 h-10 text-2xl text-white bg-green-500 rounded':'m-3 w-50 h-10 text-2xl text-green-500 bg-white border-2  rounded' }
-              onMouseOver={()=> setMouseOver(true)}
-              onMouseOut={()=> setMouseOver(false)}
-              onClick={handleSubmit}>
-                Submit
-            </button>
-        </form>
-}
-        
+      {/* ===== BODY ===== */}
+      <div className="px-6 py-6">
 
-      </div> 
+        {/* Success Message */}
+        {isChapterAdded ? (
+          <p className="text-center text-sm font-medium text-[#2D4F2B]">
+            ✔ Chapter successfully added
+          </p>
+        ) : (
+          <form className="flex flex-col gap-4">
+
+            {/* Chapter Title */}
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm text-[#2D4F2B]">
+                Chapter Title
+              </label>
+              <input
+                type="text"
+                required
+                maxLength={25}
+                placeholder="Enter chapter title"
+                value={chapterTitle}
+                onChange={(e) => setChapterTitle(e.target.value)}
+                className="
+                  h-10 px-3
+                  rounded-lg
+                  border border-[#6F8A6A]
+                  bg-white
+                  text-[#2D4F2B]
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-[#FFB823]
+                "
+              />
+            </div>
+
+            {/* Description */}
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm text-[#2D4F2B]">
+                Description
+              </label>
+              <input
+                type="text"
+                required
+                maxLength={40}
+                placeholder="Enter short description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="
+                  h-10 px-3
+                  rounded-lg
+                  border border-[#6F8A6A]
+                  bg-white
+                  text-[#2D4F2B]
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-[#FFB823]
+                "
+              />
+            </div>
+
+            {/* ===== SUBMIT BUTTON ===== */}
+            <div className="w-full flex justify-center mt-6">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="
+                  w-60 h-11
+                  rounded-xl
+                  font-semibold
+                  bg-[#2D4F2B]
+                  text-white
+                  hover:bg-[#708A58]
+                  transition
+                "
+              >
+                SUBMIT
+              </button>
+            </div>
+
+          </form>
+        )}
+      </div>
+
     </div>
-  )
+  </div>
+);
 }

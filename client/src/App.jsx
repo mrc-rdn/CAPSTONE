@@ -25,6 +25,7 @@ import TrainerCourse from "./PAGE/TrainerPage/TrainerCourse.jsx"
 import TrainerMessages from "./PAGE/TrainerPage/TrainerMessages.jsx"
 import TrainerProfile from "./PAGE/TrainerPage/TrainerProfile.jsx"
 import TrainerCourseOverview from './PAGE/TrainerPage/TrainerCourseOverview.jsx'
+import TRAINEREditProfile from './PAGE/TrainerPage/EditProfile.jsx'
 
 //this for trainee
 import TraineeDashboard from "./PAGE/TraineePage/TraineeDashboard.jsx"
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/trainer/messages" element={<TRAINERProtectedRoute><TrainerMessages/></TRAINERProtectedRoute>}/>
         <Route path="/trainer/profile" element={<TRAINERProtectedRoute><TrainerProfile /></TRAINERProtectedRoute>}/>
         <Route path='/trainer/course/:id/:courseTitle' element={<TRAINERProtectedRoute><TrainerCourseOverview /></TRAINERProtectedRoute>} />
+        <Route path='/trainer/editprofile' element={<TRAINERProtectedRoute><TRAINEREditProfile /></TRAINERProtectedRoute>} />
 
         <Route path="/trainee/dashboard" element={<TRAINEEProtectedRoute><TraineeDashboard /></TRAINEEProtectedRoute>}/>
         <Route path="/trainee/Course" element={<TRAINEEProtectedRoute><TraineeCourse/></TRAINEEProtectedRoute>}/>

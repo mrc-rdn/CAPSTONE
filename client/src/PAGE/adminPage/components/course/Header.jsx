@@ -53,7 +53,7 @@ return (
       Trainee Progress
     </button>
 
-    <button
+    {/* <button
       onClick={props.handleOpenChapterAddModal}
       className="
         m-3 p-3
@@ -63,7 +63,7 @@ return (
       "
     >
       + Add Chapter
-    </button>
+    </button> */}
 
     <button
       onClick={props.handleOpenAddTraineeModal}

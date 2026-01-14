@@ -23,11 +23,7 @@ export default function GoogleCalendarUI(props) {
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   
-  function  handleRefresh(){
-    
-    setRefresh(prev => prev + 1)
-   
-  }
+  
   const formatDate = (date) => {
   if (!date) return "";
   if (typeof date === "string") {
@@ -74,8 +70,8 @@ export default function GoogleCalendarUI(props) {
   }
   useEffect(()=>{
     fetchDate()
-  },[refresh]);
-  
+  },[]);
+
   const goToPreviousMonth = async() =>{
     setCurrentViewDate(new Date(year, month - 1, 1))
   
@@ -192,7 +188,7 @@ export default function GoogleCalendarUI(props) {
 
 
       setCalendarEvents(cleaned); // MUST be an array
-      handleRefresh();
+      setRefresh(prev => prev + 1)
     } catch (err) {
       console.error("Failed to load events", err);
     }
@@ -204,7 +200,7 @@ export default function GoogleCalendarUI(props) {
     try {
       const res = await axios.delete(`${API_URL}/trainee/calendar/events/${id}` , {withCredentials:true})
       console.log(res)
-      handleRefresh()
+     setRefresh(prev => prev + 1)
     } catch (error) {
       console.log('error deleting you todo',error)
     }
@@ -222,122 +218,198 @@ export default function GoogleCalendarUI(props) {
 };
 
   return (
-    <div className="w-full h-full px-3 py-2 rounded-xl bg-white border-2 border-gray-200"
-    style={{boxShadow: "3px 3px 5px rgba(0,0,0,0.1)"}}>
-      {/* Header */}
-      <div className="flex justify-between mt-2">
-        <button onClick={goToPreviousMonth}><ArrowBackIosIcon/></button>
-        <h2 className="font-bold text-xl">
-          {monthName} {year}
-        </h2>
-        <button onClick={goToNextMonth}><ArrowForwardIosIcon /></button>
-      </div>
+  <div
+    className="
+      w-full
+      rounded-2xl
+      bg-white/15
+      backdrop-blur-xl
+      border
+      border-white/30
+      shadow-[0_8px_30px_rgba(0,0,0,0.08)]
+      p-4
+    "
+  >
 
-      {/* Week Labels */}
-      <div className="grid grid-cols-7 text-center text-gray-500 mb-1">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d}>{d}</div>
-        ))}
-      </div>
+    {/* Header */}
+    <div className="flex items-center justify-between mb-4">
+      <button
+        className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
+        onClick={goToPreviousMonth}
+      >
+        <ArrowBackIosIcon fontSize="small" />
+      </button>
 
-      {/* Grid */}
-      <div className="grid grid-cols-7 gap-1">
-        {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-          <div key={i} />
-        ))}
+      <h2 className="font-bold text-lg text-[#2D4F2B] tracking-wide">
+        {monthName} {year}
+      </h2>
 
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          const date = new Date(year, month, day);
-          const dayEvents = getEventsFor(date);
-
-          return (
-            <button
-              key={day}
-              onClick={() => openDateModal(day)}
-              className={` pb-3 rounded hover:bg-green-700/90 relative hover:text-white text-green-900 ${isToday(date) ? "bg-green-600 text-white" : "bg-green-200"}`}
-            ><p className="text-lg  font-semibold  ">
-              {day}
-            </p>
-              
-
-              <div className="absolute top-6 left-1 flex gap-1 items-center">
-                {dayEvents.slice(0, 3).map((ev, idx) => (
-                  <span
-                    key={idx}
-                    className="w-1 h-1 rounded-full"
-                    style={{ backgroundColor: ev.color }}
-                  />
-                ))}
-                {dayEvents.length > 3 && (
-                  <span className="text-xs text-white">
-                    +{dayEvents.length - 3}
-                  </span>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* MODAL */}
-      {isModalOpen && selectedDate && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-          <div className="bg-white w-80 p-4 rounded shadow relative">
-            <button
-              className="absolute top-2 right-2"
-              onClick={() => {setIsModalOpen(false), handleRefresh(), props.onRefresh()}}
-            >
-              ✕
-            </button>
-
-            <h3 className="font-bold mb-2">
-              {selectedDate.toDateString()}
-            </h3>
-
-            <input
-              value={eventInputText}
-              onChange={(e) => setEventInputText(e.target.value)}
-              className="border p-1 w-full mb-2"
-              placeholder="Add event..."
-            />
-
-            <button
-              onClick={() => {
-                
-                addEventToDate();
-                
-                
-              }}
-              className="bg-blue-600 text-white px-3 py-1 rounded mb-2"
-            >
-              Add
-            </button>
-
-            <ul className="max-h-40 overflow-y-auto">
-              {getEventsFor(selectedDate).map((ev, idx) => (
-                <li
-                  key={idx}
-                  className="flex justify-between bg-gray-100 p-1 rounded mb-1"
-                >
-                  <span style={{ color: ev.color }}>{ev.text}</span>
-                  <button
-                    className="text-red-600"
-                    onClick={() => deleteEvent(ev.id)}
-                  >
-                    ✕
-                  </button>
-                </li>
-              ))}
-
-              {getEventsFor(selectedDate).length === 0 && (
-                <li className="text-gray-500">No events</li>
-              )}
-            </ul>
-          </div>
-        </div>
-      )}
+      <button
+        className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
+        onClick={goToNextMonth}
+      >
+        <ArrowForwardIosIcon fontSize="small" />
+      </button>
     </div>
-  );
-}
 
+    {/* Week Labels */}
+    <div className="grid grid-cols-7 text-center text-xs font-medium text-[#708A58] mb-3">
+      {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
+        <div key={d}>{d}</div>
+      ))}
+    </div>
+
+    {/* Calendar Grid */}
+    <div className="grid grid-cols-7 gap-2">
+      {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+        <div key={i} />
+      ))}
+
+      {Array.from({ length: daysInMonth }, (_, i) => {
+        const day = i + 1;
+        const date = new Date(year, month, day);
+        const dayEvents = getEventsFor(date);
+
+        return (
+          <button
+            key={day}
+            onClick={() => openDateModal(day)}
+            className={`
+              relative
+              aspect-square
+              rounded-xl
+              p-2
+              backdrop-blur-sm
+              border
+              border-white/20
+              transition-all
+              duration-200
+              ${
+                isToday(date)
+                  ? "bg-[#2D4F2B]/80 text-[#FFF1CA] shadow-lg"
+                  : "bg-white/30 text-[#2D4F2B] hover:bg-[#FFF1CA]/30"
+              }
+            `}
+          >
+            <p className="text-sm font-semibold">{day}</p>
+
+            <div className="absolute bottom-1 left-1 flex gap-1">
+              {dayEvents.slice(0,3).map((ev,idx)=>(
+                <span
+                  key={idx}
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{backgroundColor:ev.color}}
+                />
+              ))}
+              {dayEvents.length > 3 && (
+                <span className="text-[10px] text-[#2D4F2B] ml-1">
+                  +{dayEvents.length - 3}
+                </span>
+              )}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+
+    {/* MODAL */}
+    {isModalOpen && selectedDate && (
+      <div className="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center backdrop-blur-sm rounded-xl">
+
+        <div
+          className="
+            relative
+            w-[420px]
+            max-w-[92vw]
+            bg-white/20
+            backdrop-blur-xl
+            border
+            border-white/30
+            rounded-2xl
+            p-5
+            shadow-[0_10px_40px_rgba(0,0,0,0.15)]
+          "
+        >
+          <button
+            className="absolute top-3 right-4 text-white/70 hover:text-white"
+            onClick={() => {
+              setIsModalOpen(false);
+              handleRefresh();
+              props.onRefresh();
+            }}
+          >
+            ✕
+          </button>
+
+          <h3 className="font-semibold text-white mb-3">
+            {selectedDate.toDateString()}
+          </h3>
+
+          <input
+            value={eventInputText}
+            onChange={(e) => setEventInputText(e.target.value)}
+            placeholder="Add event..."
+            className="
+              w-full
+              p-2
+              mb-3
+              rounded-lg
+              bg-white/70
+              border
+              border-white/40
+              focus:outline-none
+              focus:ring-2
+              focus:ring-[#2D4F2B]
+            "
+          />
+
+          <button
+            onClick={addEventToDate}
+            className="
+              w-full
+              bg-[#2D4F2B]/80
+              hover:bg-[#2D4F2B]
+              text-white
+              py-2
+              rounded-lg
+              font-medium
+              mb-4
+              transition
+            "
+          >
+            Add Event
+          </button>
+
+          <ul className="space-y-2 max-h-52 overflow-y-auto">
+            {getEventsFor(selectedDate).map(ev => (
+              <li
+                key={ev.id}
+                className="
+                  flex
+                  justify-between
+                  items-center
+                  bg-white/30
+                  rounded-lg
+                  px-3
+                  py-2
+                "
+              >
+                <span className="text-[#2D4F2B]" style={{color: ev.color}}>
+                  {ev.text}
+                </span>
+                <button
+                  className="text-[#CF0F0F] hover:text-[#CF0F0F]/500"
+                  onClick={() => deleteEvent(ev.id)}
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+}

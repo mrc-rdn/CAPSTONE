@@ -61,96 +61,225 @@ console.log()
   };
   console.log(props.chapterInfo.chapterId)
     return (
-      
-        <div className='w-full h-full bg-white overflow-y-scroll p-3 rounded-md absolute'>
-          <button 
-            onClick={()=>{props.onExit(exit)}} 
-            onMouseOver={()=>setMouseOverCloseModal(true)} 
-            onMouseOut={()=>setMouseOverCloseModal(false)}
-            className={isMouseOverCloseModal?'text-red-500':''}>
-            <CloseIcon  />
-          </button>   
-            <div className="p-4 w-full">
-              <h2 className="text-xl font-bold mb-4">Create a Quiz</h2>
-              {isQuizUploaded?<p>Success uplading the quiz</p>
-              :<div>
-                <input
-                  placeholder="Quiz Title"
-                  className="border-2 border-green-700 p-2 mb-4 w-full rounded-md"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
+     <div className="w-full h-full bg-white overflow-y-scroll p-6 rounded-xl absolute">
 
-                <div className="flex gap-2 mb-4">
-                  <button onClick={() => addQuestion("fill_blank")} className="bg-green-500 text-white px-3 py-1 rounded">
-                    Add Fill in the Blank
-                  </button>
-                  <button onClick={() => addQuestion("multiple_choice")} className="bg-green-700 text-white px-3 py-1 rounded">
-                    Add Multiple Choice
-                  </button>
-                </div>
+    {/* ===== HEADER ===== */}
+    <div className="flex items-center justify-between border-b border-[#6F8A6A]/40 pb-3 mb-6">
+      <h2 className="text-xl font-semibold text-[#2D4F2B]">
+        Create Quiz
+      </h2>
+      <button
+        onClick={() => props.onExit(exit)}
+        className="w-9 h-9 flex items-center justify-center text-[#2D4F2B]"
+      >
+        <CloseIcon />
+      </button>
+    </div>
 
-                {questions.map((question, index) => (
-                  <div key={index} className="border p-3 mb-4 rounded bg-green-700 text-white">
-                    <div className='w-full h-10 flex'>
-                      <h3 className="font-semibold mb-2">Question {index + 1} ({question.type})</h3>
-                      <CloseIcon onClick={(e)=>{ deleteQuestion(index)}} className='ml-auto' />
-                    </div>
-                    
-                    <input
-                      placeholder="Question text"
-                      value={question.question_text}
-                      onChange={(e) => updateQuestion(index, "question_text", e.target.value)}
-                      className="border p-2 w-full mb-2 rounded-md"
-                    />
-                  
-                    {question.type === "fill_blank" ? (
-                      <input
-                        placeholder="Correct Answer"
-                        value={question.correct_answer}
-                        onChange={(e) => updateQuestion(index, "correct_answer", e.target.value)}
-                        className="border p-2 w-full rounded-md"
-                      />
-                    ) : (
-                      <div>
-                        {question.choices.map((choice, j) => (
-                          <div key={j} className="flex items-center mb-2 ">
-                            <input
-                              placeholder={`Choice ${j + 1}`}
-                              value={choice.choice_text}
-                              onChange={(e) => handleChoiceChange(index, j, "choice_text", e.target.value)}
-                              className="border p-2 flex-1 rounded-md"
-                            />
-                            <input
-                              type="checkbox"
-                              checked={choice.is_correct}
-                              onChange={(e) =>
-                                handleChoiceChange(index, j, "is_correct", e.target.checked)
-                              }
-                              className="ml-2"
-                            />
-                            <span className="ml-1">Correct</span>
-                          </div>
-                        ))}
-                        <button
-                          onClick={() => addChoice(index)}
-                          className="bg-green-500 text-white px-2 py-1 rounded"
-                        >
-                          Add Choice
-                        </button>
-                      </div>
-                    )} 
-                  </div>
-                ))}
+    {isQuizUploaded ? (
+      <div className="flex items-center justify-center py-20">
+        <p className="text-base font-medium text-[#2D4F2B]">
+          ✔ Quiz successfully uploaded
+        </p>
+      </div>
+    ) : (
 
-                <button onClick={saveQuiz} onMouseOver={()=>setMouseOver(false)} onMouseOut={()=>setMouseOver(true)} 
-                className={isMouseOver?"bg-white border-1 border-green-700 text-green px-4 py-2 rounded " : "bg-green-700 border-1 border-green-700 text-white px-4 py-2 rounded "}>
-                  Save Quiz
+      <form onSubmit={saveQuiz} className="space-y-6">
+
+        {/* ===== QUIZ TITLE ===== */}
+        <div>
+          <label className="block text-sm text-[#2D4F2B] mb-1">
+            Quiz Title
+          </label>
+          <input
+            placeholder="Enter quiz title"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="
+              w-full h-10 px-3
+              rounded-lg
+              border border-[#6F8A6A]
+              focus:outline-none
+              focus:ring-2
+              focus:ring-[#FFB823]
+            "
+          />
+        </div>
+
+        {/* ===== ADD QUESTION BUTTONS ===== */}
+        <div className="flex gap-3 flex-wrap">
+          <button
+            type="button"
+            onClick={() => addQuestion("fill_blank")}
+            className="
+              h-10 px-4
+              rounded-xl
+              font-semibold text-sm
+              bg-[#2D4F2B]
+              text-white
+              hover:bg-[#708A58]
+              transition
+            "
+          >
+            Add Fill in the Blank
+          </button>
+
+          <button
+            type="button"
+            onClick={() => addQuestion("multiple_choice")}
+            className="
+              h-10 px-4
+              rounded-xl
+              font-semibold text-sm
+              bg-[#2D4F2B]
+              text-white
+              hover:bg-[#708A58]
+              transition
+            "
+          >
+            Add Multiple Choice
+          </button>
+        </div>
+
+        {/* ===== QUESTIONS ===== */}
+        <div className="space-y-5">
+          {questions.map((question, index) => (
+            <div
+              key={index}
+              className="border border-[#6F8A6A]/40 rounded-xl p-4 bg-white"
+            >
+
+              {/* Question Header */}
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-[#2D4F2B]">
+                  Question {index + 1} ({question.type})
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => deleteQuestion(index)}
+                  className="w-8 h-8 flex items-center justify-center text-[#2D4F2B]"
+                >
+                  <CloseIcon fontSize="small" />
                 </button>
-              </div>}
+              </div>
+
+              {/* Question Text */}
+              <input
+                placeholder="Question text"
+                value={question.question_text}
+                required
+                onChange={(e) =>
+                  updateQuestion(index, "question_text", e.target.value)
+                }
+                className="
+                  w-full h-10 px-3 mb-3
+                  rounded-lg
+                  border border-[#6F8A6A]
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-[#FFB823]
+                "
+              />
+
+              {/* Question Type */}
+              {question.type === "fill_blank" ? (
+                <input
+                  placeholder="Correct answer"
+                  value={question.correct_answer}
+                  required
+                  onChange={(e) =>
+                    updateQuestion(index, "correct_answer", e.target.value)
+                  }
+                  className="
+                    w-full h-10 px-3
+                    rounded-lg
+                    border border-[#6F8A6A]
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-[#FFB823]
+                  "
+                />
+              ) : (
+                <div className="space-y-3">
+
+                  {question.choices.map((choice, j) => (
+                    <div key={j} className="flex items-center gap-3">
+                      <input
+                        placeholder={`Choice ${j + 1}`}
+                        value={choice.choice_text}
+                        required
+                        onChange={(e) =>
+                          handleChoiceChange(index, j, "choice_text", e.target.value)
+                        }
+                        className="
+                          flex-1 h-10 px-3
+                          rounded-lg
+                          border border-[#6F8A6A]
+                          focus:outline-none
+                          focus:ring-2
+                          focus:ring-[#FFB823]
+                        "
+                      />
+                      <label className="flex items-center gap-1 text-sm text-[#2D4F2B]">
+                        <input
+                          type="checkbox"
+                          checked={choice.is_correct}
+                          onChange={(e) =>
+                            handleChoiceChange(index, j, "is_correct", e.target.checked)
+                          }
+                        />
+                        Correct
+                      </label>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => addChoice(index)}
+                    className="
+                      h-9 px-4
+                      rounded-xl
+                      font-semibold text-sm
+                      bg-[#2D4F2B]
+                      text-white
+                      hover:bg-[#708A58]
+                      transition
+                    "
+                  >
+                    Add Choice
+                  </button>
+
+                </div>
+              )}
             </div>
-        </div> 
-      
-    )
+          ))}
+        </div>
+
+        {/* ===== SAVE BUTTON ===== */}
+        <div className="flex justify-end pt-4">
+          <button
+            type="submit"
+            className="
+              w-40 h-11
+              rounded-xl
+              font-semibold
+              bg-[#2D4F2B]
+              text-white
+              hover:bg-[#708A58]
+              focus:outline-none
+              focus:ring-2
+              focus:ring-[#FFB823]
+              transition
+            "
+          >
+            Save Quiz
+          </button>
+        </div>
+
+      </form>
+    )}
+
+  </div>
+);
 }

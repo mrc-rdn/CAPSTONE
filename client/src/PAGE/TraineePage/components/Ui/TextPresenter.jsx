@@ -16,15 +16,14 @@ export default function TextPresenter({data}) {
    
     
   return (
-    <div className='w-full h-full flex justify-center items-center flex-col'>
+   <div className='w-full h-full flex justify-center items-center flex-col'>
         <h2 className="text-2xl font-bold mb-4 ">Posts</h2>
 
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-center "onClick={handleprogress}>
             <Swiper
             spaceBetween={20}
             slidesPerView={1}
             className="w-full max-w-5xl h-[70vh] mx-auto"
-            onClick={handleprogress}
             >
             {data.map(post => (
                 <SwiperSlide key={post.id} className="flex justify-center">

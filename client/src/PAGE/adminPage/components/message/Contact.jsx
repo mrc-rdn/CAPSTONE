@@ -21,32 +21,44 @@ console.log( props.profile ,props.color, props.shade)
       }
   
     const userColorClass = colorMap[props.color]?.[props.shade] || 'bg-gray-500';
-console.log(props.contactData)
+console.log(props.unread_count)
   return (
-    <div className={
+  <div
+    className={
       props.isActive
-      ?'w-full h-15 flex bg-green-600 justify-center items-center'
-      :'w-full h-15 flex justify-center items-center'} 
-      onClick={ handleSelect}
-    >
-        <div className='relative'> {props.profile
-            ?<img src={props.profile} alt="" className='w-10 h-10 rounded-full ml-2 border-1 mr-3' />
-            :<div className='ml-2'>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${userColorClass}`}>
-                    <p>
-                    {props.firstName.slice(0,1).toUpperCase()}
-                    </p>
-                </div>
-            </div>}
-            {props.unread_count > 0 && (
-              <span className="w-4 h-4 bg-red-500 pl-1 text-white text-xs rounded-full absolute bottom-6 left-10">
-                {props.unread_count}
-              </span>
-            )}
+        ? "w-full h-15 flex items-center px-3 rounded-lg bg-green-700/80 text-white shadow-md backdrop-blur-sm"
+        : "w-full h-15 flex items-center px-3 rounded-lg hover:bg-white/20 transition"
+    }
+    onClick={handleSelect}
+  >
+    <div className="relative">
+      {props.profile ? (
+        <img
+          src={props.profile}
+          alt=""
+          className="w-10 h-10 rounded-full ml-2 border border-white/40 mr-3"
+        />
+      ) : (
+        <div className="ml-2">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${userColorClass} text-white`}
+          >
+            <p>{props.firstName.slice(0, 1).toUpperCase()}</p>
           </div>
-        <div className='w-full flex m-1'>
-            <p className='ml-1 mr-1'>{props.firstName} </p> <p> {props.surname}</p>
         </div>
+      )}
+
+      {props.unread_count > 0 && (
+        <span className="w-4 h-4 bg-red-500 text-white text-[10px] rounded-full absolute -top-1 -right-1 flex items-center justify-center shadow">
+          {props.unread_count}
+        </span>
+      )}
     </div>
-  )
+
+    <div className="w-full flex ml-3 text-sm">
+      <p className="mr-1 font-medium">{props.firstName}</p>
+      <p>{props.surname}</p>
+    </div>
+  </div>
+);
 }

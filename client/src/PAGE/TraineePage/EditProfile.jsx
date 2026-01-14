@@ -5,7 +5,7 @@ import { API_URL } from '../../api';
 import axios from 'axios';
 import EditUserInfo from './components/editprofile/EditUserInfo';
 import UploadProfile from './components/editprofile/UploadProfile';
-import Navrbar from './components/Navbar';
+import Navbar from './components/Navbar';
 
 export default function EditProfile() {
     
@@ -13,36 +13,62 @@ export default function EditProfile() {
     const [username, setUserName] = useState("")
     const [isProfileModal, setIsProfileModal] = useState(false)
     const [refresh, setRefresh] = useState(0)
-    
 
     useEffect(()=>{
         const fetchData = async ()=>{
             const res = await axios.get(`${API_URL}/trainee/dashboard`, {withCredentials:true})
             let data = res.data.usersInfo
-            console.log(data)
             setUserName(res.data.username)
             setData(data)
-            
         }
         fetchData()
-        
     },[refresh])
-    const handleUploadProfile = async ()=>{
+
+    const handleUploadProfile = ()=>{
         setIsProfileModal(true)
     }
+
     const handleExitModal = ()=>{
         setIsProfileModal(false)
         setRefresh(prev => prev + 1)
     }
-    
 
   return (
-    <div className='flex'>
-        <Navrbar />  
-       <div className='w-full pt-10 px-20'>
-            <EditUserInfo data={data} username={username} handleUploadProfile={handleUploadProfile} />
-       </div>
-       {isProfileModal?<UploadProfile onExit={handleExitModal} />:null}
+    <div className="relative flex w-screen h-screen overflow-hidden">
+      
+      {/* BACKGROUND IMAGE */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <img
+          src="/images/plmro.jpg"
+          alt="Dashboard background"
+          className="w-full h-full object-cover scale-105"
+        />
+        <div className="absolute inset-0 bg-white/10" />
+      </div>
+
+      {/* NAVBAR */}
+      <Navbar />
+
+      {/* MAIN CONTENT */}
+      <div className="w-full flex justify-center items-start p-5">
+        
+        {/* GLASS CONTAINER */}
+        <div className="w-full max-w-5xl h-full rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 shadow-xl p-8">
+          
+          <EditUserInfo
+            data={data}
+            username={username}
+            handleUploadProfile={handleUploadProfile}
+          />
+
+        </div>
+      </div>
+
+      {/* MODAL */}
+      {isProfileModal && (
+        <UploadProfile onExit={handleExitModal} />
+      )}
+
     </div>
   )
 }

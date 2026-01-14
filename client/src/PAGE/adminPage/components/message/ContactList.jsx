@@ -135,84 +135,89 @@ export default function ContactList({ userData, socket, refresh }) {
   }, [messages]);
 
   return (
-    <div className="h-full flex">
-      {/* CONTACT LIST */}
-      <div className="w-4/12 bg-white overflow-y-auto">
-        <ul>
-          {contacts.map((contact) => {
-            const isOtherUser = contact.user1_id !== userData.id;
+  <div className="h-11/12 flex gap-4 p-4">
+    {/* CONTACT LIST */}
+    <div className="w-4/12 backdrop-blur-md bg-white/10 border border-black/10 rounded-xl shadow-md overflow-hidden">
+      <ul className="h-full overflow-y-auto">
+        {contacts.map((contact) => {
+          const isOtherUser = contact.user1_id !== userData.id;
 
-            return (
-              <li key={contact.id}>
-                <Contact
-                  contactData={contact}
-                  firstName={
-                    isOtherUser
-                      ? contact.user1_firstname
-                      : contact.user2_firstname
-                  }
-                  surname={
-                    isOtherUser
-                      ? contact.user1_surname
-                      : contact.user2_surname
-                  }
-                  profile={
-                    isOtherUser
-                      ? contact.user1_profile_pic
-                      : contact.user2_profile_pic
-                  }
-                  color={
-                    isOtherUser
-                      ? contact.user1_color
-                      : contact.user2_color
-                  }
-                  shade={
-                    isOtherUser
-                      ? contact.user1_shades
-                      : contact.user2_shades
-                  }
-                  unread_count={contact.unread_count}
-                  isActive={activeContactId === contact.id}
-                  handleSelectContact={() =>
-                    handleSelectContact(contact.id)
-                  }
-                />
-              </li>
-            );
-          })}
+          return (
+            <li key={contact.id}>
+              <Contact
+                contactData={contact}
+                firstName={
+                  isOtherUser
+                    ? contact.user1_firstname
+                    : contact.user2_firstname
+                }
+                surname={
+                  isOtherUser
+                    ? contact.user1_surname
+                    : contact.user2_surname
+                }
+                profile={
+                  isOtherUser
+                    ? contact.user1_profile_pic
+                    : contact.user2_profile_pic
+                }
+                color={
+                  isOtherUser
+                    ? contact.user1_color
+                    : contact.user2_color
+                }
+                shade={
+                  isOtherUser
+                    ? contact.user1_shades
+                    : contact.user2_shades
+                }
+                unread_count={contact.unread_count}
+                isActive={activeContactId === contact.id}
+                handleSelectContact={() =>
+                  handleSelectContact(contact.id)
+                }
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+
+    {/* CHAT AREA */}
+    <div className="w-full h-full flex flex-col backdrop-blur-md bg-white/10 border border-black/10 rounded-xl shadow-md overflow-hidden z-0">
+      {/* MESSAGES */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <ul className="space-y-2">
+          {messages.map((msg, index) => (
+            <Messages key={index} message={msg} userData={userData} />
+          ))}
+          <div ref={bottomRef} />
         </ul>
       </div>
 
-      {/* CHAT AREA */}
-      <div className="w-full flex flex-col">
-        <div className="flex-1 overflow-y-auto">
-          <ul>
-            {messages.map((msg, index) => (
-              <Messages key={index} message={msg} userData={userData} />
-            ))}
-            <div ref={bottomRef} />
-          </ul>
-        </div>
+      {/* INPUT */}
+      {contactId && (
+        <form
+          onSubmit={handleSendMessage}
+          className="h-20 border-t border-black/10 bg-white/20 backdrop-blur-md flex items-center justify-center px-4"
+        >
+          <input
+            type="text"
+            className="w-8/12 h-11 text-sm bg-white/70 border border-black/10 rounded-full px-4 text-gray-800 placeholder-gray-500 focus:outline-none"
+            placeholder="Message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
 
-        {/* INPUT */}
-        {contactId && (
-          <form
-            onSubmit={handleSendMessage}
-            className="h-20 bg-white flex items-center justify-center"
+          <button
+            type="submit"
+            className="ml-3 w-11 h-11 rounded-full bg-green-700 hover:bg-green-800 text-white flex items-center justify-center shadow"
           >
-            <input
-              type="text"
-              className="w-6/12 h-10 text-lg bg-green-500 rounded px-3 text-white placeholder-white"
-              placeholder="Message..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <button type="submit" className="ml-3 text-green-700">
-              <SendIcon sx={{ fontSize: 30 }} />
-            </button>
-          </form>
-        )}
-      </div>
+            <SendIcon sx={{ fontSize: 22 }} />
+          </button>
+        </form>
+      )}
     </div>
-  );
+  </div>
+);
 }
