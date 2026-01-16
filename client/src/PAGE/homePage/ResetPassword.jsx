@@ -50,7 +50,7 @@ export default function ResetPassword() {
             />
 
 
-      <h2 className="text-2xl font-bold text-[#FFF1CA] mb-2">Create New Password</h2>
+      <h2 className="text-2xl font-bold text-[#FFF1CA] mb-2">Reset Password</h2>
       <input
         type="Password"
        className="

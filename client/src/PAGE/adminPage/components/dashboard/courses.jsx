@@ -21,7 +21,7 @@ export default function courses({ course }) {
   return (
     <div
       className="
-    w-60
+    w-55
     max-w-full
     h-32
     m-2

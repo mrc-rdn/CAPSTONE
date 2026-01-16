@@ -10,7 +10,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Features from './components/Features.jsx'
 import SuccessStories from './components/SuccessStories.jsx'
-import FAQ from './components/FAQ.jsx'
+
 import About from "./components/About.jsx";
 import ChatBotModal from "./components/ChatBotModal.jsx";
 
@@ -92,7 +92,7 @@ export default function LandingPage() {
       </section>
       <Features />  
       <SuccessStories />   
-      <FAQ />
+      
       <About />
 
 

@@ -9,33 +9,52 @@ export default function AddTraineeModal(props) {
     const [isEnrolled, setEnrolled] = useState(false)
     const [trainee, setTrainee] = useState([])
     const [progress, setProgress] = useState([])
+    const [refresh, setRefresh] = useState(0)
+    
+    const handleRefresh = ()=>{
+      setRefresh(prev=> prev + 1)
+    }
+    async function handleEnroll(e) {
+      e.preventDefault();
 
-    useEffect(()=>{
-      const fetch = async() =>{
-        try {
-          const [trainee, progress] = await Promise.all([axios.get(`${API_URL}/admin/${props.courseId}/trainee`, {withCredentials:true}),
-           axios.post(`${API_URL}/admin/${props.courseId}/excelrender`,{},{withCredentials:true})])
-           setProgress(progress.data.data)
-          setTrainee(trainee.data.data)
-        } catch (error) {
-          
-        }
-        
-      }
-      fetch()
-    },[])
-
-    async function handleEnroll(e){
-      e.preventDefault()
-      
       try {
-        const response = await axios.post(`${API_URL}/trainer/course/enroll`,{courseId: props.courseId, studentId: studentId}, {withCredentials: true});
-        setEnrolled(true)
-        setStudentId("")
+        await axios.post(
+          `${API_URL}/admin/course/enroll`,
+          { courseId: props.courseId, studentId },
+          { withCredentials: true }
+        );
+
+        setEnrolled(true);
+        setStudentId("");
+
+        // 👇 IMPORTANT
+        fetchData(); // instant refresh, no need to exit modal
+
       } catch (error) {
-        console.log(`error handling the request ${error}`)
+        console.log(`error handling the request ${error}`);
       }
     }
+    const fetchData = async () => {
+      try {
+        const [traineeRes, progressRes] = await Promise.all([
+          axios.get(`${API_URL}/admin/${props.courseId}/trainee`, { withCredentials: true }),
+          axios.post(`${API_URL}/admin/${props.courseId}/excelrender`, {}, { withCredentials: true })
+        ]);
+
+        setProgress(progressRes.data.data);
+        setTrainee(traineeRes.data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    useEffect(()=>{
+      
+       
+      fetchData()
+    },[refresh])
+
+ 
 
   function getCompletionPercentagePerUser(data) {
     const users = {};
@@ -68,7 +87,21 @@ export default function AddTraineeModal(props) {
   }
   let result = getCompletionPercentagePerUser(progress);
 
+const mergedData = trainee.map(student => {
+  const score = result.find(
+    r => r.user_id === student.student_id
+  );
 
+  return {
+    ...student,
+
+    // score-related (safe kahit wala)
+    done: score?.done ?? 0,
+    total: score?.total ?? 0,
+    percentage: score?.percentage ?? 0,
+  };
+});
+console.log(mergedData)
 
   return (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -96,7 +129,7 @@ export default function AddTraineeModal(props) {
 
       {/* ===== TABLE ===== */}
       <div className="px-6 py-4">
-        <div className="max-h-80 overflow-y-auto rounded-lg border border-[#6F8A6A]/40 bg-white">
+        <div className="max-h-80 overflow-y-scroll rounded-lg border border-[#6F8A6A]/40 bg-white">
           <table className="w-full text-sm">
             <thead className="bg-[#2D4F2B] text-[#F1F3E0]">
               <tr>
@@ -108,12 +141,12 @@ export default function AddTraineeModal(props) {
             </thead>
 
             <tbody className="text-[#2D4F2B]">
-              {result.map((info, index) => (
+              {mergedData.map((info, index) => (
                 <tr
                   key={index}
                   className="border-b border-[#6F8A6A]/30 hover:bg-[#708A58]/20 transition"
                 >
-                  <td className="px-4 py-3">{info.user_id}</td>
+                  <td className="px-4 py-3">{info.id}</td>
 
                   <td className="px-4 py-3">
                     {info.surname.charAt(0).toUpperCase() + info.surname.slice(1)}{" "}
@@ -121,7 +154,12 @@ export default function AddTraineeModal(props) {
                   </td>
 
                   <td className="px-4 py-3 text-center">
-                    {info.percentage === 100 ? (
+                    { info.percentage === 0 
+                    ? <span className="text-[#2D4F2B] ">
+                        Not Started
+                      </span>
+                    :(info.percentage === 100 
+                    ? (
                       <span className="text-[#2D4F2B] font-medium">
                         Completed
                       </span>
@@ -129,7 +167,7 @@ export default function AddTraineeModal(props) {
                       <span className="text-[#6F8A6A]">
                         On Going
                       </span>
-                    )}
+                    ))}
                   </td>
 
                   <td className="px-4 py-3 text-center">

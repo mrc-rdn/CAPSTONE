@@ -8,7 +8,7 @@ export default function Navbar() {
   const [showNav, setShowNav] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const menuItems = ["Home", "Features", "FAQs", "About Us"];
+  const menuItems = ["Home", "Features", "About Us"];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,15 +29,15 @@ export default function Navbar() {
           ${showNav ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"}
         `}
       >
-        <div className="max-w-[1300px] mx-auto flex items-center justify-between px-5 py-3 text-white">
+        <div className="w-full h-18 mx-auto flex items-center justify-between px-5 py-3 text-white">
           {/* Logo */}
-          <div className="flex items-center gap-4 font-bold">
-            <img src="/images/logo2.gif" alt="Logo" className="w-9 h-9" />
+          <div className="flex items-center gap-4 font-bold ml-15">
+            <img src="/images/logo2.gif" alt="Logo" className="w-12 h-12" />
             <span className="text-lg lg:text-xl">E-Kabuhayan</span>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex flex-1 justify-center gap-10">
+          <div className="hidden md:flex flex-1 justify-center gap-30 ">
             {menuItems.map((item, idx) => (
               <a
                 key={idx}
@@ -50,10 +50,10 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Login */}
-          <div className="hidden md:block">
+          <div className="hidden md:block mr-15">
             <Link
               to="/role"
-              className="px-5 py-2 rounded-full border border-[#FFB823] hover:bg-[#FFB823] hover:text-[#2D4F2B]"
+              className="px-5 py-2 rounded-full "
             >
               Login
             </Link>
@@ -67,21 +67,21 @@ export default function Navbar() {
       </nav>
 
       {/* 2️⃣ Top Navbar (laging visible) */}
-      <nav className="top-0 left-0 w-full z-50 bg-[#2D4F2B]">
-        <div className="max-w-[1300px] mx-auto flex items-center justify-between px-5 py-3 text-white">
+      <nav className="top-0 left-0 w-full h-18 z-50 bg-[#2D4F2B]">
+        <div className=" flex items-center px-5 py-3 text-white">
           {/* Logo */}
-          <div className="flex items-center gap-4 font-bold">
-            <img src="/images/logo2.gif" alt="Logo" className="w-9 h-9" />
+          <div className="flex items-center gap-4 font-bold ml-15">
+            <img src="/images/logo2.gif" alt="Logo" className="w-12 h-12" />
             <span className="text-lg lg:text-xl">E-Kabuhayan</span>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex flex-1 justify-center gap-20">
+          <div className="hidden md:flex flex-1 justify-center gap-30 ">
             {menuItems.map((item, idx) => (
               <a
                 key={idx}
                 href={`#${item.toLowerCase().replace(" ", "")}`}
-                className="text-white font-medium hover:text-[#FFB823]"
+                className="text-white font-medium hover:text-[#FFB823] text-md"
               >
                 {item}
               </a>
@@ -89,10 +89,21 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Login */}
-          <div className="hidden md:block">
-            <Link
+          <div className="hidden md:block mr-15 ">
+           <Link
               to="/role"
-              className="px-5 py-2 rounded-full border border-[#FFB823] hover:bg-[#FFB823] hover:text-[#2D4F2B]"
+              className="
+                
+                inline-block px-5 py-2 m- rounded-2xl font-bold text-[#FFF1CA] 
+                bg-[#2D4F2B] border-1 border-[#708A58]
+                shadow-[0px_5px_0px_0px_#708A58]
+                hover:translate-y-[5px]
+                hover:shadow-none
+                hover:bg-[#708A58]
+                
+                
+                transition-all duration-150 ease-in-out
+              "
             >
               Login
             </Link>
@@ -122,7 +133,7 @@ export default function Navbar() {
           <a
             key={idx}
             href={`#${item.toLowerCase().replace(" ", "")}`}
-            className="text-2xl font-semibold hover:text-[#FFB823]"
+            className="text-xl font-semibold hover:text-[#FFB823]"
             onClick={() => setIsOpenModal(false)}
           >
             {item}

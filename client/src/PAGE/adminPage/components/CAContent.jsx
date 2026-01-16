@@ -20,6 +20,8 @@ export default function CAContent() {
   const [isAccountCreated, setAccountCreated] = useState(false)
   const [isMouseOver, setMouseOver] = useState(false)
   const [isPasswordMatch, setIsPasswordMatch] = useState(null)
+  const [notice, setNotice] = useState("")
+  const [isNotice, setIsNotice] = useState("")
   //const [color, setcolor] = useState({color:null, shade:null})
   let shades = ['200', '300', '400', '500', '600', '700', '800']
   let colors = ['red', 'yellow', 'green', 'orange', 'blue', 'purple', 'pink']
@@ -41,15 +43,26 @@ export default function CAContent() {
         const response = await axios.post(`${API_URL}/admin/registeraccount`,
           { firstName: firstName, surname: surname, contactNo: contactNo, username: username, password: password, role: role, color: setColor, shade: setShade },
           { withCredentials: true })
-
-        setAccountCreated(response.data.success)
-        setFirstName("")
-        setSurname("")
-        setUsername("")
-        setContactNo("")
-        setPassword("")
-        setConfirmPassword("")
-        setIsPasswordMatch(false)
+        if(response.data.error === "Email already exists. Try logging in."){
+          setContactNo("")
+          setNotice('Email already exists. Try logging in.')
+          setIsNotice(true)
+        }else if(response.data.error === "Username already exists. Try logging in."){
+          setUsername("")
+          setNotice("Username already exists. Try logging in.")
+          setIsNotice(true)
+        }else{
+          setIsNotice(false)
+          setAccountCreated(response.data.success)
+          setFirstName("")
+          setContactNo("")
+          setSurname("")
+          setUsername("")
+          setPassword("")
+          setConfirmPassword("")
+          setIsPasswordMatch(false)
+        }
+        
 
       } catch (error) {
         setAccountCreated(false)
@@ -74,15 +87,24 @@ export default function CAContent() {
       border border-white/20
       shadow-xl
       p-6
+      pb-3
+      pt-10
+      relative
     "
       >
-        {isAccountCreated && (
-          <p className="mb-4 text-center text-green-600 font-semibold">
+        
+          <p className="mb-4 text-center text-green-600 font-semibold absolute inset-4">
+            Account Created
+          </p>
+      
+        {isNotice && (
+          <p className="mb-4 text-center text-green-600 font-semibold absolute">
             Account Created
           </p>
         )}
 
-        <form className="flex flex-wrap">
+
+        <form className="flex flex-wrap mt-1">
 
           {/* First Name */}
           <div className="flex flex-col w-full sm:w-1/2 p-2">
@@ -124,7 +146,7 @@ export default function CAContent() {
 
           {/* Contact */}
           <div className="flex flex-col w-full p-2">
-            <label className="text-sm font-medium text-[#2D4F2B]">Contact No</label>
+            <label className="text-sm font-medium text-[#2D4F2B]">Email</label>
             <input
               className="
             w-full h-10
@@ -134,7 +156,7 @@ export default function CAContent() {
             focus:outline-none focus:ring-2 focus:ring-[#2D4F2B]
           "
               type="text"
-              placeholder="Contact No"
+              placeholder="Email"
               required
               onChange={(e) => setContactNo(e.target.value)}
               value={contactNo}
@@ -226,7 +248,7 @@ export default function CAContent() {
           </div>
 
           {/* Submit */}
-          <div className="w-full flex justify-center mt-6">
+          <div className="w-full flex justify-center mt-4">
             <button
               className="
             w-52 h-11

@@ -93,7 +93,7 @@ export default function AdminDashboard() {
               <div
                 className="
               w-full h-8/12
-              rounded-lg
+              rounded-xl
               border border-white/5
               bg-white/30
               backdrop-blur-md

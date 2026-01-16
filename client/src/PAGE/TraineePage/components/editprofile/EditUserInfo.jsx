@@ -189,7 +189,7 @@ export default function EditUserInfo(props) {
                         {/* Buttons */}
                         <div className="w-full flex flex-col sm:flex-row justify-center gap-4 mt-4">
 
-                            <Link to="/admin/dashboard">
+                            <Link to="/trainee/dashboard">
                                 <button
                                     className="px-6 h-10 rounded-lg border border-[#2D4F2B] text-[#2D4F2B] bg-white/40 backdrop-blur-md hover:bg-[#2D4F2B] hover:text-white transition"
                                 >

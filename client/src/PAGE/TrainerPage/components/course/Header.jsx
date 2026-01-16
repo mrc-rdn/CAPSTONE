@@ -65,7 +65,7 @@ return (
       + Add Chapter
     </button>
 
-    <button
+    {/* <button
       onClick={props.handleOpenAddTraineeModal}
       className="
         m-3 p-3
@@ -75,7 +75,7 @@ return (
       "
     >
       + Add Trainee
-    </button>
+    </button> */}
 
   </div>
 );

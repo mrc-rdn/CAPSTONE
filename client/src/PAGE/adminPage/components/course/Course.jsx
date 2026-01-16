@@ -30,6 +30,7 @@ export default function Course(props) {
       try {
         const  result = await axios.delete(`${API_URL}/admin/coursedelete/${props.id}`, 
           {withCredentials:true})
+          props.handleRefresh()
         setIscourseDelete(true)
         setOpenModal(false)
       } catch (error) {

@@ -34,7 +34,7 @@ export default function RoleChoicePage() {
                           rounded-2xl overflow-hidden shadow-2xl">
 
             {/* CONTAINER OVERLAY */}
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-[#2D4F2B]" />
 
             {/* CONTENT (UNCHANGED LOGIC) */}
             <div className="relative z-10 h-full flex flex-col items-center justify-center p-10">
@@ -51,21 +51,33 @@ export default function RoleChoicePage() {
 
               <button 
                 onClick={()=>{handleRoleSelection("trainer")}}
-                className='w-full h-12 bg-[#FFF1CA] rounded-xl mb-3 font-semibold text-[#2D4F2B]
-                transition-all duration-200
-                hover:bg-[#708A58] hover:-translate-y-0.5 hover:shadow-md'>
+                className='inline-block px-30 py-3 m-3 rounded-2xl font-bold text-[#FFF1CA] 
+                bg-[#2D4F2B] border-1 border-[#708A58]
+                shadow-[0px_5px_0px_0px_#708A58]
+                hover:translate-y-[5px]
+                hover:shadow-none
+                hover:bg-[#708A58]
+                
+                
+                transition-all duration-150 ease-in-out'>
                 TRAINER
               </button>
 
               <button 
                 onClick={()=>{handleRoleSelection("trainee")}}
-                className='w-full h-12 bg-[#FFF1CA] rounded-xl mb-4 font-semibold text-[#2D4F2B]
-                transition-all duration-200
-                hover:bg-[#708A58] hover:-translate-y-0.5 hover:shadow-md'>
+                className='inline-block px-30 py-3 m-3 mb-8 rounded-2xl font-bold text-[#FFF1CA] 
+                bg-[#2D4F2B] border-1 border-[#708A58]
+                shadow-[0px_5px_0px_0px_#708A58]
+                hover:translate-y-[5px]
+                hover:shadow-none
+                hover:bg-[#708A58]
+                
+                
+                transition-all duration-150 ease-in-out'>
                 TRAINEE
               </button>
 
-              <button className='text-[#FFB823]/80 font-bold'>
+              <button className='text-[#FFB823]/80 font-bold '>
                 <Link to="/">BACK</Link>
               </button>
 

@@ -18,6 +18,7 @@ import { Server } from "socket.io";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { GoogleGenAI } from "@google/genai";
 env.config();
 
 
@@ -127,38 +128,55 @@ function generateNumericId() {
 }
 
 
-// Mahalaga para mabasa ang JSON galing sa Postman
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Gawa tayo ng bagong test route para hindi magulo ang dati mong routes
-app.post("/test-ai", async (req, res) => {
+// Automatic na babasahin nito ang process.env.GEMINI_API_KEY
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+
+app.post("/ask", async (req, res) => {
   try {
     const { question } = req.body;
-    console.log("Pumasok sa Postman:", question);
+    
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview", 
+      contents: `
+        SYSTEM RULES (STRICT):
+        1. Role: E-Kabuhayan LMS Assistant (Parañaque PLRMO).
+        2. Scope: E-Kabuhayan LMS, PLRMO training programs, and enrollment access only.
+        3. Restriction: Kapag ang tanong ay labas sa system (hal. sports, general coding), magalang na tumanggi at ituro ang usapan pabalik sa E-Kabuhayan.
+        4. Tone: Friendly Taglish.
 
-    // Gamitin ang pinaka-stable na ID para sa 2026
+        OFFERED PROGRAMS (COURSES):
+        Dito lamang pwedeng mamili ang mga residente:
+        - Food Processing
+        - Pastry Making
+        - Dressmaking
+        - Electrical Work
+        - Handicrafts
 
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        UNIFIED ENROLLMENT & REGISTRATION PROCESS:
+        - STEP 1: Pumunta sa official PLRMO Facebook Page (ito ang tanging paraan).
+        - STEP 2: Ibigay ang personal details at piliin ang kursong nais (Food Processing, Pastry Making, etc.).
+        - STEP 3: Ang PLRMO staff ang gagawa ng account para sa user.
+        - STEP 4: Pagkatapos magawa ang account, doon pa lang pwedeng mag-login sa E-Kabuhayan LMS website para mag-aral.
+        - Reminder: Walang "Sign Up" o "Self-Enroll" sa website dashboard. Lahat ay manual na ginagawa ng PLRMO.
 
-    const result = await model.generateContent(question);
-    const text = result.response.text();
+        KNOWLEDGE BASE:
+        - Ang E-Kabuhayan ay para sa upskilling at employment ng mga taga-Parañaque.
+        - Features: Modular learning, quizzes, monitoring, at certification.
+        - Access: FREE para sa registered residents.
 
-    res.json({ 
-      status: "Success",
-      reply: text 
+        USER QUESTION: ${question}
+      `,
     });
 
+    res.json({ answer: response.text });
   } catch (error) {
-    console.error("API ERROR:", error.message);
-    res.status(500).json({ 
-      status: "Error",
-      message: error.message 
-    });
+    console.error("Chat Error:", error);
+    res.status(500).send("AI error.");
   }
 });
-
-
 
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
@@ -196,10 +214,87 @@ app.post("/forgot-password", async (req, res) => {
     to: email,
     subject: "Reset your password",
     html: `
-      <h3>Password Reset</h3>
-      <p>Click the link below to change your password:</p>
-      <a href="${resetLink}">${resetLink}</a>
-      <p>This link expires in 15 minutes.</p>
+      
+      <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Transporter Notification</title>
+                  <style>
+                    body {
+                      margin: 0;
+                      padding: 0;
+                      background-color: #FFF1CA;
+                      font-family: Arial, sans-serif;
+                    }
+                    .container {
+                      max-width: 600px;
+                      margin: 0 auto;
+                      background-color: #FFFFFF;
+                      border-radius: 10px;
+                      overflow: hidden;
+                      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                    }
+                    .header {
+                      background-color: #2D4F2B;
+                      color: #FFF1CA;
+                      padding: 20px;
+                      text-align: center;
+                      font-size: 24px;
+                      font-weight: bold;
+                    }
+                    .body {
+                      padding: 20px;
+                      color: #2D4F2B;
+                      line-height: 1.6;
+                    }
+                    .body h2 {
+                      color: #708A58;
+                    }
+                    .button {
+                      display: inline-block;
+                      background-color: #FFB823;
+                      color: #2D4F2B;
+                      padding: 12px 25px;
+                      margin: 20px 0;
+                      border-radius: 5px;
+                      text-decoration: none;
+                      font-weight: bold;
+                    }
+                    .footer {
+                      background-color: #708A58;
+                      color: #FFF1CA;
+                      text-align: center;
+                      padding: 15px;
+                      font-size: 14px;
+                    }
+                    @media screen and (max-width: 600px) {
+                      .container {
+                        width: 100% !important;
+                        border-radius: 0;
+                      }
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <div class="header">
+                      E-KABUHAYAN Notification
+                    </div>
+                    <div class="body">
+                      <h3>Password Reset</h3>
+                      <p>Click the link below to change your password:</p>
+                      <p>This link expires in 15 minutes.</p>
+                      <a href="${resetLink}">${resetLink}</a>
+                     
+                    </div>
+                    <div class="footer">
+                      &copy; 2026 E-KABUHAYAN All rights reserved.
+                    </div>
+                  </div>
+                </body>
+                </html>
     `
   });
 
@@ -254,9 +349,12 @@ app.post("/admin/registeraccount", async (req, res) => {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
     const checkResult = await db.query("SELECT * FROM users WHERE username = $1", [username])
+    const checkEmail = await db.query("SELECT * FROM users_info WHERE email = $1", [contactNo])
 
-    if (checkResult.rows.length > 0) {
+    if (checkResult.rows.length > 0 ) {
       res.json({ success: false, error: "Username already exists. Try logging in." })
+    }else if(checkEmail.rows.length > 0){
+      res.json({ success: false, error: "Email already exists. Try logging in." })
     } else {
       if (password.length < 8) {
 
@@ -274,6 +372,95 @@ app.post("/admin/registeraccount", async (req, res) => {
             const userId = users.id
 
             const userInfoRes = await db.query("INSERT INTO users_info (id, first_name, surname, email, color, shades) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *", [userId, firstName, surname, contactNo, color, shade])
+              await transporter.sendMail({
+              from: `"LMS Support" <${process.env.GMAIL_USER}>`,
+              to: contactNo,
+              subject: "Accout Created",
+              html: `
+               <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Transporter Notification</title>
+                  <style>
+                    body {
+                      margin: 0;
+                      padding: 0;
+                      background-color: #FFF1CA;
+                      font-family: Arial, sans-serif;
+                    }
+                    .container {
+                      max-width: 600px;
+                      margin: 0 auto;
+                      background-color: #FFFFFF;
+                      border-radius: 10px;
+                      overflow: hidden;
+                      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                    }
+                    .header {
+                      background-color: #2D4F2B;
+                      color: #FFF1CA;
+                      padding: 20px;
+                      text-align: center;
+                      font-size: 24px;
+                      font-weight: bold;
+                    }
+                    .body {
+                      padding: 20px;
+                      color: #2D4F2B;
+                      line-height: 1.6;
+                    }
+                    .body h2 {
+                      color: #708A58;
+                    }
+                    .button {
+                      display: inline-block;
+                      background-color: #FFB823;
+                      color: #2D4F2B;
+                      padding: 12px 25px;
+                      margin: 20px 0;
+                      border-radius: 5px;
+                      text-decoration: none;
+                      font-weight: bold;
+                    }
+                    .footer {
+                      background-color: #708A58;
+                      color: #FFF1CA;
+                      text-align: center;
+                      padding: 15px;
+                      font-size: 14px;
+                    }
+                    @media screen and (max-width: 600px) {
+                      .container {
+                        width: 100% !important;
+                        border-radius: 0;
+                      }
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <div class="header">
+                      E-KABUHAYAN Notification
+                    </div>
+                    <div class="body">
+                      <h2>Hello ${firstName} ${surname}, you are a ${role}!</h2>
+                      <p>We would like to inform you that your account has been created. Please log in to access your account.</p>
+                      <p><strong>Username:</strong> ${username}</p>
+                      <p><strong>Password:</strong>${password} </p>
+                      <a href="${frontendURL}" class="button">Login</a>
+                      <p>Thank you for your inquiry</p
+                    </div>
+                    <div class="footer">
+                      &copy; 2026 E-KABUHAYAN All rights reserved.
+                    </div>
+                  </div>
+                </body>
+                </html>
+
+              `
+            });
 
             res.json({ success: true, message: "Account created" })
           }

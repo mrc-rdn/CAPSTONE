@@ -12,7 +12,7 @@ export default function Content(props) {
     <div
   className="
     w-full h-50
-    rounded-lg
+    rounded-xl
     flex p-5
     bg-white/10
     backdrop-blur-md

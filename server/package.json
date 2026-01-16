@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/mrc-rdn/LMS-E-KABUHAYAN#readme",
   "dependencies": {
+    "@google/genai": "^1.35.0",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.74.0",
     "bcrypt": "^6.0.0",
