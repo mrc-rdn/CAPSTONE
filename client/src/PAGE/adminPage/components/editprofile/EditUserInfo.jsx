@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 
 export default function EditUserInfo(props) {
     let data = props.data
+    console.log
     const [firstName, setFirstName] = useState('')
     const [surname, setSurname] = useState("");
     const [contactNo, setContactNo] = useState("");
@@ -24,7 +25,7 @@ export default function EditUserInfo(props) {
         if (!props.data) return
         setFirstName(data.first_name ?? "")
         setSurname(data.surname ?? "")
-        setContactNo(data.contact_no ?? "")
+        setContactNo(data.email ?? "")
         setUsername(props.username ?? "")
         setPicture(data.profile_pic ?? "")
     }, [props.data, props.username])

@@ -28,6 +28,16 @@ export default function GoogleCalendarUI(props) {
     setRefresh(prev => prev + 1)
    
   }
+
+  const isPastDate = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // remove time
+
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+
+    return compareDate < today;
+  };
   const formatDate = (date) => {
   if (!date) return "";
   if (typeof date === "string") {
@@ -127,17 +137,16 @@ export default function GoogleCalendarUI(props) {
     props.handleUpcomingEventData(result.data.data)
   };
 
-  const openDateModal = (day) => {
-    const date = new Date(year, month, day);
-    setSelectedDate(date);
-    setEventInputText("");
-    setIsModalOpen(true);
-    const dateStr = date.toLocaleDateString("en-CA"); // "YYYY-MM-DD"
-    console.log(dateStr); // "2025-11-01"
+ const openDateModal = (day) => {
+  const date = new Date(year, month, day);
 
-    
-    
-  };
+  if (isPastDate(date)) return; // ❌ stop here
+
+  setSelectedDate(date);
+  setEventInputText("");
+  setIsModalOpen(true);
+};
+
 
   async function addEventToDate() {
   try {
@@ -277,6 +286,7 @@ export default function GoogleCalendarUI(props) {
         return (
           <button
             key={day}
+            disabled={isPastDate(date)}
             onClick={() => openDateModal(day)}
             className={`
               relative
@@ -291,6 +301,8 @@ export default function GoogleCalendarUI(props) {
               ${
                 isToday(date)
                   ? "bg-[#2D4F2B]/80 text-[#FFF1CA] shadow-lg"
+                  : isPastDate(date)
+                  ? "bg-gray-300/40 text-gray-400 cursor-not-allowed"
                   : "bg-white/30 text-[#2D4F2B] hover:bg-[#FFF1CA]/30"
               }
             `}

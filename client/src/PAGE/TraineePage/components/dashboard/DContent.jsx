@@ -12,7 +12,7 @@ import { API_URL } from '../../../../api';
 
 export default function Content(props) {
     const [announcement, setAnnouncement] = useState([]);
-   
+    console.log(props.courseId)
     const fectchdata = async()=>{
       const fetch = await axios.get(`${API_URL}/trainee/announcement/${props.courseId.id}`, {withCredentials:true})
       setAnnouncement(fetch.data)

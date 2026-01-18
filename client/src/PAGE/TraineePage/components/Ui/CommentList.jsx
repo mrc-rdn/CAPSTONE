@@ -17,8 +17,9 @@ export default function CommentList({ comment, userId, deleteComment, onRefresh,
 
  const userColorClass = colorMap[color]?.[shade] || 'bg-gray-500';
  console.log(comment)
-  return (
-   <li className="flex gap-3 mb-6">
+ 
+ return (
+  <li className="flex gap-3 mb-6">
 
     {/* Avatar */}
     <div className="flex-shrink-0">

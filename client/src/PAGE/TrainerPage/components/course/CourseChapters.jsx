@@ -71,6 +71,7 @@ export default function CourseChapters(props) {
 
   function handleShowEditChapterModal(chapterId, chapter_index, chapter_title, chapter_description ){
     setIsEditChapterModal(true)
+    console.log(chapterId, chapter_index, chapter_title, chapter_description)
     setEditChapterData({chapterId:chapterId, chapter_index: chapter_index, chapter_title:chapter_title, chapter_description: chapter_description})
       
   }

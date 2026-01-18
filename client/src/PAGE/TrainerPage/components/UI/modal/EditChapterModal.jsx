@@ -7,15 +7,13 @@ import { API_URL } from '../../../../../api.js';
 export default function EditChapterModal(props) {
     const exit = false
     const {chapterId, chapter_index, chapter_title, chapter_description} = props.chapterData;
-    const [chapterTitle, setChapterTitle] = useState("");
-    const [chapterPrevTitle, setChapterPrevTitle] = useState(chapter_title)
-    const [chapterDescription, setChapterDescription] = useState("");
-    const [chapterPrevDescription, setChapterPrevDescription] = useState(chapter_description)
+    const [chapterTitle, setChapterTitle] = useState(chapter_title);
+    const [chapterDescription, setChapterDescription] = useState(chapter_description);
     const [isDeleted, setDelete] = useState(false)
 
     const [isChapterAdded, setChapterAdded] = useState(false);
     const [isMouseOver, setMouseOver] = useState(false)
-    console.log(chapterId, chapter_index, chapter_title, chapter_description)
+
     async function handleSubmit(e){
       e.preventDefault();
       
@@ -45,6 +43,7 @@ export default function EditChapterModal(props) {
         console.log('error deleting chapter',error)
       }
     }
+    console.log(props.chapterData)
 
   return (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">

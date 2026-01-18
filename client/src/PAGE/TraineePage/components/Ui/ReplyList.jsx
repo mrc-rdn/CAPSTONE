@@ -12,9 +12,24 @@ export default function ReplyList({ commentId, onRefresh }) {
   const [replyData, setReplyData] = useState([]);
   const [openReply, setOpenReply] = useState(false);
   const [replyIsOpen, setReplyIsOpen] = useState(false)
+  const [userId, setUserId] = useState("")
+  const [refresh, setRefresh] = useState(0);
 
-  useEffect(() => {
-    const fetchReply = async () => {
+  const handleRefresh = () => {
+    setRefresh((p) => p + 1);
+  };
+
+
+  const fetchuserInfo = async()=>{
+    const fetchusers = await axios.get(`${API_URL}/trainee/dashboard`,{withCredentials:true})
+    setUserId(fetchusers.data.usersInfo.id)
+
+  }
+  useEffect(()=>{
+    fetchuserInfo()
+  },[])
+
+  const fetchReply = async () => {
       try {
         const res = await axios.get(
           `${API_URL}/trainee/${commentId}/reply`,
@@ -25,9 +40,11 @@ export default function ReplyList({ commentId, onRefresh }) {
         console.log(error);
       }
     };
+  useEffect(() => {
+    
 
     fetchReply();
-  }, [commentId, onRefresh]);
+  }, [commentId, onRefresh, refresh]);
 
   const postReply = async () => {
     if (!reply.trim()) return;
@@ -44,41 +61,77 @@ export default function ReplyList({ commentId, onRefresh }) {
       console.log(error);
     }
   };
-  console.log(replyData)
+ 
+  
   return (
-    <div className="ml-10">
-      <button className="text-gray-500 ml-10" 
-      onClick={() => setOpenReply(!openReply)}>
-       <MessageIcon sx={{fontSize:20}} /> Reply 
+  <div className="mt-3">
+
+    {/* Reply button */}
+    <button
+      className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 transition"
+      onClick={() => setOpenReply(!openReply)}
+    >
+      <MessageIcon sx={{ fontSize: 16 }} />
+      Reply
+    </button>
+
+    {/* Reply input */}
+    {openReply && (
+      <div className="flex items-start gap-2 mt-3">
+
+        <input
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          placeholder="Add a reply..."
+          className="
+            flex-1 px-3 py-2
+            border border-gray-300 rounded-full
+            text-sm
+            focus:outline-none focus:ring-2 focus:ring-green-600
+          "
+        />
+
+        <button
+          onClick={postReply}
+          className="text-green-600 hover:text-green-700 transition"
+        >
+          <SendIcon sx={{ fontSize: 30 }} />
+        </button>
+      </div>
+    )}
+
+    {/* Toggle replies */}
+    {replyData.length > 0 && (
+      <button
+        className="flex items-center gap-1 mt-3 text-xs text-gray-500 hover:text-gray-800 transition"
+        onClick={() => setReplyIsOpen(!replyIsOpen)}
+      >
+        {replyIsOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        {replyData.length} {replyData.length > 1 ? "replies" : "reply"}
       </button>
+    )}
 
-      {openReply && (
-        <div>
-          <input
-            value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            placeholder="Reply..."
+    {/* Replies list */}
+    {replyIsOpen && (
+      <div className="mt-4 pl-6 border-l border-gray-200 space-y-3">
+        {replyData.map((reply, index) => (
+          <Reply
+            key={index}
+            userId={userId}
+            replyId={reply.id}
+            replyUserId={reply.user_id}
+            first_name={reply.first_name}
+            surname={reply.surname}
+            profile={reply.profile_pic}
+            color={reply.color}
+            shade={reply.shades}
+            content={reply.content}
+            handleRefresh={handleRefresh}
           />
-          <button onClick={postReply}>
-            <SendIcon />
-          </button>
-        </div>
+        ))}
+      </div>
+    )}
 
-      )}
-      
-        
-        <div className='flex items-center' onClick={()=>{setReplyIsOpen(!replyIsOpen)}}>
-        { replyIsOpen?   (<div className="flex"><KeyboardArrowDownIcon /><p> {replyData.length} Reply</p></div>):(<div className="flex"><KeyboardArrowUpIcon /><p> {replyData.length} Reply</p></div>) }
-        </div> 
-        {replyIsOpen
-            ?<div className='ml-10'>
-              {replyData.map((reply, index)=>{
-                return <Reply key={index} first_name={reply.first_name} surname={reply.surname} profile={reply.profile_pic} color={reply.color} shade={reply.shades} content={reply.content} />
-                
-                
-              })}
-            </div>
-            :null}
-    </div>
-  );
+  </div>
+);
 }

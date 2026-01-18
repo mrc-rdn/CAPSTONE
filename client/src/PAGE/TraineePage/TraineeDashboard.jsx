@@ -17,19 +17,32 @@ export default function AdminDashboard() {
   const [courses, setCourseData] = useState([])
   const [refresh, setRefresh] = useState(0)
 
-  
-  useEffect(()=>{
-    async function fetchData(){
+  async function fetchcourses(){
       try {
-        const [response, course] = await Promise.all([
-          axios.get(`${API_URL}/trainee/dashboard`, {withCredentials: true}),
-          axios.get(`${API_URL}/trainee/course`, {withCredentials: true})])
+        const  course = await axios.get(`${API_URL}/trainee/course`, {withCredentials: true})
+          
+          
           setCourseData(course.data.data)
+          
+      } catch (error) {
+        
+      }
+    }
+     async function fetchData(){
+      try {
+        const response = await axios.get(`${API_URL}/trainee/dashboard`, {withCredentials: true})
+          
+          
+          
           setData(response.data)
       } catch (error) {
         
       }
     }
+
+  
+  useEffect(()=>{
+    fetchcourses()
     fetchData()
     
   },[])

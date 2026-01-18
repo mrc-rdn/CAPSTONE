@@ -1,6 +1,14 @@
 import React from 'react'
+import DeleteIcon from "@mui/icons-material/Delete";
+import { API_URL } from '../../../../api';
+import axios from 'axios';
 
-export default function Reply({first_name,surname, profile, shade, color, content}) {
+export default function Reply({replyUserId , replyId, first_name,surname, profile, shade, color, content, userId, handleRefresh}) {
+  console.log(replyId)
+
+  const deleteReply = async ()=>{
+    const fetch = await axios.post(`${API_URL}/trainer/deletereply/${replyId}`,{},{withCredentials:true})
+  }
   const colorMap = {
     red: {200: 'bg-red-200',300: 'bg-red-300',400: 'bg-red-400',500: 'bg-red-500',600: 'bg-red-600',700: 'bg-red-700', 800: 'bg-red-800'},
     yellow: {200: 'bg-yellow-200',300: 'bg-yellow-300',400: 'bg-yellow-400',500: 'bg-yellow-500',600: 'bg-yellow-600',700: 'bg-yellow-700',800: 'bg-yellow-800'},
@@ -12,23 +20,58 @@ export default function Reply({first_name,surname, profile, shade, color, conten
   }
 
  const userColorClass = colorMap[color]?.[shade] || 'bg-gray-500';
-  return (
-    <div className='mt-5'>
-      <div className='flex'>
-        {profile
-            ?<img src={profile} alt="" className='w-8 h-8 rounded-full ml-2 border-1' />
-            :<div className='ml-2'>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${userColorClass}`}>
-                    <p>
-                    { first_name.slice(0,1).toUpperCase()}
-                    </p>
-                </div>
-            </div>}
-        <h1 className="ml-3">
-            {first_name} {surname}
-        </h1>
+
+
+ 
+  
+ return (
+  <div className="flex gap-3 mt-4">
+
+    {/* Avatar */}
+    <div className="flex-shrink-0">
+      {profile ? (
+        <img
+          src={profile}
+          alt=""
+          className="w-8 h-8 rounded-full object-cover"
+        />
+      ) : (
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${userColorClass}`}
+        >
+          {first_name.slice(0, 1).toUpperCase()}
+        </div>
+      )}
+    </div>
+
+    {/* Reply content */}
+    <div className="flex-1">
+
+      {/* Name */}
+      <div className="flex items-center gap-2">
+        <span className="font-semibold text-sm text-gray-900">
+          {first_name} {surname}
+        </span>
       </div>
-    <p className="ml-16 break-words w-11/12 mb-3">{content}</p>
+
+      {/* Reply text */}
+      <p className="text-sm text-gray-800 mt-1 leading-relaxed break-words">
+        {content}
+      </p>
+
+
+    </div>
+    {replyUserId === userId && 
+    <button
+      className="ml-auto text-gray-500 hover:text-red-600 transition"
+      onClick={(e) => {  
+        handleRefresh() 
+        deleteReply()
+      }}
+    >
+      <DeleteIcon fontSize="small" />
+    </button>}
+   
   </div>
-  )
+);
 }

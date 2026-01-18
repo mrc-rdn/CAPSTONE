@@ -47,7 +47,7 @@ export default function CourseModal(props) {
                 " placeholder='Course' onChange={(e)=>{setTitle(e.target.value)}} value={title}  />
           </div>
           <div className=' flex flex-col'>
-             <label >Description</label>
+             <label >Batch Name</label>
               <input type="text" className="
                   h-10 px-3
                   rounded-lg
@@ -57,7 +57,7 @@ export default function CourseModal(props) {
                   focus:outline-none
                   focus:ring-2
                   focus:ring-[#FFB823]
-                " placeholder='Description' onChange={(e)=>{setDescription(e.target.value)}} value={description}/>
+                " placeholder='Batch Name' onChange={(e)=>{setDescription(e.target.value)}} value={description}/>
           </div>
           <div className="w-full flex justify-center mt-6">
             <button type="submit"

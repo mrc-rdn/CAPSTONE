@@ -80,16 +80,25 @@ export default function AddChapterModal(props) {
 
             }else if(quiz.data.success){
                 //admin/:courseId/:chapterId
-                 const result = await axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineequizprogress`, {withCredentials:true})
-                    setIsVideo(false)
-                    setIsData(true)
-                    setIsImage(false)
-                    setIsQuiz(true)
-                    setIsText(false)
-                    setIsCertificate(false)
-                    setQuizData(result.data.data)
-                    setQuestionLength(result.data.quizLength)
-                    console.log(result.data)
+                  const result1 = await axios.get(`${API_URL}/admin/traineeprogress/${props.courseId}/${id}`, {withCredentials:true})
+                  const result = await axios.get(`${API_URL}/admin/${props.courseId}/${id}/traineequizprogress`, {withCredentials:true})
+
+                const filtered = result.data.data.filter(item => 
+                  result1.data.data.some(trainee => trainee.user_id === item.student_id)
+                );
+
+                console.log(filtered);
+
+                  
+                  setIsVideo(false)
+                  setIsData(true)
+                  setIsImage(false)
+                  setIsQuiz(true)
+                  setIsText(false)
+                  setIsCertificate(false)
+                  setQuizData(filtered)
+                  setQuestionLength(result.data.quizLength)
+                    
                 
             }else if (text.data.success){
                 const result = await axios.get(`${API_URL}/admin/traineeprogress/${props.courseId}/${id}`, {withCredentials:true})

@@ -22,6 +22,7 @@ export default function CAContent() {
   const [isPasswordMatch, setIsPasswordMatch] = useState(null)
   const [notice, setNotice] = useState("")
   const [isNotice, setIsNotice] = useState("")
+  const [isCreated, setIsCreated] = useState(false)
   //const [color, setcolor] = useState({color:null, shade:null})
   let shades = ['200', '300', '400', '500', '600', '700', '800']
   let colors = ['red', 'yellow', 'green', 'orange', 'blue', 'purple', 'pink']
@@ -42,17 +43,20 @@ export default function CAContent() {
       try {
         const response = await axios.post(`${API_URL}/admin/registeraccount`,
           { firstName: firstName, surname: surname, contactNo: contactNo, username: username, password: password, role: role, color: setColor, shade: setShade },
-          { withCredentials: true })
+          { withCredentials: true });
+
         if(response.data.error === "Email already exists. Try logging in."){
           setContactNo("")
-          setNotice('Email already exists. Try logging in.')
+          setNotice('Email already exists.')
+          setIsCreated(false)
           setIsNotice(true)
+          
         }else if(response.data.error === "Username already exists. Try logging in."){
           setUsername("")
-          setNotice("Username already exists. Try logging in.")
+          setNotice("Username already exists.")
           setIsNotice(true)
+          setIsCreated(false)
         }else{
-          setIsNotice(false)
           setAccountCreated(response.data.success)
           setFirstName("")
           setContactNo("")
@@ -61,6 +65,8 @@ export default function CAContent() {
           setPassword("")
           setConfirmPassword("")
           setIsPasswordMatch(false)
+          setIsCreated(true)
+          setIsNotice(false)
         }
         
 
@@ -93,13 +99,16 @@ export default function CAContent() {
     "
       >
         
-          <p className="mb-4 text-center text-green-600 font-semibold absolute inset-4">
+          
+      
+        {isCreated && (
+          <p className="mb-4 w-full h-10 text-center text-green-600 font-semibold absolute inset-0 top-4">
             Account Created
           </p>
-      
+        )}
         {isNotice && (
-          <p className="mb-4 text-center text-green-600 font-semibold absolute">
-            Account Created
+          <p className="mb-4 w-full h-10 text-center text-red-600 font-semibold absolute inset-0 top-4">
+            {notice}
           </p>
         )}
 

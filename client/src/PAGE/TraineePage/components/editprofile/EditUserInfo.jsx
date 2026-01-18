@@ -24,7 +24,7 @@ export default function EditUserInfo(props) {
         if (!props.data) return
         setFirstName(data.first_name ?? "")
         setSurname(data.surname ?? "")
-        setContactNo(data.contact_no ?? "")
+        setContactNo(data.email ?? "")
         setUsername(props.username ?? "")
         setPicture(data.profile_pic ?? "")
     }, [props.data, props.username])
@@ -32,7 +32,7 @@ export default function EditUserInfo(props) {
     const sendData = async (e) => {
         e.preventDefault();
         if (password === confirmPassword) {
-            const res = await axios.post(`${API_URL}/admin/edituserinfo`, { firstName, surname, contactNo, password }, { withCredentials: true })
+            const res = await axios.post(`${API_URL}/trainee/edituserinfo`, { firstName, surname, contactNo, password }, { withCredentials: true })
 
             setIsPasswordMatch(false)
             return setUpdateProfile(res.data.success)
@@ -98,7 +98,8 @@ export default function EditUserInfo(props) {
                         Successful Updating Profile
                     </p>
                 )
-                : (
+                : null}
+
                     <form className="flex flex-wrap gap-4">
 
                         {/* First & Surname */}
@@ -207,8 +208,8 @@ export default function EditUserInfo(props) {
                         </div>
 
                     </form>
-                )
-            }
+                
+            
         </div>
 
     )

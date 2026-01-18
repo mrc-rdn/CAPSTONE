@@ -20,7 +20,7 @@ export default function UploadProfile(props) {
 
     try {
       setUploading(true);
-      const res = await axios.post(`${API_URL}/admin/EditProfile/UploadProfile`, formData, {withCredentials:true});
+      const res = await axios.post(`${API_URL}/trainee/EditProfile/UploadProfile`, formData, {withCredentials:true});
       
       console.log("Upload success:", res.data);
     } catch (error) {

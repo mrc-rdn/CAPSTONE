@@ -71,7 +71,7 @@ export default function AddTraineeModal(props) {
 
 
   return (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div className="fixed inset-0 z-2000 flex items-center justify-center bg-black/50">
     <div className="w-11/12 max-w-5xl rounded-xl bg-white shadow-lg">
 
       {/* ===== HEADER ===== */}

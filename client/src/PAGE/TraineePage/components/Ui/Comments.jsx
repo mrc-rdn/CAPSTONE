@@ -60,8 +60,12 @@ function Comments({ videoId }) {
       console.log(error);
     }
   };
+
 console.log(comments)
-  return (
+  
+console.log(comments);
+
+return (
   <div className="w-full">
 
     {/* Comment count */}

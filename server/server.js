@@ -133,7 +133,6 @@ function generateNumericId() {
 // Automatic na babasahin nito ang process.env.GEMINI_API_KEY
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-
 app.post("/ask", async (req, res) => {
   try {
     const { question } = req.body;
@@ -1121,6 +1120,25 @@ app.post("/admin/:commentsId/reply", async (req, res) => {
     req.json(error)
   }
 });
+
+app.post("/admin/deletereply/:replyId", async (req,res)=>{
+  try {
+    const { replyId } = req.params;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "SUPERADMIN") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `DELETE FROM replies WHERE id = $1`, 
+      [replyId])
+
+     res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    req.json(error)
+  }
+})
 
 //to create a quiz
 app.post("/admin/chapter/createquiz", async (req, res) => {
@@ -2465,6 +2483,24 @@ app.post("/trainer/:commentsId/reply", async (req, res) => {
     req.json(error)
   }
 });
+app.post("/trainer/deletereply/:replyId", async (req,res)=>{
+  try {
+    const { replyId } = req.params;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `DELETE FROM replies WHERE id = $1`, 
+      [replyId])
+
+     res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    req.json(error)
+  }
+})
 
 //to create a quiz
 app.post("/trainer/chapter/createquiz", async (req, res) => {
@@ -4194,6 +4230,27 @@ app.post("/trainee/:commentsId/reply", async (req, res) => {
     req.json(error)
   }
 });
+
+app.post("/trainee/deletereply/:replyId", async (req,res)=>{
+  try {
+    const { replyId } = req.params;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, messsage: 'unauthorized access' })
+    }
+    if (req.user.role !== "TRAINEE") {
+      return res.status(401).json({ success: false, message: 'invalid role' })
+    }
+    const result = await db.query(
+      `DELETE FROM replies WHERE id = $1`, 
+      [replyId])
+
+     res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    req.json(error)
+  }
+})
+
+
 
 //fetch anouncement (kinuka ung mga data announce data available in the course ) 
 

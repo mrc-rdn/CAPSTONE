@@ -27,6 +27,7 @@ export default function AddChapterModal(props) {
 
     useEffect(() => {
       fectchdata()
+      readNotif()
 
     }, []);
    console.log(announcement)

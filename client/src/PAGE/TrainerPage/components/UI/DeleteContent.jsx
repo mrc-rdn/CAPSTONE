@@ -30,7 +30,7 @@ export default function DeleteContent(props) {
     }
   return (
     
-    <div className='absolute inset-0 z-100 bg-gray-500/40 w-full h-full flex justify-center items-center'>
+    <div className='absolute inset-0 z-10 bg-gray-500/40 w-full h-full flex justify-center items-center'>
       <button 
       onClick={handleDelete}
       className='w-60 h-20 border-2 border-red-500 rounded-2xl text-large text-white font-bold bg-red-500 flex justify-center items-center'>
