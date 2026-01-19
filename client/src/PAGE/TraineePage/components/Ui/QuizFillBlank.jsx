@@ -19,6 +19,7 @@ export default function QuizFillBlank(props) {
         className='border-b-2 border-gray-400 focus:border-[#2D4F2B] outline-none px-2 py-1 w-full mt-8'
         type="text" 
         placeholder="Your answer..." 
+        required
       />
     </div>
   );

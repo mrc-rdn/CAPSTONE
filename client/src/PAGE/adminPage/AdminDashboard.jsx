@@ -147,13 +147,49 @@ export default function AdminDashboard() {
                 </div>
 
 
-                <div className='h-35 w-11/12 overflow-y-scroll '>
-                  {upcomingEventsData.map((item, index) => {
-                    return <UpcomingEvents key={index} text={item.text} eventDate={item.event_date} color={item.color} refresh={refresh} />
-                  })
+                 <div className='h-35 w-11/12 overflow-y-scroll'>
+                  {upcomingEventsData
+                    .slice() // make a copy so we don't mutate the original
+                    .sort((a, b) => {
+                      const today = new Date();
+                      const dateA = new Date(a.event_date);
+                      const dateB = new Date(b.event_date);
 
-                  }
+                      // Helper to check if the date is "today"
+                      const isToday = (date) =>
+                        date.getFullYear() === today.getFullYear() &&
+                        date.getMonth() === today.getMonth() &&
+                        date.getDate() === today.getDate();
+
+                      // Check if a or b are today
+                      const aToday = isToday(dateA);
+                      const bToday = isToday(dateB);
+
+                      if (aToday && !bToday) return -1; // a today, b not → a comes first
+                      if (!aToday && bToday) return 1;  // b today, a not → b comes first
+
+                      // Neither today → future events come first, past events later
+                      const now = today.setHours(0, 0, 0, 0);
+                      const aTime = dateA.setHours(0, 0, 0, 0);
+                      const bTime = dateB.setHours(0, 0, 0, 0);
+
+                      if (aTime >= now && bTime >= now) return aTime - bTime; // both future → ascending
+                      if (aTime < now && bTime < now) return aTime - bTime;   // both past → ascending (older first or last, your choice)
+                      if (aTime >= now && bTime < now) return -1; // future before past
+                      if (aTime < now && bTime >= now) return 1;  // past after future
+
+                      return 0;
+                    })
+                    .map((item, index) => (
+                      <UpcomingEvents
+                        key={index}
+                        text={item.text}
+                        eventDate={item.event_date}
+                        color={item.color}
+                      />
+                    ))}
                 </div>
+                
               </div>
 
 

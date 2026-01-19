@@ -199,8 +199,9 @@ export default function AddChapterModal(props) {
                   <tr key={index} className="border-b hover:bg-gray-50 transition">
                     <td className="py-3 px-6">{info.user_id}</td>
                     <td className="py-3 px-6">
-                      {info.surname.charAt(0).toUpperCase() + info.surname.slice(1)}{" "}
-                      {info.first_name.charAt(0).toUpperCase() + info.first_name.slice(1)}
+                      {info.first_name.charAt(0).toUpperCase() + info.first_name.slice(1)}{" "}
+                      {info.surname.charAt(0).toUpperCase() + info.surname.slice(1)}
+                      
                     </td>
                     <td className="py-3 px-6 text-center">
                       {info.is_done
@@ -215,8 +216,9 @@ export default function AddChapterModal(props) {
                   <tr key={index} className="border-b hover:bg-gray-50 transition">
                     <td className="py-3 px-6">{info.user_id}</td>
                     <td className="py-3 px-6">
-                      {info.surname.charAt(0).toUpperCase() + info.surname.slice(1)}{" "}
-                      {info.first_name.charAt(0).toUpperCase() + info.first_name.slice(1)}
+                      {info.first_name.charAt(0).toUpperCase() + info.first_name.slice(1)}{" "}
+                      {info.surname.charAt(0).toUpperCase() + info.surname.slice(1)}
+                      
                     </td>
                     <td className="py-3 px-6 text-center">
                       {info.is_done
@@ -229,9 +231,9 @@ export default function AddChapterModal(props) {
                 {isQuiz && quizData.map((info, index) => (
                   <tr key={index} className="border-b hover:bg-gray-50 transition">
                     <td className="py-3 px-6">{info.student_id}</td>
-                    <td className="py-3 px-6">
-                      {info.surname.charAt(0).toUpperCase() + info.surname.slice(1)}{" "}
-                      {info.first_name.charAt(0).toUpperCase() + info.first_name.slice(1)}
+                    <td className="py-3 px-6">{info.first_name.charAt(0).toUpperCase() + info.first_name.slice(1)}{" "}
+                      {info.surname.charAt(0).toUpperCase() + info.surname.slice(1)}
+                      
                     </td>
                     <td className="py-3 px-6 text-center">
                       {info.percentage !== null

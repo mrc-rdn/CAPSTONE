@@ -30,7 +30,7 @@ export default function ImagePlayer(props) {
     </div>
     <h1 className="text-lg m-3 font-semibold ">
       Title: <span className="font-bold"> {props.videoData.title}</span>
-      </h1>
+    </h1>
   </div>
   );
 }

@@ -4,6 +4,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 
+
 import { API_URL } from '../../../../../api';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -14,22 +15,51 @@ export default function TextEditor(props) {
     const [isPostingSuccess, setIspostingSuccess] = useState(false)
    
 
-    const savePost = async () => {
-        if (!title || !content) return alert("Title and content are required");
-        try {
-            const res = await axios.post(`${API_URL}/trainer/texteditor`,
-                { title:title, courseId: props.courseId, chapterId: props.chapterInfo.chapterId, content: content },
-                {withCredentials:true});
-            setPosts([res.data, ...posts]);
-            setTitle('');
-            setContent('');
-            setIspostingSuccess(true)
-            props.onExit()
-        } catch (err) {
-            console.error(err);
-            setIspostingSuccess(false)
-        }
-    };
+const savePost = async () => {
+  if (!title || !content) return alert("Title and content are required");
+
+  try {
+    let res;
+
+    if (props.mode === "edit") {
+      // UPDATE
+      res = await axios.put(
+        `${API_URL}/trainer/texteditor/${props.post.id}`,
+        { title, content },
+        { withCredentials: true }
+      );
+
+      props.onUpdated(res.data.data); // send updated post back
+      props.onExit();
+
+    } else {
+      // CREATE (your original)
+      res = await axios.post(
+        `${API_URL}/trainer/texteditor`,
+        { title, courseId: props.courseId, chapterId: props.chapterInfo.chapterId, content },
+        { withCredentials: true }
+      );
+
+      setTitle('');
+      setContent('');
+      setIspostingSuccess(true);
+      props.onExit();
+    }
+
+  } catch (err) {
+    console.error(err);
+    setIspostingSuccess(false);
+  }
+};
+
+
+    useEffect(() => {
+  if (props.mode === "edit" && props.post) {
+    setTitle(props.post.title);
+    setContent(props.post.content);
+  }
+}, [props.mode, props.post]);
+
 
 
     return (
@@ -38,8 +68,9 @@ export default function TextEditor(props) {
     {/* ===== HEADER ===== */}
     <div className="flex items-center justify-between px-6 py-4 border-b border-[#6F8A6A]/40">
       <h1 className="text-xl font-semibold text-[#2D4F2B]">
-        Text Editor
-      </h1>
+  {props.mode === "edit" ? "Edit Post" : "Text Editor"}
+</h1>
+
       <button
         onClick={() => props.onExit()}
         className="w-9 h-9 flex items-center justify-center text-[#2D4F2B]"
@@ -103,7 +134,8 @@ export default function TextEditor(props) {
               transition
             "
           >
-            Save Post
+            {props.mode === "edit" ? "Update Post" : "Save Post"}
+
           </button>
         </div>
 

@@ -85,14 +85,14 @@ console.log(courses)
            <div className="absolute inset-0 bg-white/5 -z-0"></div>
    
            <div className="px-4 pt-4">
-             <div className="flex w-full h-16 backdrop-blur-md bg-[#2D4F2B] 
-                 border border-black/10 rounded-xl shadow-md">
-               <div className="h-full flex items-center w-full">
-                 <h1 className="text-xl font-bold text-white ml-3">Dashboard</h1>
-                 <Profile data={data} userColorClass={userColorClass} />
-               </div>
-             </div>
-           </div>
+              <div className="flex w-full h-16 backdrop-blur-md bg-
+                  border border-black/10 rounded-xl shadow-md">
+                <div className="h-full flex items-center w-full">
+                  <h1 className="text-xl font-bold text-[#2D4F2B]  ml-3">Dashboard</h1>
+                  <Profile data={data} userColorClass={userColorClass} />
+                </div>
+              </div>
+            </div>
    
            <div className="h-[calc(100%-4rem)] w-full overflow-y-scroll relative z-10 px-4">
    
@@ -155,13 +155,49 @@ console.log(courses)
                    </div>
    
    
-                   <div className='h-35 w-11/12 overflow-y-scroll '>
-                     {upcomingEventsData.map((item, index) => {
-                       return <UpcomingEvents key={index} text={item.text} eventDate={item.event_date} color={item.color} refresh={refresh} />
-                     })
-   
-                     }
-                   </div>
+                  <div className='h-35 w-11/12 overflow-y-scroll'>
+                    {upcomingEventsData
+                      .slice() // make a copy so we don't mutate the original
+                      .sort((a, b) => {
+                        const today = new Date();
+                        const dateA = new Date(a.event_date);
+                        const dateB = new Date(b.event_date);
+
+                        // Helper to check if the date is "today"
+                        const isToday = (date) =>
+                          date.getFullYear() === today.getFullYear() &&
+                          date.getMonth() === today.getMonth() &&
+                          date.getDate() === today.getDate();
+
+                        // Check if a or b are today
+                        const aToday = isToday(dateA);
+                        const bToday = isToday(dateB);
+
+                        if (aToday && !bToday) return -1; // a today, b not → a comes first
+                        if (!aToday && bToday) return 1;  // b today, a not → b comes first
+
+                        // Neither today → future events come first, past events later
+                        const now = today.setHours(0, 0, 0, 0);
+                        const aTime = dateA.setHours(0, 0, 0, 0);
+                        const bTime = dateB.setHours(0, 0, 0, 0);
+
+                        if (aTime >= now && bTime >= now) return aTime - bTime; // both future → ascending
+                        if (aTime < now && bTime < now) return aTime - bTime;   // both past → ascending (older first or last, your choice)
+                        if (aTime >= now && bTime < now) return -1; // future before past
+                        if (aTime < now && bTime >= now) return 1;  // past after future
+
+                        return 0;
+                      })
+                      .map((item, index) => (
+                        <UpcomingEvents
+                          key={index}
+                          text={item.text}
+                          eventDate={item.event_date}
+                          color={item.color}
+                        />
+                      ))}
+                  </div>
+
                  </div>
    
    

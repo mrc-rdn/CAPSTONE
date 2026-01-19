@@ -47,7 +47,7 @@ console.log(res.data)
           className="
             relative
             w-full max-w-[500px]
-            h-[520px]
+            h-[550px]
             rounded-2xl
             overflow-hidden
             shadow-2xl

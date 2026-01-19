@@ -11,7 +11,7 @@ export default function UpcomingEvents({text, eventDate, color}) {
     const found = monthsShort.find((month, index)=> index === months )
     
     
-
+console.log(text, eventDate, color)
 
   return (
       <div

@@ -35,6 +35,7 @@ export default function QuizList(props) {
 
   // STORE USER ANSWERS
   const [userAnswers, setUserAnswers] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
 const handleAnswer = (answer, questionId) => {
   setUserAnswers(prev => ({
@@ -43,15 +44,22 @@ const handleAnswer = (answer, questionId) => {
   }));
 };
 
+
   
   // FINAL SCORE
-  const handleCheck = async () => {
-    //console.log(props.chapterDetails, props.courseDetails)
-    setCheckedAnswers(false)
-    let score = 0;
-    let tempResults = [];
+const handleCheck = async () => {
+  // Check if all questions are answered
+  const unanswered = groupedQuizzes.filter(q => !userAnswers[q.question_id]);
+  if (unanswered.length > 0) {
+    alert("Please answer all questions before submitting!");
+    return;
+  }
 
-    groupedQuizzes.forEach((quiz, index) => {
+  setCheckedAnswers(false);
+  let score = 0;
+  let tempResults = [];
+
+  groupedQuizzes.forEach((quiz, index) => {
     const userAns = userAnswers[quiz.question_id];
     let correctAns = "";
 
@@ -66,73 +74,77 @@ const handleAnswer = (answer, questionId) => {
         question: quiz.question_text,
         userAnswer: userAns || "",
         correctAnswer: correctAns,
-        isCorrect: isCorrect
+        isCorrect
       });
     }
 
-  if (quiz.type === "multiple_choice") {
-    const correct = quiz.choices.find(c => c.is_correct === true);
+    if (quiz.type === "multiple_choice") {
+      const correct = quiz.choices.find(c => c.is_correct === true);
+      if (!correct) {
+        tempResults.push({
+          no: index + 1,
+          question_id: quiz.question_id,
+          question: quiz.question_text,
+          userAnswer: userAns || "",
+          correctAnswer: "No correct answer set",
+          isCorrect: false
+        });
+        return;
+      }
 
-    if (!correct) {
-      console.error("No correct answer found for question:", quiz.question_id);
+      correctAns = correct.text;
+      const isCorrect = userAns === correctAns;
+      if (isCorrect) score++;
+
       tempResults.push({
         no: index + 1,
         question_id: quiz.question_id,
         question: quiz.question_text,
         userAnswer: userAns || "",
-        correctAnswer: "No correct answer set",
-        isCorrect: false
+        correctAnswer: correctAns,
+        isCorrect
       });
-      return; // continue sa next iteration
     }
-    const correctAns = correct.text;
-    const isCorrect = userAns === correctAns;
-    if (isCorrect) score++;
+  });
 
-    tempResults.push({
-      no: index + 1,
-      question_id: quiz.question_id,
-      question: quiz.question_text,
-      userAnswer: userAns || "",
-      correctAnswer: correctAns,
-      isCorrect
-    });
+  setResults(tempResults);
+
+  const total = groupedQuizzes.length;
+  const percent = (score / total) * 100;
+
+  console.log("FINAL SCORE:", score, "/", total);
+  console.log("PERCENTAGE:", percent.toFixed(2) + "%");
+  console.log("DETAILED RESULTS:", tempResults);
+
+  // POST results
+  try {
+    const [quizanswer, progress] = await Promise.all([
+      axios.post(
+        `${API_URL}/trainee/quiz/answer`,
+        {
+          quiz_id: props.quizData[0].quiz_id,
+          chapter_id: props.quizData[0].chapter_id,
+          course_id: props.courseId,
+          score: score,
+          percentage: percent,
+          tempResults
+        },
+        { withCredentials: true }
+      ),
+      axios.post(
+        `${API_URL}/trainee/chapterprogress/${props.courseId}/${props.quizData[0].chapter_id}`,
+        {},
+        { withCredentials: true }
+      )
+    ]);
+
+    setResultFecth(quizanswer.data.data);
+    setRefresh(prev => prev + 1);
+  } catch (error) {
+    console.log('error posting your answer', error);
   }
-});
+};
 
-    // Save results to state
-    setResults(tempResults);
-
-    // Percentage
-    const total = groupedQuizzes.length;
-    const percent = (score / total) * 100;
-
-    console.log("FINAL SCORE:", score, "/", total);
-    console.log("PERCENTAGE:", percent.toFixed(2) + "%");
-
-    console.log("DETAILED RESULTS:", tempResults);
-
-    
-   
-    
-    try {
-      const [quizanswer, progress] = await Promise.all([
-        axios.post(`${API_URL}/trainee/quiz/answer`, 
-        {quiz_id: props.quizData[0].quiz_id, chapter_id: props.quizData[0].chapter_id, course_id:  props.courseId, score: score ,percentage: percent, tempResults}, 
-        {withCredentials: true}),
-        axios.post(`${API_URL}/trainee/chapterprogress/${props.courseId}/${props.quizData[0].chapter_id}`,{}, {withCredentials:true})
-      ]); 
-
-      console.log(quizanswer.data)
-      console.log(progress.data)
-      setResultFecth(quizanswer.data.data)
-      setRefresh(prev => prev + 1)
-    } catch (error) {
-      console.log('errorposting your asnwer', error)
-    }
-
-  };
-    
     
   useEffect(() => {
     const isAnswered = async () => {
@@ -192,8 +204,11 @@ console.log(groupedQuizzes)
 
         {/* SUBMIT BUTTON */}
         <button
-        className='m-3 w-50 h-10 text-2xl text-white bg-[#2D4F2B] rounded mx-auto'
-        onClick={handleCheck}>Submit</button>
+  className='m-3 w-50 h-10 text-2xl text-white bg-[#2D4F2B] rounded mx-auto'
+  onClick={() => setIsModalOpen(true)}
+>
+  Submit
+</button>
       </>
     </div>}
     
@@ -210,6 +225,34 @@ console.log(groupedQuizzes)
     </div>
   )}
   </div>}
+  {isModalOpen && (
+  <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+    <div className="bg-white rounded-lg w-96 p-6 shadow-lg">
+      <h2 className="text-lg font-bold mb-4">Confirm Submission</h2>
+      <p className="mb-6">Are you sure you want to submit your answers? Once submitted, you cannot change them.</p>
+
+      <div className="flex justify-end space-x-4">
+        <button
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          onClick={() => setIsModalOpen(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="px-4 py-2 bg-[#2D4F2B] text-white rounded hover:bg-[#3f6a3b]"
+          onClick={() => {
+            setIsModalOpen(false);
+            handleCheck(); // only submit if confirmed
+          }}
+        >
+          Yes, Submit
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
   </div>
 );

@@ -7,7 +7,8 @@ import { API_URL } from "../../api";
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
 
-  const submit = async () => {
+  const submit = async (e) => {
+    e.preventDefault()
     await axios.post(`${API_URL}/forgot-password`, { email });
     alert("Check your Gmail for reset link");
   };

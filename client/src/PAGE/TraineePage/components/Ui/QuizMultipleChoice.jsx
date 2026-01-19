@@ -24,8 +24,10 @@ console.log(answer)
           >
             <label className='flex items-center cursor-pointer'>
               <input 
+              
                 className='mr-2 accent-[#FFB823]' 
                 type="radio" 
+                required
                 name={`q-${no}`} 
                 checked={selectedIndex === index}
                 onChange={() => {

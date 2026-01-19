@@ -86,7 +86,7 @@ export default function GoogleCalendarUI(props) {
   }
   useEffect(()=>{
     fetchDate()
-  },[]);
+  },[refresh]);
 
   const goToPreviousMonth = async() =>{
     setCurrentViewDate(new Date(year, month - 1, 1))

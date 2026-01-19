@@ -2663,6 +2663,47 @@ app.get('/trainer/texteditor/:courseId/:chapterId', async (req, res) => {
   }
 );
 
+// EDIT / UPDATE text editor post
+app.put('/trainer/texteditor/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, content } = req.body;
+
+  try {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ success: false, message: 'unauthorized access' });
+    }
+
+    if (req.user.role !== "TRAINER") {
+      return res.status(401).json({ success: false, message: 'invalid role' });
+    }
+
+    // optional: check ownership (security)
+    const check = await db.query(
+      'SELECT * FROM text_editor WHERE id = $1 AND user_id = $2',
+      [id, req.user.id]
+    );
+
+    if (check.rows.length === 0) {
+      return res.status(403).json({ success: false, message: 'not allowed to edit this post' });
+    }
+
+    const result = await db.query(
+      `UPDATE text_editor 
+       SET title = $1, content = $2
+       WHERE id = $3
+       RETURNING *`,
+      [title, content, id]
+    );
+
+    res.json({ success: true, data: result.rows[0] });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating post');
+  }
+});
+
+
 //certificate upload
 app.post("/trainer/chapter/addcertificate", async (req, res) => {
 

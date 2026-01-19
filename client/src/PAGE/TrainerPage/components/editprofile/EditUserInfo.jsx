@@ -86,11 +86,11 @@ export default function EditUserInfo(props) {
                     )
                 }
 
-                <div className="absolute bottom-4 right-[42%] bg-white/70 backdrop-blur-md p-2 rounded-full shadow">
+                <div className="absolute bottom-7 right-[42%] bg-white/70 backdrop-blur-md w-8 h-8 p-1 rounded-full pb-[10px] shadow">
                     <CreateIcon fontSize="small" />
                 </div>
 
-                <p className="mt-2 font-medium">{firstName}</p>
+                <p className="mt-4 font-medium">{firstName}</p>
             </div>
 
             {isUpdateProfile
