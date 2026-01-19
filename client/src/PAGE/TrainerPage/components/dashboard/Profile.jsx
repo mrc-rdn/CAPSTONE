@@ -54,7 +54,7 @@ export default function Profile(props) {
                     </div>
                 )}
 
-                <p className="text-sm text-white font-medium">
+                <p className="text-sm text-[#2D4F2B] font-medium">
                     {props.data.username && props.data.username}
                 </p>
             </div>

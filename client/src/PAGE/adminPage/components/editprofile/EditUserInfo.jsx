@@ -19,7 +19,9 @@ export default function EditUserInfo(props) {
     const [isMouseOver1, setMouseOver1] = useState(false)
     const [isUpdateProfile, setUpdateProfile] = useState(false)
     const [isPasswordMatch, setIsPasswordMatch] = useState(null)
-
+    const [notice, setNotice] = useState("")
+    const [isNotice, setIsNotice] = useState("")
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (!props.data) return
@@ -32,11 +34,31 @@ export default function EditUserInfo(props) {
 
     const sendData = async (e) => {
         e.preventDefault();
+         if (!contactNo) {
+        setError("This field is required");
+        return; // stop submission
+        }
+
+        if (!contactNo.endsWith("@gmail.com")) {
+            setError("Email is not valid");
+        return; // stop submission
+        }
+
+    
         if (password === confirmPassword) {
             const res = await axios.post(`${API_URL}/admin/edituserinfo`, { firstName, surname, contactNo, password }, { withCredentials: true })
-
+            if(res.data.error ==="Email already exists. Try logging in."){
+                setIsNotice(true)
+                setNotice("Email already exists.")
+                setError("")
+            }else{
             setIsPasswordMatch(false)
+            setIsNotice(false)
+            setError("")
+            setPassword("")
+            setConfirmPassword("")
             return setUpdateProfile(res.data.success)
+            }
 
         } else {
             setIsPasswordMatch(true)
@@ -93,13 +115,18 @@ export default function EditUserInfo(props) {
                 <p className="mt-2 font-medium">{firstName}</p>
             </div>
 
-            {isUpdateProfile
-                ? (
-                    <p className="text-green-700 font-semibold text-center">
-                        Successful Updating Profile
-                    </p>
-                )
-                : (
+            {isUpdateProfile && (
+                <p className="mb-4 w-full h-10 text-center text-green-600 font-semibold absolute inset-0 top-4">
+                    Successful Editing Profile
+                </p>
+                )}
+                {isNotice && (
+                <p className="mb-4 w-full h-10 text-center text-red-600 font-semibold absolute inset-0 top-4">
+                    {notice}
+                </p>
+                )}
+                {error && <p className='mb-4 w-full h-10 text-center text-red-600 font-semibold absolute inset-0 top-4'>{error}</p>}
+                
                     <form className="flex flex-wrap gap-4">
 
                         {/* First & Surname */}
@@ -131,11 +158,16 @@ export default function EditUserInfo(props) {
 
                         {/* Contact */}
                         <div className="flex flex-col w-full">
-                            <label className="text-sm font-medium mb-1">Email</label>
+                            <div className='flex'>
+                                <label className="text-sm font-medium mb-1">Email</label> 
+                            </div>
+                            
                             <input
                                 className="w-full h-10 text-sm bg-white/30 backdrop-blur-md border border-white/40 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-green-400"
-                                type="text"
+                                type="Email"
                                 placeholder="Email"
+                                pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                                title="Please enter a valid Gmail address"
                                 onChange={(e) => { setContactNo(e.target.value) }}
                                 value={contactNo}
                             />
@@ -208,8 +240,8 @@ export default function EditUserInfo(props) {
                         </div>
 
                     </form>
-                )
-            }
+                
+            
         </div>
 
     )

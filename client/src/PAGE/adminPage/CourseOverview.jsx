@@ -155,7 +155,7 @@ export default function CourseOverview() {
             ? (isLesson ? null : <DeleteContent isQuiz={isQuiz} isVideo={isVideo} isCertificate={isCertificate} isText={isText} videoData={videoData}  quizData={quizData} certificateData={certificateData} textData={textData}  onRefresh={handleRefresh}/>)
             : null}
 
-            {isLesson? <CourseAddContent onRefresh={handleRefresh} chapterInfo={chapterInfo} courseId={id} />: null}
+            {/* {isLesson? <CourseAddContent onRefresh={handleRefresh} chapterInfo={chapterInfo} courseId={id} />: null} */}
           </div>
           <div className='ml-auto h-full w-4/12 bg-white'>
             <CourseChapters  courseId={id} refresh={refresh} handleChaptersInfo={handleChaptersInfo} handleEditChapter={handleEditChapter} />

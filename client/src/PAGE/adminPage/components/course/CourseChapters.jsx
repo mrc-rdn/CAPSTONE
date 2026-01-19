@@ -120,11 +120,11 @@ export default function CourseChapters(props) {
 
             <div className="h-10 w-full bg-gray-200 flex items-center sticky top-0">  {/*course content header*/}
               <h1 className="text-large ml-3 font-bold ">Course content</h1>
-              <button
+              {/* <button
                 onClick={()=>{setEditChapter(!isEditChapter), props.handleEditChapter(isEditChapter)}}
                 className='m-3 ml-auto'
               ><MoreHorizIcon  />
-              </button>
+              </button> */}
             </div>
             
             {isEditChapter

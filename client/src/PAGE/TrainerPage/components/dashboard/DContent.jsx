@@ -13,13 +13,13 @@ export default function Content(props) {
   function getgreeting (){
      const hour = new Date().getHours();
       if (hour >= 5 && hour < 12) {
-      return setGretting("Good morning Trainer");
+      return setGretting("Good Morning Trainer");
     } else if (hour >= 12 && hour < 17) {
-      return setGretting("Good afternoon Trainer");
+      return setGretting("Good Afternoon Trainer");
     } else if (hour >= 17 && hour < 21) {
-      return setGretting("Good evening Trainer");
+      return setGretting("Good Evening Trainer");
     } else {
-      return setGretting("Good night Trainer");
+      return setGretting("Good Night Trainer");
     }
   }
   useEffect(()=>{

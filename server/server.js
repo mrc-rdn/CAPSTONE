@@ -668,10 +668,11 @@ app.post("/admin/edituserinfo", async (req, res) => {
     if (req.user.role !== "SUPERADMIN") {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
-    const checkResult = await db.query("SELECT * FROM users WHERE username = $1", [req.user.username])
+    
+    const checkEmail = await db.query("SELECT * FROM users_info WHERE email = $1", [contactNo])
 
-    if (checkResult.rows.length < 0) {
-      res.json({ success: false, error: "Username already exists." })
+   if(checkEmail.rows.length > 0){
+      res.json({ success: false, error: "Email already exists. Try logging in." })
     } else {
       if (password.length < 8) {
 
@@ -1965,10 +1966,10 @@ app.post("/trainer/edituserinfo", async (req, res) => {
     if (req.user.role !== "TRAINER") {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
-    const checkResult = await db.query("SELECT * FROM users WHERE username = $1", [req.user.username])
+    const checkEmail = await db.query("SELECT * FROM users_info WHERE email = $1", [contactNo])
 
-    if (checkResult.rows.length < 0) {
-      res.json({ success: false, error: "Username already exists." })
+   if(checkEmail.rows.length > 0){
+      res.json({ success: false, error: "Email already exists. Try logging in." })
     } else {
       if (password.length < 8) {
 
@@ -3370,10 +3371,10 @@ app.post("/trainee/edituserinfo", async (req, res) => {
     if (req.user.role !== "TRAINEE") {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
-    const checkResult = await db.query("SELECT * FROM users WHERE username = $1", [req.user.username])
+    const checkEmail = await db.query("SELECT * FROM users_info WHERE email = $1", [contactNo])
 
-    if (checkResult.rows.length < 0) {
-      res.json({ success: false, error: "Username already exists." })
+   if(checkEmail.rows.length > 0){
+      res.json({ success: false, error: "Email already exists. Try logging in." })
     } else {
       if (password.length < 8) {
 

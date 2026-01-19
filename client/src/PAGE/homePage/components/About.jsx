@@ -113,7 +113,7 @@ export default function About() {
                       </li>
                       <li className="flex items-center gap-2">
                         <i className="fas fa-envelope"></i>
-                        <span>info@plrmo.parañaque.gov.ph</span>
+                        <span>ekabuhayanlms@gmail.com</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <i className="fas fa-map-marker-alt"></i>
