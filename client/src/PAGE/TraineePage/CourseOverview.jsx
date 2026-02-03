@@ -140,7 +140,7 @@ export default function CourseOverview() {
             {isQuiz?<QuizList quizData={quizData} courseId={id} /> : null }
             {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoData.id} videoData={videoData}  />:null}
             {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData} courseId={id} chapterId={chapterId} />:null}
-            {isCertificate? <Certificate courseId={id} certificateData={certificateData} />: null}
+            {isCertificate? <Certificate courseId={id} certificateData={certificateData} isDone={progresstrack.is_unlocked} />: null}
             {isText?<TextPresenter data={textData} />:null}
             {isAnnouncementModal?<AnnouncementModal courseId={id} onExit={handleExitAnnouncementModal} notif={notif}  /> : null}
             {progresstrack.is_unlocked ?null:<div className="absolute inset-0 bg-gray-400/70 z-10 grid place-items-center"><div className='grid place-items-center'>

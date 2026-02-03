@@ -8,12 +8,14 @@ export default function Certificate(props) {
   const { title } = props.certificateData[0];
   const [data, setData] = useState({});
   const [completionDate, setCompletionDate] = useState({
+  
     fullDate: '',
     day: '',
     month: '',
     year: '',
     time: '',
   });
+  const [isDone, setIsDone] = useState(false)
 
   const certificateRef = useRef(); // <-- Ref for the certificate div
 
@@ -38,7 +40,7 @@ export default function Certificate(props) {
     const year = now.getFullYear();
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
-
+    setIsDone(props.isDone)
     setCompletionDate({
       fullDate: now.toLocaleDateString(),
       day: day,
@@ -69,7 +71,6 @@ export default function Certificate(props) {
   const handleprogress = async()=>{
     const sendprogress = await axios.post(`${API_URL}/trainee/chapterprogress/${props.courseId}/${props.certificateData[0].chapter_id}`,{}, {withCredentials:true})
   }
-
   return (
     <div className="w-full h-full overflow-y-scroll">
       <div className="w-full min-h-screen flex flex-col items-center p-2 sm:p-4 lg:p-8">
@@ -135,7 +136,7 @@ export default function Certificate(props) {
                   className="font-serif text-xl sm:text-3xl md:text-xl lg:text-3xl font-bold text-black border-b-2 lg:border-b-[3px] border-black pb-2 lg:pb-2.5 mx-auto mb-5 sm:mb-7 lg:mb-8 capitalize max-w-[90%] sm:max-w-[85%] lg:max-w-[80%] inline-block break-words"
                   id="recipientName"
                 >
-                  {data.first_name} {data.surname}
+                 {isDone?(`${data.first_name} ${data.surname}`) :null}
                 </div>
 
                 <p className="text-xs sm:text-sm lg:text-[15px] text-gray-800 leading-[1.6] sm:leading-[1.8] mb-2 lg:mb-2.5 px-4">

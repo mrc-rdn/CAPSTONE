@@ -100,11 +100,11 @@ export default function TrainerLoginPage() {
                 autocomplete="off"
                 id="email"
                 type="text"
-                className=" peer rounded-xl text-[#2D4F2B] pl-10 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
+                className=" peer rounded-xl text-[#2D4F2B] pl-3 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
               />
 
               <label
-                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[40px] 
+                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[13px] 
                   peer-focus-visible:text-[#FFF1CA]
                   peer-focus-visible:translate-x-[5px] 
                   peer-focus-visible:translate-y-[-38px] 
@@ -154,11 +154,11 @@ export default function TrainerLoginPage() {
                 autocomplete="off"
                 id="email"
                 type="password"
-                className=" peer rounded-xl text-[#2D4F2B]  pl-10 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
+                className=" peer rounded-xl text-[#2D4F2B]  pl-3 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
               />
 
               <label
-                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[40px] 
+                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[13px] 
                   peer-focus-visible:text-[#FFF1CA]
                   peer-focus-visible:translate-x-[5px] 
                   peer-focus-visible:translate-y-[-38px] 

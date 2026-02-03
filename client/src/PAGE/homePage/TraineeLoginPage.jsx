@@ -97,11 +97,11 @@ console.log(res.data)
                 autocomplete="off"
                 id="email"
                 type="text"
-                className=" peer rounded-xl text-[#2D4F2B] pl-10 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
+                className=" peer rounded-xl text-[#2D4F2B] pl-3 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
               />
 
               <label
-                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[40px] 
+                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[13px] 
                   peer-focus-visible:text-[#FFF1CA]
                   peer-focus-visible:translate-x-[5px] 
                   peer-focus-visible:translate-y-[-38px] 
@@ -113,14 +113,14 @@ console.log(res.data)
                 Username
               </label>
 
-              <span
+              {/* <span
                 className="pointer-events-none absolute z-[+1] left-0 top-0 bottom-0 flex items-center justify-center size-[40px] text-[#2D4F2B] peer-focus-visible:text-[#708A58]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" stroke-linejoin="round" stroke-linecap="round" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor">
                   <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
                   <path d="M16 12v1.5a2.5 2.5 0 0 0 5 0v-1.5a9 9 0 1 0 -5.5 8.28"></path>
                 </svg>
-              </span>
+              </span> */}
 
               <div
                 className="group w-[40px] absolute top-0 bottom-0 right-0 flex items-center justify-center text-[#2D4F2B] peer-focus-visible:text-[#708A58]"
@@ -151,11 +151,11 @@ console.log(res.data)
                 autocomplete="off"
                 id="email"
                 type="password"
-                className=" peer rounded-xl text-[#2D4F2B]  pl-10 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
+                className=" peer rounded-xl text-[#2D4F2B]  pl-3 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
               />
 
               <label
-                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[40px] 
+                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[13px] 
                   peer-focus-visible:text-[#FFF1CA]
                   peer-focus-visible:translate-x-[5px] 
                   peer-focus-visible:translate-y-[-38px] 
@@ -167,11 +167,11 @@ console.log(res.data)
                 Password
               </label>
 
-              <span
+              {/* <span
                 className="pointer-events-none absolute z-[+1] left-0 top-0 bottom-0 flex items-center justify-center size-[40px] text-[#2D4F2B] peer-focus-visible:text-[#708A58]"
               >
                 <PasswordIcon />
-              </span>
+              </span> */}
 
               <div
                 className="group w-[40px] absolute top-0 bottom-0 right-0 flex items-center justify-center text-[#2D4F2B] peer-focus-visible:text-[#708A58]"

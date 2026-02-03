@@ -84,8 +84,15 @@ const ChatBot = () => {
                 <div className={`p-3 rounded-xl text-sm max-w-[85%] shadow-sm ${
                   m.role === 'user' ? 'bg-[#2D4F2B] text-white rounded-tr-none' : 'bg-white border text-gray-800 rounded-tl-none'
                 }`}>
-                  {m.text}
+                  {m.role === 'ai' ? (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: m.text }}
+                    />
+                  ) : (
+                    m.text
+                  )}
                 </div>
+
               </div>
             ))}
             {isLoading && <div className="text-[10px] text-gray-400 italic px-2">Sumasagot...</div>}
