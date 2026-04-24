@@ -1,5 +1,6 @@
 import React from 'react'
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
+import { ThemeProvider } from './ThemeContext.jsx'
 import LandingPage from "./PAGE/homePage/landingPage.jsx"
 import TraineeLoginPage from "./PAGE/homePage/TraineeLoginPage.jsx"
 import TrainerLoginPage from "./PAGE/homePage/TrainerLoginPage.jsx"
@@ -37,8 +38,9 @@ import TraineeEditProfile from './PAGE/TraineePage/EditProfile.jsx'
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
+    <ThemeProvider>
+      <Router>
+        <Routes>
         <Route path="/" element={<LandingPage />}/>
         <Route path="/role" element={<RoleChoicePage />} />
         <Route path="/trainee/login" element={<TraineeLoginPage />} />
@@ -67,7 +69,8 @@ export default function App() {
         <Route path="/admin/course/:id/:courseTitle" element={<AdminProtectedRoute> <CourseOverview /> </AdminProtectedRoute>}/>
         <Route path="/admin/editprofile" element={<AdminProtectedRoute><EditProfile /></AdminProtectedRoute>} />
       </Routes>
-    </Router>
+      </Router>
+    </ThemeProvider>
   )
 }
 

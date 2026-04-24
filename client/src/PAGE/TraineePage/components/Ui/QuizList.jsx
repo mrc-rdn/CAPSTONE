@@ -36,6 +36,7 @@ export default function QuizList(props) {
   // STORE USER ANSWERS
   const [userAnswers, setUserAnswers] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [ isAnswerReady, setIsAnswerReady] = useState(false);
 
 const handleAnswer = (answer, questionId) => {
   setUserAnswers(prev => ({
@@ -168,9 +169,18 @@ const handleCheck = async () => {
 console.log(groupedQuizzes)
 
   return (
-  <div className='w-full h-full flex flex-col items-center overflow-y-scroll p-5'>
+  
+  <div className='w-full h-full flex flex-col items-center overflow-y-scroll px-5 z-300'>
     
-    <h2 className="text-lg font-bold ">{isAnswer?'Quiz Result':'Available Quizzes'}</h2>
+    {isAnswerReady || isAnswer ?null: <div className='bg-black/10 backdrop-blur-md w-full h-full absolute flex items-center justify-center'>
+      <div>
+        <h1 className='text-xl font-semibold' onClick={()=>{setIsAnswerReady(true), props.chapteroff(true)}} >Are you ready to Answer? Click Me </h1>
+        
+        
+      </div>
+    </div> }
+    
+    <h2 className="text-lg font-bold mt-5">{isAnswer?'Quiz Result':'Available Quizzes'}</h2>
     
     {isAnswer?null
     :<div className='w-full flex flex-col '>
@@ -243,6 +253,7 @@ console.log(groupedQuizzes)
           className="px-4 py-2 bg-[#2D4F2B] text-white rounded hover:bg-[#3f6a3b]"
           onClick={() => {
             setIsModalOpen(false);
+            props.chapteroff(false)
             handleCheck(); // only submit if confirmed
           }}
         >

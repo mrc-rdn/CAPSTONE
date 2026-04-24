@@ -10,7 +10,7 @@ export default function Features() {
   return (
     <div>
          {/* Features */}
-      <section id="features" className="py-24 bg-[#F1F3E0]">
+      <section id="features" className="py-24 ">
         <div className="max-w-[1200px] mx-auto px-6 ">
 
           {/* Header */}

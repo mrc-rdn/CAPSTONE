@@ -1,114 +1,133 @@
-import React, {useState , useEffect} from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-//components
-import Logout from "./Logout"
-
-
-//icons
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import Logout from "./Logout";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MessageIcon from '@mui/icons-material/Message';
-import PersonIcon from '@mui/icons-material/Person';
+import { motion, AnimatePresence } from 'framer-motion';
 
+export default function Navbar() {
+  const location = useLocation();
+  const [isExpanded, setIsExpanded] = useState(false);
 
-export default function Navrbar(props) {
-  const [navigation, setNavigation] = useState("dashboard");
-  const [viewData , setViewData] = useState(null)
-
-  function handleNavigation(routes){
-     console.log(routes)
-    setNavigation(routes)
-   
-  }
+  const menuItems = [
+    { name: 'Dashboard', path: '/trainer/dashboard', icon: DashboardIcon },
+    { name: 'Courses', path: '/trainer/course', icon: GroupsIcon },
+    { name: 'Messages', path: '/trainer/messages', icon: MessageIcon },
+  ];
 
   return (
-       <div
-  className="
-    h-[96%]
-    w-1/5
-    m-4
-    flex flex-col
-    rounded-2xl
-    bg-white/10
-    backdrop-blur-md
-    border border-white/20
-    shadow-xl
-  "
->
-  {/* HEADER */}
-  <div
-    className="
-      flex items-center
-      w-full h-20
-      bg-white/5
-      backdrop-blur-md
-      border-b border-white/5
-      px-4
-      rounded-t-2xl
-    "
-  >
-    <img src="/images/logo2.gif" alt="" className="h-12 mr-4" />
-    <h1 className="text-2xl font-bold text-[#708A58]">
-  <span className="text-[#2D4F2B]">E</span>-Kabuhayan
-  </h1>
-
-  </div>
-
-  {/* NAV */}
-  <nav className="flex flex-col mt-3 px-2 gap-1">
-    <Link
-      to="/trainer/dashboard"
-      className="
-        flex items-center gap-2
-        px-3 py-3
-        rounded-xl
-        text-[#2D4F2B] font-semibold
-        hover:bg-white/20
-        hover:text-yellow-400
-        transition
-      "
+    <motion.div 
+      initial={false}
+      animate={{ width: isExpanded ? 260 : 80 }}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+      /* Seamless styling: Removed margins, removed all rounding, added border-right */
+      className="h-screen flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200/60 dark:border-slate-800 shadow-[4px_0_24px_rgba(0,0,0,0.02)] overflow-hidden relative z-[100] transition-colors duration-300"
     >
-      <DashboardIcon sx={{ fontSize: 30 }} /> Dashboard
-    </Link>
+      {/* Brand Section: h-20 matches the Header height for a continuous top-line */}
+      <div className={cn(
+        "flex items-center w-full h-20 px-6 border-b border-slate-100/80 dark:border-slate-800 transition-all",
+        !isExpanded && "justify-center px-0"
+      )}>
+        <div className="flex items-center gap-4">
+          <div className="relative group/logo">
+            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/20 to-amber-500/20 rounded-full blur-xl opacity-0 group-hover/logo:opacity-100 transition duration-500"></div>
+            <div className="relative w-10 h-10 flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center p-1.5 overflow-hidden transition-transform duration-500 group-hover/logo:scale-110">
+              <img src="/images/logo2.gif" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+          </div>
+          
+          <AnimatePresence>
+            {isExpanded && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="flex flex-col"
+              >
+                <h1 className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
+                   <span className="text-emerald-700 dark:text-emerald-500">E</span><span className="text-amber-500">-Kabuhayan</span>
+                </h1>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Trainer</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
 
-    <Link
-      to="/trainer/course"
-      className="
-        flex items-center gap-2
-        px-3 py-3
-        rounded-xl
-        text-[#2D4F2B] font-semibold
-        hover:bg-white/20
-        hover:text-yellow-400
-        transition
-      "
-    >
-      <GroupsIcon sx={{ fontSize: 30 }} /> Course
-    </Link>
-  
+      {/* Navigation Links */}
+      <nav className="flex-1 flex flex-col mt-6 px-3 gap-1.5">
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="px-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 dark:text-slate-600 mb-2"
+            >
+              Main Menu
+            </motion.p>
+          )}
+        </AnimatePresence>
 
-    <Link
-      to="/trainer/messages"
-      className="
-        flex items-center gap-2
-        px-3 py-3
-        rounded-xl
-        text-[#2D4F2B] font-semibold
-        hover:bg-white/20
-        hover:text-yellow-400
-        transition
-      "
-    >
-      <MessageIcon sx={{ fontSize: 30 }} /> Messages
-    </Link>
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "relative flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 group",
+                !isExpanded && "justify-center px-0",
+                isActive 
+                  ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400" 
+                  : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+              )}
+            >
+              {isActive && (
+                <motion.div 
+                  layoutId="active-bar"
+                  className="absolute left-0 w-1 h-6 bg-emerald-600 rounded-r-full"
+                />
+              )}
 
-    
-  </nav>
+              <item.icon className={cn(
+                "w-5 h-5 transition-colors duration-200",
+                isActive ? "text-emerald-600" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+              )} />
+              
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.span 
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -5 }}
+                    className={cn(
+                        "text-xs font-black tracking-wide whitespace-nowrap uppercase",
+                        isActive ? "text-emerald-700 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"
+                    )}
+                  >
+                    {item.name}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          );
+        })}
+      </nav>
 
-<div className="mt-auto px-2 pb-4">
-  <Logout />
-  </div>
-</div>
+      {/* Logout Area */}
+      <div className={cn("mt-auto p-4 mb-4 border-t border-slate-100 dark:border-slate-800", !isExpanded && "px-2")}>
+        <Logout isCollapsed={!isExpanded} />
+      </div>
+    </motion.div>
+  );
+}
 
-  )
+function cn(...inputs) {
+  return inputs.filter(Boolean).join(' ');
 }

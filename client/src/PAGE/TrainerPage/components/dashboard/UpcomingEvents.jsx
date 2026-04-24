@@ -13,22 +13,24 @@ console.log(found)
   return (
    <div
   className="
-    w-[300px]
+    w-full
     max-w-full
-    sm:w-[300px]
     my-3 m-1 p-3
     flex flex-row items-center gap-3
     rounded-xl
     backdrop-blur-md
     bg-white/30
+    dark:bg-slate-800/40
     border border-white/30
-    shadow-xl
+    dark:border-slate-700
+    shadow-sm
+    dark:shadow-none
+    transition-colors duration-300
   "
 >
   <div
     className="
       w-11 h-11
-      sm:w-11 sm:h-11
       flex flex-col items-center justify-center
       rounded-lg
       text-white
@@ -39,14 +41,15 @@ console.log(found)
     style={{ backgroundColor: color }}
   >
     <p className="text-sm leading-none">{day}</p>
-    <p className="text-xs opacity-90">{found}</p>
+    <p className="text-xs opacity-90 font-black uppercase tracking-tighter">{found}</p>
   </div>
 
   <p className="
       flex-1
       text-sm
-      sm:text-sm
       text-gray-700
+      dark:text-slate-300
+      font-medium
       break-words
     ">
     {text}

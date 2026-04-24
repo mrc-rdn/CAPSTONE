@@ -237,9 +237,11 @@ export default function GoogleCalendarUI(props) {
       w-full
       rounded-2xl
       bg-white/15
+      dark:bg-slate-900/40
       backdrop-blur-xl
       border
       border-white/30
+      dark:border-slate-800
       shadow-[0_8px_30px_rgba(0,0,0,0.08)]
       p-4
     "
@@ -248,26 +250,26 @@ export default function GoogleCalendarUI(props) {
     {/* Header */}
     <div className="flex items-center justify-between mb-4">
       <button
-        className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
+        className="p-2 rounded-full bg-white/20 dark:bg-slate-800 hover:bg-white/30 dark:hover:bg-slate-700 transition"
         onClick={goToPreviousMonth}
       >
-        <ArrowBackIosIcon fontSize="small" />
+        <ArrowBackIosIcon fontSize="small" className="dark:text-slate-100" />
       </button>
 
-      <h2 className="font-bold text-lg text-[#2D4F2B] tracking-wide">
+      <h2 className="font-bold text-lg text-brand-green dark:text-emerald-400 tracking-wide">
         {monthName} {year}
       </h2>
 
       <button
-        className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
+        className="p-2 rounded-full bg-white/20 dark:bg-slate-800 hover:bg-white/30 dark:hover:bg-slate-700 transition"
         onClick={goToNextMonth}
       >
-        <ArrowForwardIosIcon fontSize="small" />
+        <ArrowForwardIosIcon fontSize="small" className="dark:text-slate-100" />
       </button>
     </div>
 
     {/* Week Labels */}
-    <div className="grid grid-cols-7 text-center text-xs font-medium text-[#708A58] mb-3">
+    <div className="grid grid-cols-7 text-center text-xs font-black uppercase tracking-widest text-[#708A58] dark:text-emerald-500/70 mb-3">
       {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
         <div key={d}>{d}</div>
       ))}
@@ -297,29 +299,31 @@ export default function GoogleCalendarUI(props) {
               backdrop-blur-sm
               border
               border-white/20
+              dark:border-slate-800
               transition-all
               duration-200
+              flex flex-col items-center justify-center
               ${
                 isToday(date)
-                  ? "bg-[#2D4F2B]/80 text-[#FFF1CA] shadow-lg"
+                  ? "bg-brand-green dark:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
                   : isPastDate(date)
-                  ? "bg-gray-300/40 text-gray-400 cursor-not-allowed"
-                  : "bg-white/30 text-[#2D4F2B] hover:bg-[#FFF1CA]/30"
+                  ? "bg-gray-300/20 dark:bg-slate-800/40 text-gray-400 dark:text-slate-600 cursor-not-allowed"
+                  : "bg-white/30 dark:bg-slate-800/60 text-brand-green dark:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700"
               }
             `}
           >
-            <p className="text-sm font-semibold">{day}</p>
+            <p className="text-sm font-black tracking-tight">{day}</p>
 
-            <div className="absolute bottom-1 left-1 flex gap-1">
+            <div className="absolute bottom-1.5 flex gap-0.5">
               {dayEvents.slice(0,3).map((ev,idx)=>(
                 <span
                   key={idx}
-                  className="w-1.5 h-1.5 rounded-full"
+                  className="w-1 h-1 rounded-full"
                   style={{backgroundColor:ev.color}}
                 />
               ))}
               {dayEvents.length > 3 && (
-                <span className="text-[10px] text-[#2D4F2B] ml-1">
+                <span className={`text-[8px] font-black leading-none ${isToday(date) ? 'text-white' : 'text-brand-green dark:text-emerald-400'}`}>
                   +{dayEvents.length - 3}
                 </span>
               )}
@@ -331,24 +335,25 @@ export default function GoogleCalendarUI(props) {
 
     {/* MODAL */}
     {isModalOpen && selectedDate && (
-      <div className="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center backdrop-blur-sm rounded-xl">
+      <div className="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center backdrop-blur-sm rounded-xl p-4">
 
         <div
           className="
             relative
             w-[420px]
-            max-w-[92vw]
-            bg-white/20
+            max-w-full
+            bg-white dark:bg-slate-900
             backdrop-blur-xl
             border
             border-white/30
+            dark:border-slate-800
             rounded-2xl
             p-5
             shadow-[0_10px_40px_rgba(0,0,0,0.15)]
           "
         >
           <button
-            className="absolute top-3 right-4 text-white/70 hover:text-white"
+            className="absolute top-3 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white"
             onClick={() => {
               setIsModalOpen(false);
               handleRefresh();
@@ -358,25 +363,32 @@ export default function GoogleCalendarUI(props) {
             ✕
           </button>
 
-          <h3 className="font-semibold text-white mb-3">
+          <h3 className="font-black text-slate-800 dark:text-white mb-4 uppercase tracking-widest text-xs">
             {selectedDate.toDateString()}
           </h3>
 
           <input
             value={eventInputText}
             onChange={(e) => setEventInputText(e.target.value)}
-            placeholder="Add event..."
+            placeholder="Add new event..."
             className="
               w-full
-              p-2
-              mb-3
-              rounded-lg
-              bg-white/70
+              p-3
+              mb-4
+              rounded-xl
+              bg-slate-50
+              dark:bg-slate-800
               border
-              border-white/40
+              border-slate-200
+              dark:border-slate-700
+              text-slate-800
+              dark:text-white
+              placeholder-slate-400
               focus:outline-none
               focus:ring-2
-              focus:ring-[#2D4F2B]
+              focus:ring-brand-green
+              dark:focus:ring-emerald-500
+              transition-all
             "
           />
 
@@ -384,20 +396,26 @@ export default function GoogleCalendarUI(props) {
             onClick={addEventToDate}
             className="
               w-full
-              bg-[#2D4F2B]/80
-              hover:bg-[#2D4F2B]
+              bg-brand-green
+              dark:bg-emerald-600
+              hover:bg-[#1e3a1c]
+              dark:hover:bg-emerald-700
               text-white
-              py-2
-              rounded-lg
-              font-medium
-              mb-4
-              transition
+              py-3
+              rounded-xl
+              font-black
+              uppercase
+              tracking-widest
+              text-xs
+              mb-6
+              transition-all
+              active:scale-95
             "
           >
-            Add Event
+            Create Event
           </button>
 
-          <ul className="space-y-2 max-h-52 overflow-y-auto">
+          <ul className="space-y-2 max-h-52 overflow-y-auto custom-scrollbar">
             {getEventsFor(selectedDate).map(ev => (
               <li
                 key={ev.id}
@@ -405,17 +423,20 @@ export default function GoogleCalendarUI(props) {
                   flex
                   justify-between
                   items-center
-                  bg-white/30
-                  rounded-lg
-                  px-3
-                  py-2
+                  bg-slate-50
+                  dark:bg-slate-800/50
+                  border border-slate-100
+                  dark:border-slate-700
+                  rounded-xl
+                  px-4
+                  py-3
                 "
               >
-                <span className="text-[#2D4F2B]" style={{color: ev.color}}>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
                   {ev.text}
                 </span>
                 <button
-                  className="text-[#CF0F0F] hover:text-[#CF0F0F]/500"
+                  className="text-red-500 hover:text-red-700 p-1 rounded-lg hover:bg-red-50 transition-colors"
                   onClick={() => deleteEvent(ev.id)}
                 >
                   ✕

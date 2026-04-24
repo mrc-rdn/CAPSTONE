@@ -1,107 +1,120 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import axios from 'axios'
+import CampaignIcon from '@mui/icons-material/Campaign';
+import axios from 'axios';
 import { API_URL } from '../../../../api';
 import CircularProgress from '@mui/material/CircularProgress';
 
-
-
 export default function Header(props) {
-  const [notifications, setNotificaitons] = useState(0)
-   const [progress, setProgress] = useState([])
-    
-     function deslugify(slug) {
-        // 1. Replace hyphens with spaces
-        // 2. Capitalize first letter of each word (optional)
+    const [notifications, setNotificaitons] = useState(0);
+    const [progress, setProgress] = useState([]);
+
+    function deslugify(slug) {
+        if (!slug) return "";
         return slug
-            .replace(/-/g, ' ')               // replace - with space
-            .replace(/\b\w/g, char => char.toUpperCase()); // capitalize each word
+            .replace(/-/g, ' ')
+            .replace(/\b\w/g, char => char.toUpperCase());
     }
 
-    useEffect(()=>{
-      const fetchData= async()=>{
-        const [result,  progress ] = await Promise.all([ axios.get(`${API_URL}/admin/announcement/${props.courseId}/notificaitons`,{withCredentials:true}),
-          axios.get(`${API_URL}/trainee/traineeprogress/${props.courseId}`, { withCredentials: true }),  
-         ])
-      
-         setProgress(progress.data.data)
-        setNotificaitons(result.data.totalNotif)
-      } 
-      fetchData()
-    },[props.refresh])
-
-  function getCompletionPercentagePerUser(data) {
-    const users = {};
-
-    data.forEach(item => {
-      const userId = item.user_id;
-
-      if (!users[userId]) {
-        users[userId] = {
-          user_id: userId,
-          first_name: item.first_name,
-          surname: item.surname,
-          total: 0,
-          done: 0
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [result, progressRes] = await Promise.all([
+                    axios.get(`${API_URL}/admin/announcement/${props.courseId}/notificaitons`, { withCredentials: true }),
+                    axios.get(`${API_URL}/trainee/traineeprogress/${props.courseId}`, { withCredentials: true }),
+                ]);
+                setProgress(progressRes.data.data);
+                setNotificaitons(result.data.totalNotif);
+            } catch (error) {
+                console.error("Error fetching header data:", error);
+            }
         };
-      }
+        fetchData();
+    }, [props.courseId, props.refresh]);
 
-      users[userId].total += 1;
+    function getCompletionPercentagePerUser(data) {
+        if (!data || data.length === 0) return [{ percentage: 0 }];
+        const users = {};
+        data.forEach(item => {
+            const userId = item.user_id;
+            if (!users[userId]) {
+                users[userId] = { total: 0, done: 0 };
+            }
+            users[userId].total += 1;
+            if (item.is_done) users[userId].done += 1;
+        });
 
-      if (item.is_done) {
-        users[userId].done += 1;
-      }
-    });
+        return Object.values(users).map(user => ({
+            percentage: Math.round((user.done / user.total) * 100)
+        }));
+    }
 
-    // Step 2: compute percentage
-    return Object.values(users).map(user => ({
-      ...user,
-      percentage: Math.round((user.done / user.total) * 100)
-    }));
-  }
-  let result = getCompletionPercentagePerUser(progress);
+    const result = getCompletionPercentagePerUser(progress);
+    const currentPercentage = result[0]?.percentage || 0;
 
-    
-  return (
-      <div className="flex w-full h-full bg-[#2D4F2B] items-center text-white">
+    return (
+        <div className="w-full h-full flex items-center">
+            
+            {/* LEFT SIDE: Back & Title (Trainer Style) */}
+            <div className="flex items-center gap-6">
+                <Link to="/trainee/course">
+                    <button className="w-10 h-10 rounded-xl bg-[#2D4F2B]/10 text-[#2D4F2B] flex items-center justify-center hover:bg-[#2D4F2B] hover:text-white transition-all duration-300">
+                        <ArrowBackIcon fontSize="small" />
+                    </button>
+                </Link>
 
-    {/* Back button */}
-    <Link to="/trainee/course">
-      <button className="ml-5 text-large hover:text-[#FFB823] transition">
-        <ArrowBackIcon />
-      </button>
-    </Link>
+                <div className="flex flex-col">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#2D4F2B]/40 leading-none mb-1">
+                        Learning Path
+                    </p>
+                    <h1 className="text-xl font-black text-[#2D4F2B] truncate max-w-md">
+                        {deslugify(props.courseTitle)}
+                    </h1>
+                </div>
+            </div>
 
-    {/* Title */}
-    <h1 className="text-xl font-medium ml-20 truncate">
-      {deslugify(props.courseTitle)}
-    </h1>
+            {/* RIGHT SIDE: Progress & Announcements */}
+            <div className="flex ml-auto items-center gap-4">
+                
+                {/* PROGRESS SECTION */}
+                <div className='flex items-center gap-3 bg-[#2D4F2B]/5 px-4 py-2 rounded-2xl border border-[#2D4F2B]/10'>
+                    <div className="relative flex items-center justify-center">
+                        <CircularProgress 
+                            variant="determinate" 
+                            value={currentPercentage} 
+                            size={32} 
+                            thickness={5}
+                            sx={{ color: '#2D4F2B' }}
+                        />
+                        <span className='absolute text-[8px] font-bold text-[#2D4F2B]'>
+                            {currentPercentage}%
+                        </span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-black uppercase tracking-tighter text-[#2D4F2B]/50 leading-none">Your Status</span>
+                        <span className="text-xs font-bold text-[#2D4F2B]">Progress</span>
+                    </div>
+                </div>
 
+                {/* ANNOUNCEMENT BUTTON (Trainer Style) */}
+                <div className="relative">
+                    <button
+                        onClick={() => props.handleOpenAnnouncementModal(notifications)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#2D4F2B] hover:bg-[#2D4F2B]/10 rounded-xl transition-all"
+                    >
+                        <CampaignIcon fontSize="small" />
+                        <span className="hidden md:block">Announcements</span>
+                    </button>
+                    
+                    {notifications > 0 && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 animate-bounce">
+                            <span className="text-[10px] font-bold">{notifications}</span>
+                        </div>
+                    )}
+                </div>
 
-    <div className='relative ml-auto flex items-center mr-3'>
-      <CircularProgress  variant="determinate" value={result[0]?.percentage} />
-      <span className='absolute top-3 left-1.5 text-xs'>{result?result[0]?.percentage: '0'}%</span>
-      <h1 className='ml-3'>Your Progress</h1>
-    </div>
-    {/* Actions */}
-    <div className=' relative'>
-          <button
-          onClick={() => {props.handleOpenAnnouncementModal(notifications)}}
-          className=" m-3 p-3  m-3 hover:border-b-3 p-3 transition-all duration-80 ease-in-out"
-            >
-          Announcement
-          </button>
-          {notifications >= 1 && <div className='w-4 h-4 bg-red-500 rounded-full absolute top-4 right-3  '>
-            <span className='text-[10px] absolute left-[5px] top-[1px]'>
-                {notifications}
-            </span>
-
-          </div>}
-          
-
+            </div>
         </div>
-
-  </div>
-);
+    );
 }

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 export default function QuizMultipleChoice({ no, type_question, question, choices, answers, questionId, answer }) {
   // store the index of the selected choice
   const [selectedIndex, setSelectedIndex] = useState(null);
-console.log(answer)
+
   return (
     <div className='w-full h-60 text-black mt-2 p-3 rounded-md'>
       <div className='flex mb-3'>

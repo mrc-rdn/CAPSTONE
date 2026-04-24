@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 import Header from "./components/course/Header.jsx"
@@ -15,17 +15,16 @@ import Certificate from "./components/UI/Certificate.jsx"
 import DeleteContent from './components/UI/DeleteContent.jsx'
 import AnnouncementModal from './components/UI/modal/AnnouncementModal.jsx'
 import TextPresenter from './components/UI/TextPresenter.jsx'
-
-
+import Navbar from './components/Navbar.jsx'
+import AutoStoriesIcon from '@mui/icons-material/AutoStories'; // Added for the icon style
 
 export default function CourseOverview() {
     const { id, courseTitle } = useParams();
     const [isChapterModal, setIsChapterModal] = useState(false);
     const [isAddTraineeModal, setIsAddTraineeModal] = useState(false);
     const [isTraineeProgressModal, setIsTraineeProgressModal] = useState(false)
-    const [chapterLength, setChapterLength] = useState(0);
     const [refresh, setRefresh] = useState(0)
-    const [chapterInfo, setChapterInfo] = useState({chapterId: "", chapterIndex: ""})
+    const [chapterInfo, setChapterInfo] = useState({ chapterId: "", chapterIndex: "" })
 
     const [isLesson, setIsLessonUploaded] = useState(false)
     const [isVideo, setIsVideo] = useState(false);
@@ -37,136 +36,128 @@ export default function CourseOverview() {
     const [certificateData, setCertificateData] = useState([])
     const [textData, setTextData] = useState([])
     const [isEditChapter, setIsEditChapterModal] = useState(false)
-    const [isAnnounceModalOpen, setIsAnnouncementModalOpen ] = useState(false)
-    
+    const [isAnnounceModalOpen, setIsAnnouncementModalOpen] = useState(false)
 
-    const handleOpenChapterAddModal = async()=>{
-      setIsChapterModal(true) 
-    }
-    const handleExitChapterModal = (exit) => {
-      setIsChapterModal(exit)
-      setRefresh(prev => prev + 1)
-    }
-    const handleOpenAddTraineeModal = () =>{
-      setIsAddTraineeModal(true)
+    // ... (Your existing handler functions: handleOpenChapterAddModal, handleChaptersInfo, etc., remain exactly as you have them)
+    const handleOpenChapterAddModal = () => setIsChapterModal(true);
+    const handleExitChapterModal = (exit) => { setIsChapterModal(exit); setRefresh(prev => prev + 1); };
+    const handleOpenAddTraineeModal = () => setIsAddTraineeModal(true);
+    const handleExitaddTraineeModal = () => setIsAddTraineeModal(false);
+    const handleOpenTraineeProgress = () => setIsTraineeProgressModal(true);
+    const handleExitTraineeProgressModal = () => setIsTraineeProgressModal(false);
+    const handleOpenAnnouncementModal = () => setIsAnnouncementModalOpen(true);
+    const handleExitAnnouncementModal = () => setIsAnnouncementModalOpen(false);
+    const handleRefresh = () => setRefresh(prev => prev + 1);
+    const handleEditChapter = (isEditChapter) => setIsEditChapterModal(!isEditChapter);
+
+    const handleChaptersInfo = async (chaptersId, chapterIndex, isEditChapter) => {
+        setIsEditChapterModal(isEditChapter)
+        try {
+            const [video, quiz, certificate, text] = await Promise.all([
+                axios.post(`${API_URL}/trainer/chapter/mediaitems`, { courseId: id, chapterId: chaptersId }, { withCredentials: true }),
+                axios.post(`${API_URL}/trainer/chapter/quiz`, { chapterId: chaptersId }, { withCredentials: true }),
+                axios.get(`${API_URL}/trainer/${id}/${chaptersId}/getcertificate`, { withCredentials: true }),
+                axios.get(`${API_URL}/trainer/texteditor/${id}/${chaptersId}`, { withCredentials: true })
+            ])
+
+            if (quiz.data.success) {
+                setIsQuiz(true); setIsVideo(false); setIsLessonUploaded(false); setIsCertificate(false); setIstext(false);
+                setQuizData(quiz.data.data)
+            } else if (video.data.success) {
+                setIsVideo(true); setIsQuiz(false); setIsLessonUploaded(false); setIsCertificate(false); setIstext(false);
+                setVideoData(video.data.data[0])
+            } else if (certificate.data.success) {
+                setIsVideo(false); setIsQuiz(false); setIsCertificate(true); setIsLessonUploaded(false); setIstext(false);
+                setCertificateData(certificate.data.data)
+            } else if (text.data.success) {
+                setIsVideo(false); setIsQuiz(false); setIsCertificate(false); setIsLessonUploaded(false); setIstext(true);
+                setTextData(text.data.data)
+            } else {
+                setIsQuiz(false); setIsVideo(false); setIsCertificate(false); setIstext(false); setIsLessonUploaded(true);
+            }
+        } catch (error) { console.log(error) }
+        setChapterInfo({ chapterId: chaptersId, chapterIndex: chapterIndex })
     }
 
-    const handleExitaddTraineeModal = () =>{
-      setIsAddTraineeModal(false)
-    }
+    return (
+        <div className='flex w-screen h-screen bg-[#F8FAFC] dark:bg-slate-950 overflow-hidden font-sans text-slate-900 dark:text-slate-100 transition-colors duration-500'>
 
-    const handleOpenTraineeProgress = () =>{
-      setIsTraineeProgressModal(true)
-    }
-    const handleExitTraineeProgressModal = () =>{
-      setIsTraineeProgressModal(false)
-    }
-    const handleOpenAnnouncementModal = () =>{
-      setIsAnnouncementModalOpen(true)
-    }
-    const handleExitAnnouncementModal = () =>{
-      setIsAnnouncementModalOpen(false)
-    }
-
-    function handleRefresh(){
-      setRefresh(prev => prev + 1)
-       
-    }
-   // this to open the delete content this function is pass by course chapter component
-    const handleEditChapter = (isEditChapter)=>{
-      setIsEditChapterModal(!isEditChapter)
-    }
-
-    const handleChaptersInfo = async(chaptersId, chapterIndex , isEditChapter)=>{
-      setIsEditChapterModal(isEditChapter)
-       try {
-          const [video, quiz, certificate, text] = await Promise.all([
-          axios.post(`${API_URL}/trainer/chapter/mediaitems`, {courseId: id, chapterId: chaptersId  }, {withCredentials: true}),
-          axios.post(`${API_URL}/trainer/chapter/quiz`, {chapterId: chaptersId  }, {withCredentials: true}),
-          axios.get(`${API_URL}/trainer/${id}/${chaptersId}/getcertificate`, {withCredentials:true}),
-          axios.get(`${API_URL}/trainer/texteditor/${id}/${chaptersId}`, {withCredentials:true})
-
-
-        ])
-        
-          
-          if(quiz.data.success){
-            setIsQuiz(true) 
-            setIsVideo(false)
-            setIsLessonUploaded(false)
-            setIsCertificate(false)
-            setIstext(false)
-            setQuizData(quiz.data.data)
             
-          } else if(video.data.success){
-            setIsVideo(true)
-            setIsQuiz(false) 
-            setIsLessonUploaded(false)
-            setIsCertificate(false)
-            setIstext(false)
-            setVideoData(video.data.data[0])
-            
-          }else if (certificate.data.success){
-            setIsVideo(false)
-            setIsQuiz(false) 
-            setIsCertificate(true)
-            setIsLessonUploaded(false)
-            setIstext(false)
-            setCertificateData(certificate.data.data)
-          }else if(text.data.success){
-            setIsVideo(false)
-            setIsQuiz(false) 
-            setIsCertificate(false)
-            setIsLessonUploaded(false)
-            setIstext(true)
-            setTextData(text.data.data)
-          }else{
-            setIsQuiz(false)
-            setIsVideo(false)
-            setIsCertificate(false)
-            setIstext(false)
-            setIsLessonUploaded(true)
-          }
-          
-        } catch{
-          console.log(error)
-        }
-      setChapterInfo({chapterId: chaptersId, chapterIndex: chapterIndex})
-    }
 
-    
+            <div className='flex-1 flex flex-col relative overflow-hidden'>
+                
+                {/* 2. MODERN GLASS HEADER (Matches Dashboard) */}
+                <header className="h-20 shrink-0 flex items-center justify-between px-10 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/50 sticky top-0 z-[50] transition-colors duration-500">
+                    
 
-    
-  return (
-    <div className='w-screen h-screen'>
-        <div className='h-1/12'>
-          <Header courseTitle={courseTitle} handleOpenAnnouncementModal={handleOpenAnnouncementModal}  handleOpenChapterAddModal={handleOpenChapterAddModal} handleOpenAddTraineeModal={handleOpenAddTraineeModal} handleOpenTrianeeProgressModal={handleOpenTraineeProgress} />
+                    {/* Integration for your specific Course Actions inside the Header component */}
+                    <div className="flex-1 max-w-full px-6 ">
+                         <Header 
+                            courseTitle={courseTitle} 
+                            handleOpenAnnouncementModal={handleOpenAnnouncementModal} 
+                            handleOpenChapterAddModal={handleOpenChapterAddModal} 
+                            handleOpenAddTraineeModal={handleOpenAddTraineeModal} 
+                            handleOpenTrianeeProgressModal={handleOpenTraineeProgress} 
+                        />
+                    </div>
+                </header>
+
+                {/* 3. SCROLLABLE CONTENT VIEWPORT */}
+                <main className='flex-1 flex overflow-hidden p-8 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+                    
+                    {/* LEFT: CONTENT VIEWER (White Glass) */}
+                    <div className='flex-1 relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 overflow-y-auto custom-scrollbar shadow-xl shadow-slate-200/40 dark:shadow-none p-8'>
+                        {isQuiz && <QuizList quizData={quizData} />}
+                        {isVideo && videoData.item_type === "VIDEO" && <MediaPlayer videoURL={videoData.source_url} videoId={videoData.id} videoData={videoData} />}
+                        {isVideo && videoData.item_type === "IMAGE" && <ImagePlayer videoData={videoData} />}
+                        {isCertificate && <Certificate courseId={id} certificateData={certificateData} />}
+                        {isText && <TextPresenter data={textData} />}
+                        
+                        {isEditChapter && !isLesson && (
+                            <DeleteContent 
+                                isQuiz={isQuiz} isVideo={isVideo} isCertificate={isCertificate} isText={isText} 
+                                videoData={videoData} quizData={quizData} certificateData={certificateData} 
+                                textData={textData} onRefresh={handleRefresh}
+                            />
+                        )}
+
+                        {isLesson && <CourseAddContent onRefresh={handleRefresh} chapterInfo={chapterInfo} courseId={id} />}
+
+                        {!isQuiz && !isVideo && !isCertificate && !isText && !isLesson && (
+                            <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-700">
+                                <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center mb-4 border border-slate-100 dark:border-slate-800">
+                                    <span className="text-5xl opacity-40 grayscale">📖</span>
+                                </div>
+                                <p className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">Select a chapter to view content</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* RIGHT: CHAPTER LIST (Darker Glass) */}
+                    <aside className='w-96 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 overflow-hidden shadow-xl shadow-slate-200/40 dark:shadow-none flex flex-col'>
+                        <div className="p-8 border-b border-slate-100 dark:border-slate-800/50">
+                            <h2 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] flex items-center gap-3">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Course Chapters
+                            </h2>
+                        </div>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
+                            <CourseChapters 
+                                courseId={id} 
+                                refresh={refresh} 
+                                handleChaptersInfo={handleChaptersInfo} 
+                                handleEditChapter={handleEditChapter} 
+                            />
+                        </div>
+                    </aside>
+                </main>
+            </div>
+
+            {/* MODALS */}
+            {isTraineeProgressModal && <TraineeProgressModal onExit={handleExitTraineeProgressModal} courseId={id} />}
+            {isAddTraineeModal && <AddTraineeModal onExit={handleExitaddTraineeModal} courseId={id} />}
+            {isChapterModal && <AddChapterModal onExit={handleExitChapterModal} courseId={id} />}
+            {isAnnounceModalOpen && <AnnouncementModal onExit={handleExitAnnouncementModal} courseId={id} certificate={certificateData} />}
         </div>
-        
-        <div className='h-11/12 w-full flex'>
-          <div className='relative w-full'>
-            
-            {isQuiz?<QuizList quizData={quizData} /> : null }
-            {isVideo&&videoData.item_type === "VIDEO"? <MediaPlayer videoURL={videoData.source_url} videoId={videoData.id} videoData={videoData}  />:null}
-            {isVideo&&videoData.item_type === "IMAGE"? <ImagePlayer videoData={videoData} />:null}
-            {isCertificate? <Certificate courseId={id} certificateData={certificateData} />: null}
-            {isText? <TextPresenter data={textData} />:null}
-            {isEditChapter
-            ? (isLesson ? null : <DeleteContent isQuiz={isQuiz} isVideo={isVideo} isCertificate={isCertificate} isText={isText} videoData={videoData}  quizData={quizData} certificateData={certificateData} textData={textData}  onRefresh={handleRefresh}/>)
-            : null}
-
-            {isLesson? <CourseAddContent onRefresh={handleRefresh} chapterInfo={chapterInfo} courseId={id} />: null}
-          </div>
-          <div className='ml-auto h-full w-4/12 bg-white'>
-            <CourseChapters  courseId={id} refresh={refresh} handleChaptersInfo={handleChaptersInfo} handleEditChapter={handleEditChapter} />
-          </div>
-            
-        </div>
-        {isTraineeProgressModal?<TraineeProgressModal   onExit={handleExitTraineeProgressModal} courseId={id}  /> :null}
-        {isAddTraineeModal?<AddTraineeModal onExit={handleExitaddTraineeModal}  courseId={id}/>: null}
-        {isChapterModal?<AddChapterModal onExit={handleExitChapterModal} courseId={id} chapterlength1={chapterLength}/>: null}
-        {isAnnounceModalOpen?<AnnouncementModal onExit={handleExitAnnouncementModal} courseId={id} certificate={certificateData} />:null}
-    </div>
-
-  )
+    )
 }

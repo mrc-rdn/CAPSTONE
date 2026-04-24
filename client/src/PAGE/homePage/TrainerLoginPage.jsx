@@ -1,220 +1,151 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../../api.js";
-import PasswordIcon from '@mui/icons-material/Password';
 
 export default function TrainerLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
-
     try {
       const res = await axios.post(
         `${API_URL}/trainer/login`,
-        {
-          username: email,
-          password: password,
-        },
+        { username: email, password: password },
         { withCredentials: true }
       );
-
       if (res.data.redirectTo) {
         navigate(res.data.redirectTo);
       }
     } catch (err) {
       setError("Invalid credentials. Please try again.");
-      console.error(err);
     }
   }
 
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="flex h-screen w-full font-sans overflow-hidden bg-white">
+      
+      {/* LEFT SIDE: Brand & Hero (Matching the Set) */}
+      <div className={`hidden lg:flex flex-col justify-between w-1/2 bg-[#2D4F2B] relative overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+        
+        {/* Background School Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/plmro.jpg" 
+            alt="School Campus" 
+            className={`w-full h-full object-cover transition-transform duration-[2000ms] ease-out ${isLoaded ? 'scale-100 opacity-30' : 'scale-110 opacity-0'}`}
+          />
+          <div className="absolute inset-0 bg-[#2D4F2B]/50" />
+        </div>
 
-      {/* BLURRED BACKGROUND */}
-      <img
-        src="/images/plmro.jpg"
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover scale-110 blur-md"
-      />
-      <div className="absolute inset-0 bg-black/30" />
+        {/* Top Branding */}
+        <div className={`relative z-10 p-10 flex justify-between items-center transition-all duration-700 delay-300 ${isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
+          <div className="flex items-center gap-2">
+            <img src="/images/logo2.gif" alt="Logo" className="h-10 w-auto" />
+            <span className="tracking-widest font-bold text-[#FFF1CA] uppercase text-xl">E-Kabuhayan</span>
+          </div>
+        </div>
 
-      {/* CENTER CONTENT */}
-      <div className="relative z-10 h-full flex items-center justify-center px-4">
-
-        {/* CARD */}
-        <div
-          className="
-            relative
-            w-full max-w-[500px]
-            h-[550px]
-            rounded-2xl
-            overflow-hidden
-            shadow-2xl
-          "
-        >
-          {/* CARD OVERLAY */}
-          <div className="absolute inset-0 bg-[#2D4F2B]" />
-
-          {/* CONTENT */}
-          <div className="relative z-10 h-full flex flex-col items-center justify-center p-10">
-
-            {/* LOGO */}
-            <img
-              src="/images/logo2.gif"
-              alt="Logo"
-              className="h-24 mb-4"
+        {/* Hero Section */}
+        <div className="relative z-10 px-16 flex flex-col items-center flex-grow justify-center">
+          <h1 className={`text-4xl font-bold text-[#FFF1CA] leading-tight mb-12 self-start transition-all duration-700 delay-500 ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
+            Empowering the next generation of skilled professionals.
+          </h1>
+          
+          <div className={`relative w-full max-w-sm h-[45vh] overflow-hidden rounded-2xl shadow-2xl border-4 border-[#FFF1CA]/20 transition-all duration-1000 delay-700 ${isLoaded ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
+            <img 
+              src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800&auto=format&fit=crop" 
+              alt="Trainer leading a session" 
+              className="w-full h-full object-cover"
             />
+          </div>
+        </div>
 
-            <h1 className="text-3xl font-bold text-[#FFF1CA] mb-2">
-              Welcome back!
-            </h1>
+        <div className="relative z-10 p-10 flex gap-4 text-xs text-[#FFF1CA]/60">
+          <Link to="#" className="hover:text-[#FFF1CA]">Terms of service</Link>
+          <span>|</span>
+          <Link to="#" className="hover:text-[#FFF1CA]">Privacy policy</Link>
+        </div>
+      </div>
 
-            <p className="text-[#FFF1CA] mb-9">
-              Trainer Login
-            </p>
+      {/* RIGHT SIDE: Trainer Login Form */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center bg-white p-12 relative overflow-y-auto">
+        
+        <div className={`max-w-md w-full transition-all duration-1000 ease-out ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+          <h2 className="text-4xl font-extrabold text-[#2D4F2B] mb-2">
+            Welcome back!
+          </h2>
+          <p className="text-gray-500 mb-10 font-medium">Please enter your trainer credentials.</p>
 
-            {error && (
-              <p className="text-red-300 text-sm  text-center absolute top-55">
-                {error}
-              </p>
-            )}
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 animate-pulse">
+              <p className="text-red-700 text-sm font-bold">{error}</p>
+            </div>
+          )}
 
-            <form onSubmit={handleLogin} className="w-full">
+          <form onSubmit={handleLogin} className="space-y-8">
             
-            <div className="[--clr:#2D4F2B] relative flex flex-row items-center font-sans w-full">
-              
+            {/* Username/Email Input */}
+            <div className="relative flex flex-row items-center w-full">
               <input
                 onChange={e => setEmail(e.target.value)}
                 value={email}
-                
                 required
-                aria-invalid="false"
                 placeholder=" "
-                spellcheck="false"
-                autocomplete="off"
-                id="email"
                 type="text"
-                className=" peer rounded-xl text-[#2D4F2B] pl-3 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
+                className="peer rounded-xl text-[#2D4F2B] pl-4 h-[50px] w-full border-2 border-solid border-gray-200 bg-gray-50 outline-0 focus:border-[#2D4F2B] focus:bg-white transition-all duration-200"
               />
-
-              <label
-                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[13px] 
-                  peer-focus-visible:text-[#FFF1CA]
-                  peer-focus-visible:translate-x-[5px] 
-                  peer-focus-visible:translate-y-[-38px] 
-                  peer-[:not(:placeholder-shown)]:translate-x-[5px] 
-                  peer-[:not(:placeholder-shown)]:translate-y-[-38px] 
-                  peer-[:not(:placeholder-shown)]:text-[#708A58]"
-                for="email"
-              >
+              <label className="absolute left-4 text-gray-400 font-bold pointer-events-none duration-300 transform -translate-y-0 scale-100 peer-focus:-translate-y-10 peer-focus:scale-90 peer-focus:text-[#2D4F2B] peer-[:not(:placeholder-shown)]:-translate-y-10 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:text-[#2D4F2B]">
                 Username
               </label>
-
-              {/* <span
-                className="pointer-events-none absolute z-[+1] left-0 top-0 bottom-0 flex items-center justify-center size-[40px] text-[#2D4F2B] peer-focus-visible:text-[#708A58]"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" stroke-linejoin="round" stroke-linecap="round" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor">
-                  <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
-                  <path d="M16 12v1.5a2.5 2.5 0 0 0 5 0v-1.5a9 9 0 1 0 -5.5 8.28"></path>
-                </svg>
-              </span> */}
-
-              <div
-                className="group w-[40px] absolute top-0 bottom-0 right-0 flex items-center justify-center text-[#2D4F2B] peer-focus-visible:text-[#708A58]"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" stroke-linejoin="round" stroke-linecap="round" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor">
-                  <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
-                  <path d="M12 8v4"></path>
-                  <path d="M12 16h.01"></path>
-                </svg>
-                <span
-                  className="text-xs absolute bg-[#2D4F2B] text-[#FFF1CA] font-bold cursor-default select-none rounded-[4px] px-2 py-1 opacity-0 right-0 -z-10 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-[calc(100%+10px)]"
-                >
-                  Required!
-                </span>
-              </div>
             </div>
 
-            <div className="[--clr:#2D4F2B] relative flex flex-row items-center font-sans w-full mt-8 mb-3">
-              
+            {/* Password Input */}
+            <div className="relative flex flex-row items-center w-full">
               <input
                 onChange={e => setPassword(e.target.value)}
                 value={password}
-                name="email"
                 required
-                aria-invalid="false"
                 placeholder=" "
-                spellcheck="false"
-                autocomplete="off"
-                id="email"
                 type="password"
-                className=" peer rounded-xl text-[#2D4F2B]  pl-3 h-[45px] pr-[40px] leading-normal appearance-none resize-none box-border text-base w-full block text-left border-2 border-solid border-[#2D4F2B] bg-[#FFF1CA] rounded-[10px] m-0 outline-0 focus-visible:outline-0 focus-visible:border-[#708A58] focus-visible:ring-4 focus-visible:ring-[#708a582e] transition-all duration-200"
+                className="peer rounded-xl text-[#2D4F2B] pl-4 h-[50px] w-full border-2 border-solid border-gray-200 bg-gray-50 outline-0 focus:border-[#2D4F2B] focus:bg-white transition-all duration-200"
               />
-
-              <label
-                className="text-[#2D4F2B] cursor-text text-[--clr] inline-block z-0 text-sm mb-px font-bold text-start select-none absolute duration-300 transform origin-[0] translate-x-[13px] 
-                  peer-focus-visible:text-[#FFF1CA]
-                  peer-focus-visible:translate-x-[5px] 
-                  peer-focus-visible:translate-y-[-38px] 
-                  peer-[:not(:placeholder-shown)]:translate-x-[5px] 
-                  peer-[:not(:placeholder-shown)]:translate-y-[-38px] 
-                  peer-[:not(:placeholder-shown)]:text-[#708A58]"
-                for="email"
-              >
+              <label className="absolute left-4 text-gray-400 font-bold pointer-events-none duration-300 transform -translate-y-0 scale-100 peer-focus:-translate-y-10 peer-focus:scale-90 peer-focus:text-[#2D4F2B] peer-[:not(:placeholder-shown)]:-translate-y-10 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:text-[#2D4F2B]">
                 Password
               </label>
-
-              {/* <span
-                className="pointer-events-none absolute z-[+1] left-0 top-0 bottom-0 flex items-center justify-center size-[40px] text-[#2D4F2B] peer-focus-visible:text-[#708A58]"
-              >
-                <PasswordIcon />
-              </span> */}
-
-              <div
-                className="group w-[40px] absolute top-0 bottom-0 right-0 flex items-center justify-center text-[#2D4F2B] peer-focus-visible:text-[#708A58]"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" stroke-linejoin="round" stroke-linecap="round" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor">
-                  <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
-                  <path d="M12 8v4"></path>
-                  <path d="M12 16h.01"></path>
-                </svg>
-                <span
-                  className="text-xs absolute bg-[#2D4F2B] text-[#FFF1CA] font-bold cursor-default select-none rounded-[4px] px-2 py-1 opacity-0 right-0 -z-10 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-[calc(100%+10px)]"
-                >
-                  Required!
-                </span>
-              </div>
             </div>
-            
-            <button className="text-[#FFF1CA] " onClick={()=>{navigate('/trainer/ForgetPassword')}}>Forget Password</button>  
-              <button
-                type="submit"
-                className="w-full mt-2
-                  inline-block px-30 py-3 rounded-2xl font-bold text-[#FFF1CA] 
-                bg-[#2D4F2B] border-1 border-[#708A58]
-                shadow-[0px_5px_0px_0px_#708A58]
-                hover:translate-y-[5px]
-                hover:shadow-none
-                hover:bg-[#708A58]
-                
-                
-                transition-all duration-150 ease-in-out
-                "
+
+            <div className="flex justify-end">
+              <button 
+                type="button"
+                onClick={() => navigate('/trainer/ForgetPassword')}
+                className="text-sm font-bold text-[#2D4F2B] hover:underline"
               >
-                LOG IN
+                Forgot Password?
               </button>
-            </form>
+            </div>
 
-            <button className="mt-6 text-[#FFB823]/80 font-bold">
-              <Link to="/role">BACK</Link>
+            <button
+              type="submit"
+              className="w-full py-4 rounded-xl font-bold text-[#FFF1CA] bg-[#2D4F2B] hover:bg-[#1e361d] shadow-lg transition-all active:scale-[0.98]"
+            >
+              LOG IN AS TRAINER
             </button>
+          </form>
 
+          <div className="mt-10 text-center">
+            <Link to="/role" className="text-sm font-bold text-[#FFB823] hover:underline">
+               ← BACK TO ROLE SELECTION
+            </Link>
           </div>
         </div>
       </div>

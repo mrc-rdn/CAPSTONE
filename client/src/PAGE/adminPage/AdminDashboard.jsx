@@ -1,208 +1,176 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
-
 import Dcontent from './components/dashboard/DContent.jsx'
 import CalendarTodo from './components/dashboard/CalendarTodo.jsx'
 import axios from 'axios'
 import { API_URL } from '../../api'
 import Profile from './components/dashboard/Profile.jsx'
-
 import UpcomingEvents from './components/dashboard/UpcomingEvents.jsx'
 import Courses from './components/dashboard/courses.jsx'
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import GroupsIcon from '@mui/icons-material/Groups';
+import CalendarToday from '@mui/icons-material/CalendarToday';
+import { Link } from 'react-router-dom';
+import ThemeToggle from '../../ThemeToggle';
 
 export default function AdminDashboard() {
+  // --- LOGIC: Kept from original Admin Dashboard ---
   const [data, setData] = useState([])
-  const [color, setcolor] = useState({ color: null, shade: null })
   const [upcomingEventsData, setUpcomingEventData] = useState([])
   const [courses, setCourseData] = useState([])
   const [refresh, setRefresh] = useState(0)
-
 
   useEffect(() => {
     async function fetchData() {
       try {
         const [response, course] = await Promise.all([
           axios.get(`${API_URL}/admin/dashboard`, { withCredentials: true }),
-          axios.get(`${API_URL}/admin/course`, { withCredentials: true })])
+          axios.get(`${API_URL}/admin/course`, { withCredentials: true })
+        ])
         setCourseData(course.data.data)
         setData(response.data)
       } catch (error) {
-
+        console.log("error fetching data", error)
       }
     }
     fetchData()
-
-  }, [])
+  }, [refresh])
 
   const handleRefresh = () => {
     setRefresh(prev => prev + 1)
-
   }
 
-  const colorMap = {
-    red: { 200: 'bg-red-200', 300: 'bg-red-300', 400: 'bg-red-400', 500: 'bg-red-500', 600: 'bg-red-600', 700: 'bg-red-700', 800: 'bg-red-800' },
-    yellow: { 200: 'bg-yellow-200', 300: 'bg-yellow-300', 400: 'bg-yellow-400', 500: 'bg-yellow-500', 600: 'bg-yellow-600', 700: 'bg-yellow-700', 800: 'bg-yellow-800' },
-    green: { 200: 'bg-green-200', 300: 'bg-green-300', 400: 'bg-green-400', 500: 'bg-green-500', 600: 'bg-green-600', 700: 'bg-green-700', 800: 'bg-green-800' },
-    orange: { 200: 'bg-orange-200', 300: 'bg-orange-300', 400: 'bg-orange-400', 500: 'bg-orange-500', 600: 'bg-orange-600', 700: 'bg-orange-700', 800: 'bg-orange-800' },
-    blue: { 200: 'bg-blue-200', 300: 'bg-blue-300', 400: 'bg-blue-400', 500: 'bg-blue-500', 600: 'bg-blue-600', 700: 'bg-blue-700', 800: 'bg-blue-800' },
-    purple: { 200: 'bg-purple-200', 300: 'bg-purple-300', 400: 'bg-purple-400', 500: 'bg-purple-500', 600: 'bg-purple-600', 700: 'bg-purple-700', 800: 'bg-purple-800' },
-    pink: { 200: 'bg-pink-200', 300: 'bg-pink-300', 400: 'bg-pink-400', 500: 'bg-pink-500', 600: 'bg-pink-600', 700: 'bg-pink-700', 800: 'bg-pink-800' },
-  }
-
-  const userColorClass = colorMap[data.color]?.[data.shade] || 'bg-gray-500';
   const handleUpcomingEventData = (data) => {
     setUpcomingEventData(data)
-    console.log(data)
   }
 
+  // --- DESIGN CONFIG: Updated to match Trainer's visual style ---
+  const colorMap = {
+    red: { 500: 'bg-red-500' }, yellow: { 500: 'bg-yellow-500' },
+    green: { 500: 'bg-emerald-500' }, orange: { 500: 'bg-orange-500' },
+    blue: { 500: 'bg-blue-500' }, purple: { 500: 'bg-purple-500' },
+    pink: { 500: 'bg-pink-500' },
+  }
+  const userColorClass = colorMap[data.color]?.[data.shade] || 'bg-slate-500';
+
   return (
-    <div className="flex w-screen h-screen">
+    <div className="flex w-screen h-screen bg-[#F8FAFC] dark:bg-slate-950 overflow-hidden font-sans text-slate-900 dark:text-slate-100 transition-colors duration-500">
+      
+      {/* GLOBAL BACKGROUND - Inherited from Trainer */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <img
           src="/images/plmro.jpg"
           alt="Dashboard background"
-          className="w-full h-full object-cover scale-105 "
+          className="w-full h-full object-cover opacity-[0.04] dark:opacity-[0.02] grayscale"
         />
+        <div className="absolute inset-0 bg-gradient-to-tr from-slate-100/50 via-transparent to-emerald-50/30 dark:from-slate-950 dark:via-slate-950/80 dark:to-emerald-950/20" />
       </div>
-
 
       <Navbar />
-      <div className="w-full flex flex-col relative ">
-
-        <div className="absolute inset-0 bg-white/5 -z-0"></div>
-
-        <div className="px-4 pt-4">
-          <div className="flex w-full h-16 backdrop-blur-md bg-
-              border border-black/10 rounded-xl shadow-md">
-            <div className="h-full flex items-center w-full">
-              <h1 className="text-xl font-bold text-[#2D4F2B]  ml-3">Dashboard</h1>
-              <Profile data={data} userColorClass={userColorClass} />
+      
+      <div className="flex-1 flex flex-col relative overflow-hidden">
+        
+        {/* HEADER: Modern Glass effect */}
+        <header className="h-20 shrink-0 flex items-center justify-between px-10 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/50 sticky top-0 z-[50] transition-colors duration-500">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-emerald-600 rounded-xl shadow-lg shadow-emerald-200 dark:shadow-emerald-900/20">
+              <DashboardIcon className="text-white w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight uppercase">Admin Dashboard</h1>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">System Active</p>
+              </div>
             </div>
           </div>
-        </div>
+          
+          <div className="flex items-center gap-6">
+            <ThemeToggle />
+            <Profile data={data} userColorClass={userColorClass} />
+          </div>
+        </header>
 
-        <div className="h-[calc(100%-4rem)] w-full overflow-y-scroll relative z-10 px-4">
-
-
-
-          <div className='m-3 h-full flex gap-8 p-8'>
-            <div className='w-8/12 h-full flex flex-col gap-8'>
-              <div className='w-full flex flex-col items-center'>
-                <Dcontent traineeCount={data.traineeCount} trainerCount={data.trainerCount} coursesCount={data.coursesCount} />
-              </div>
-              <div
-                className="
-              w-full h-8/12
-              rounded-xl
-              border border-white/5
-              bg-white/30
-              backdrop-blur-md
-            "
-                style={{ boxShadow: "3px 3px 5px rgba(0,0,0,0.1)" }}
-              >
-                <div className="w-30 h-10 flex items-center justify-center ">
-                  <p className="text-[#2D4F2B] text-lg font-bold">Courses</p>
-                </div>
-
-
-                <div className="w-full h-10/12 rounded-br-md 
-                              flex flex-wrap justify-center
-                               backdrop-blur-md
-                              border border-white/5">
-
-                  {courses.length > 0 ? (courses.map((course) => {
-                    return (
-                      <Courses key={course.id} course={course} />
-
-                    )
-                  })
-                  ) : (<p>No Course Found</p>)
-                  }
-                </div>
-
-
-              </div>
-
+        {/* MAIN VIEWPORT: Uses Trainer's high-res grid layout */}
+        <main className="flex-1 overflow-y-auto px-10 py-8 custom-scrollbar">
+          <div className="max-w-[1600px] mx-auto space-y-8">
+            
+            {/* Stats Section */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <Dcontent 
+                traineeCount={data.traineeCount} 
+                trainerCount={data.trainerCount} 
+                coursesCount={courses.length} 
+              />
             </div>
-            <div className='w-4/12 flex flex-col gap-8'>
-              <div className='w-full h-100'>
-                <CalendarTodo handleUpcomingEventData={handleUpcomingEventData} onRefresh={handleRefresh} />
+            
+            <div className="grid grid-cols-12 gap-8">
+              {/* Left Column: Courses with Trainer's styling */}
+              <div className="col-span-12 lg:col-span-8 space-y-8">
+                <section className="h-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 p-8 shadow-xl shadow-slate-200/40 dark:shadow-none transition-colors duration-500">
+                  <div className="flex items-center justify-between mb-8 px-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center border border-amber-100 dark:border-amber-900/30 shadow-sm">
+                        <GroupsIcon className="text-amber-600 dark:text-amber-400 w-5 h-5" />
+                      </div>
+                      <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase">Platform Courses</h2>
+                    </div>
+                    <Link to="/admin/course" className="group flex items-center gap-3 text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 px-5 py-2.5 rounded-2xl transition-all border border-emerald-100/50 dark:border-emerald-800">
+                      Manage All <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {courses.length > 0 ? (
+                      courses.map((course) => <Courses key={course.id} course={course} />)
+                    ) : (
+                      <div className="col-span-full py-20 text-center bg-slate-50/50 dark:bg-slate-800/20 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-700">
+                        <p className="text-xs font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest">No active courses found</p>
+                      </div>
+                    )}
+                  </div>
+                </section>
               </div>
 
-              <div
-                className="
-                  h-5/12
-                  rounded-2xl
-                  flex items-center flex-col
-                  backdrop-blur-md
-                  bg-white/15
-                  border border-white/30
-                  shadow-xl
-                "
-              >
-                <div className="w-full">
-                  <p className="my-3 ml-5 font-bold text-lg text-[#2D4F2B]">
-                    Upcoming
-                  </p>
+              {/* Right Column: Calendar & Timeline */}
+              <div className="col-span-12 lg:col-span-4 space-y-8">
+                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 p-4 shadow-xl shadow-slate-200/40 dark:shadow-none transition-colors duration-500">
+                  <CalendarTodo handleUpcomingEventData={handleUpcomingEventData} onRefresh={handleRefresh} />
                 </div>
 
-
-                 <div className='h-35 w-11/12 overflow-y-scroll'>
-                  {upcomingEventsData
-                    .slice() // make a copy so we don't mutate the original
-                    .sort((a, b) => {
-                      const today = new Date();
-                      const dateA = new Date(a.event_date);
-                      const dateB = new Date(b.event_date);
-
-                      // Helper to check if the date is "today"
-                      const isToday = (date) =>
-                        date.getFullYear() === today.getFullYear() &&
-                        date.getMonth() === today.getMonth() &&
-                        date.getDate() === today.getDate();
-
-                      // Check if a or b are today
-                      const aToday = isToday(dateA);
-                      const bToday = isToday(dateB);
-
-                      if (aToday && !bToday) return -1; // a today, b not → a comes first
-                      if (!aToday && bToday) return 1;  // b today, a not → b comes first
-
-                      // Neither today → future events come first, past events later
-                      const now = today.setHours(0, 0, 0, 0);
-                      const aTime = dateA.setHours(0, 0, 0, 0);
-                      const bTime = dateB.setHours(0, 0, 0, 0);
-
-                      if (aTime >= now && bTime >= now) return aTime - bTime; // both future → ascending
-                      if (aTime < now && bTime < now) return aTime - bTime;   // both past → ascending (older first or last, your choice)
-                      if (aTime >= now && bTime < now) return -1; // future before past
-                      if (aTime < now && bTime >= now) return 1;  // past after future
-
-                      return 0;
-                    })
-                    .map((item, index) => (
-                      <UpcomingEvents
-                        key={index}
-                        text={item.text}
-                        eventDate={item.event_date}
-                        color={item.color}
-                      />
-                    ))}
-                </div>
-                
+                <section className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 p-8 shadow-xl shadow-slate-200/40 dark:shadow-none flex flex-col min-h-[400px] transition-colors duration-500">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-900/30 shadow-sm">
+                      <CalendarToday className="text-indigo-600 dark:text-indigo-400 w-5 h-5" />
+                    </div>
+                    <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase">System Timeline</h2>
+                  </div>
+                  
+                  <div className="flex-1 space-y-4">
+                    {upcomingEventsData.length > 0 ? (
+                      upcomingEventsData
+                        .slice()
+                        .sort((a, b) => new Date(a.event_date) - new Date(b.event_date))
+                        .map((item, index) => (
+                          <UpcomingEvents
+                            key={index}
+                            text={item.text}
+                            eventDate={item.event_date}
+                            color={item.color}
+                          />
+                        ))
+                    ) : (
+                      <div className="py-12 text-center">
+                        <p className="text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest">No scheduled events</p>
+                      </div>
+                    )}
+                  </div>
+                </section>
               </div>
-
-
             </div>
           </div>
-
-        </div>
+        </main>
       </div>
-
-
-
-
-
     </div>
   )
 }

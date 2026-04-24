@@ -7,77 +7,43 @@ export default function courses({ course }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get(
-        `${API_URL}/trainer/course`,
-        { withCredentials: true }
-      )
-      setenrolled(res.data.data)
+      try {
+        const res = await axios.get(
+          `${API_URL}/trainer/${course.id}/enrolled`,
+          { withCredentials: true }
+        )
+        setenrolled(res.data.data)
+      } catch (error) {
+        console.log(error)
+      }
     }
     fetchData()
-  }, [])
-
-  console.log(enrolled)
+  }, [course.id])
 
   return (
-    <div
-      className="
-    w-60
-    max-w-full
-    h-32
-    m-2
-    p-4
-    rounded-xl
-    bg-white/70
-    border border-emerald-900/5
-    shadow-sm
-    flex flex-col
-    justify-between
-    transition
-    hover:shadow-md
-  "
-    >
-      <p
-        className="
-      text-base
-      font-bold
-      text-[#2D4F2B]
-      leading-tight
-      truncate
-    "
-      >
-        {course.title}
-      </p>
+    <div className="group w-full h-44 p-6 rounded-[2rem] bg-[#F1F3E0]/50 dark:bg-slate-800/40 border border-[#2D4F2B]/5 dark:border-emerald-500/10 hover:bg-white dark:hover:bg-slate-800 hover:border-[#2D4F2B]/20 dark:hover:border-emerald-500/30 hover:shadow-xl hover:shadow-[#2D4F2B]/5 dark:hover:shadow-none transition-all duration-300 flex flex-col justify-between overflow-hidden relative">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFB823]/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-500"></div>
 
-      <p
-        className="
-      text-sm
-      text-[#6F8A6A]
-      leading-snug
-      line-clamp-2
-    "
-      >
-        {course.description}
-      </p>
+      <div className="relative z-10">
+        <h3 className="text-sm font-black text-[#2D4F2B] dark:text-emerald-400 uppercase tracking-tight mb-2 group-hover:text-[#FFB823] transition-colors line-clamp-1">
+          {course.title}
+        </h3>
+        <p className="text-[11px] text-[#2D4F2B]/60 dark:text-slate-400 font-bold leading-relaxed line-clamp-2">
+          {course.description || "Comprehensive vocational training module for community development."}
+        </p>
+      </div>
 
-      <div className="pt-2">
-        <span
-          className="
-        inline-flex
-        items-center
-        justify-center
-        px-3
-        py-1
-        text-xs
-        font-medium
-        text-[#2D4F2B]
-        bg-[#708A58]/50
-        rounded-full
-      "
-        >
-          {enrolled.length} Students
-        </span>
+      <div className="relative z-10 pt-4 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2D4F2B] dark:bg-emerald-600 rounded-full shadow-lg shadow-[#2D4F2B]/20 dark:shadow-emerald-900/20">
+          <div className="w-1 h-1 rounded-full bg-[#FFB823] animate-pulse"></div>
+          <span className="text-[9px] font-black text-white uppercase tracking-widest">
+            {enrolled.length} Trainees
+          </span>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#2D4F2B]/5 dark:border-slate-700 flex items-center justify-center text-[#2D4F2B] dark:text-emerald-400 group-hover:bg-[#2D4F2B] dark:group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+           <span className="text-xs font-black">→</span>
+        </div>
       </div>
     </div>
-
   )
 }

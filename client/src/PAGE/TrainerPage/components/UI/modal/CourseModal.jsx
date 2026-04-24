@@ -6,21 +6,34 @@ export default function CourseModal(props) {
     const exit = false; 
     const [title, setTitle] = useState("");
     const [description , setDescription] = useState("");
-    const [isMouseOver, setMouseOver] = useState(false)
+    const [isMouseOver, setMouseOver] = useState(false);
+    const [image, setImage] = useState(null);
     
 
-    async function handleSubmit(){
-        try {
-            const response = await axios.post(
-                `${API_URL}/trainer/course/createcourse`, 
-                {title: title, description: description},
-                {withCredentials: true}
-            )
-            console.log(`nice i hadle it well`, response.data)
-        } catch (error) {
-            console.log(error)
-        }
-    } 
+    async function handleSubmit(e){
+      
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("image", image); // MUST match 'image'
+
+      try {
+        const response = await axios.post(
+          `${API_URL}/trainer/course/createcourse`,
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        );
+
+        console.log("SUCCESS", response.data);
+      } catch (error) {
+        console.log(error.response?.data || error);
+      }
+    }
     
   return (
     
@@ -44,11 +57,16 @@ export default function CourseModal(props) {
                   focus:outline-none
                   focus:ring-2
                   focus:ring-[#FFB823]
-                " placeholder='Course' onChange={(e)=>{setTitle(e.target.value)}} value={title}  />
+                " 
+                required
+                placeholder='Course' 
+                onChange={(e)=>{setTitle(e.target.value)}} value={title}  />
           </div>
           <div className=' flex flex-col'>
              <label >Batch Name</label>
-              <input type="text" className="
+              <input type="text"
+                required
+                className="
                   h-10 px-3
                   rounded-lg
                   border border-[#6F8A6A]
@@ -58,6 +76,13 @@ export default function CourseModal(props) {
                   focus:ring-2
                   focus:ring-[#FFB823]
                 " placeholder='Batch Name' onChange={(e)=>{setDescription(e.target.value)}} value={description}/>
+          </div>
+          <div>
+            <label >Insert Picture</label>
+            <input 
+                type="file" 
+                onChange={(e) => setImage(e.target.files[0])}
+              />
           </div>
           <div className="w-full flex justify-center mt-6">
             <button type="submit"
@@ -70,7 +95,7 @@ export default function CourseModal(props) {
                   hover:bg-[#708A58]
                   transition
                 "
-              
+                required
              onClick={handleSubmit}
             >Submit</button>
           </div>

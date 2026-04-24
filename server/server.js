@@ -382,92 +382,106 @@ app.post("/admin/registeraccount", async (req, res) => {
 
             const userInfoRes = await db.query("INSERT INTO users_info (id, first_name, surname, email, color, shades) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *", [userId, firstName, surname, contactNo, color, shade])
               await transporter.sendMail({
-              from: `"LMS Support" <${process.env.GMAIL_USER}>`,
+              from: `"E-Kabuhayan Support" <${process.env.GMAIL_USER}>`,
               to: contactNo,
-              subject: "Accout Created",
+              subject: "Account Created Successfully",
               html: `
                <!DOCTYPE html>
                 <html lang="en">
                 <head>
                   <meta charset="UTF-8">
                   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <title>Transporter Notification</title>
+                  <title>Account Created</title>
                   <style>
                     body {
                       margin: 0;
                       padding: 0;
-                      background-color: #FFF1CA;
-                      font-family: Arial, sans-serif;
+                      background-color: #f8fafc;
+                      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                     }
                     .container {
                       max-width: 600px;
-                      margin: 0 auto;
-                      background-color: #FFFFFF;
-                      border-radius: 10px;
+                      margin: 40px auto;
+                      background-color: #ffffff;
+                      border-radius: 12px;
                       overflow: hidden;
-                      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+                      border: 1px solid #e2e8f0;
                     }
                     .header {
                       background-color: #2D4F2B;
-                      color: #FFF1CA;
-                      padding: 20px;
+                      color: #ffffff;
+                      padding: 30px;
                       text-align: center;
+                    }
+                    .header h1 {
+                      margin: 0;
                       font-size: 24px;
-                      font-weight: bold;
+                      letter-spacing: 1px;
                     }
                     .body {
-                      padding: 20px;
-                      color: #2D4F2B;
+                      padding: 40px;
+                      color: #334155;
                       line-height: 1.6;
                     }
                     .body h2 {
-                      color: #708A58;
+                      color: #2D4F2B;
+                      margin-top: 0;
+                    }
+                    .credentials {
+                      background-color: #f1f5f9;
+                      padding: 20px;
+                      border-radius: 8px;
+                      margin: 25px 0;
+                      border-left: 4px solid #2D4F2B;
                     }
                     .button {
                       display: inline-block;
-                      background-color: #FFB823;
-                      color: #2D4F2B;
-                      padding: 12px 25px;
-                      margin: 20px 0;
-                      border-radius: 5px;
+                      background-color: #2D4F2B;
+                      color: #ffffff !important;
+                      padding: 14px 30px;
+                      border-radius: 8px;
                       text-decoration: none;
-                      font-weight: bold;
+                      font-weight: 600;
+                      margin: 10px 0 30px;
                     }
                     .footer {
-                      background-color: #708A58;
-                      color: #FFF1CA;
+                      background-color: #f8fafc;
+                      color: #64748b;
                       text-align: center;
-                      padding: 15px;
-                      font-size: 14px;
-                    }
-                    @media screen and (max-width: 600px) {
-                      .container {
-                        width: 100% !important;
-                        border-radius: 0;
-                      }
+                      padding: 20px;
+                      font-size: 13px;
+                      border-top: 1px solid #e2e8f0;
                     }
                   </style>
                 </head>
                 <body>
                   <div class="container">
                     <div class="header">
-                      E-KABUHAYAN Notification
+                      <h1>E-KABUHAYAN</h1>
                     </div>
                     <div class="body">
-                      <h2>Hello ${firstName} ${surname}, you are a ${role}!</h2>
-                      <p>We would like to inform you that your account has been created. Please log in to access your account.</p>
-                      <p><strong>Username:</strong> ${username}</p>
-                      <p><strong>Password:</strong>${password} </p>
-                      <a href="${frontendURL}" class="button">Login</a>
-                      <p>Thank you for your inquiry</p
+                      <h2>Welcome, ${firstName}!</h2>
+                      <p>We are pleased to inform you that your professional account has been successfully created as a <strong>${role}</strong>.</p>
+                      
+                      <p>You can now access the learning management system using the following credentials:</p>
+                      
+                      <div class="credentials">
+                        <p style="margin: 5px 0;"><strong>Username:</strong> ${username}</p>
+                        <p style="margin: 5px 0;"><strong>Temporary Password:</strong> ${password}</p>
+                      </div>
+
+                      <a href="${frontendURL}" class="button">Log In to Dashboard</a>
+                      
+                      <p>If you have any questions or require assistance, please do not hesitate to contact our support team.</p>
+                      <p>Best regards,<br>The E-Kabuhayan Team</p>
                     </div>
                     <div class="footer">
-                      &copy; 2026 E-KABUHAYAN All rights reserved.
+                      &copy; 2026 E-KABUHAYAN Learning Management System. All rights reserved.
                     </div>
                   </div>
                 </body>
                 </html>
-
               `
             });
 
@@ -716,7 +730,7 @@ app.post("/admin/edituserinfo", async (req, res) => {
 });
 
 //create course
-app.post("/admin/course/createcourse", async (req, res) => {
+app.post("/admin/course/createcourse",UploadImageProfile.single('image'), async (req, res) => {
   const { title, description } = req.body;
   try {
     if (!req.isAuthenticated()) {
@@ -725,10 +739,17 @@ app.post("/admin/course/createcourse", async (req, res) => {
     if (req.user.role !== "SUPERADMIN") {
       res.status(403).json({ succes: false, messsage: "invalid role" })
     }
+    if (!req.file) {
+      return res.status(400).json({ succes: false, message: "No file uploaded" })
+    }
 
     const response = await db.query(
-      "INSERT INTO courses (title, description, created_by ) VALUES($1, $2, $3) RETURNING * ",
-      [title, description, req.user.id])
+      `INSERT INTO courses (title, description, created_by, picture)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *`,
+      [title, description, req.user.id, req.file.path]
+    );
+
 
     res.status(200).json({ succes: true, data: response.rows })
   } catch (error) {
@@ -1748,7 +1769,7 @@ app.get('/admin/publishcountcourses', async (req, res) => {
     res.status(400).json({ success: false, message: 'error query' })
   }
 });
-
+ 
 app.get("/admin/announcement/:courseId", async (req, res) => {
   try {
     const { courseId } = req.params;
@@ -2013,20 +2034,25 @@ app.post("/trainer/edituserinfo", async (req, res) => {
 });
 
 //create course
-app.post("/trainer/course/createcourse", async (req, res) => {
+app.post("/trainer/course/createcourse",UploadImageProfile.single('image'), async (req, res) => {
   const { title, description, image } = req.body;
   try {
     if (!req.isAuthenticated()) {
       res.status(401).json({ succes: false, message: "Unauthorized" })
     }
+
     if (req.user.role !== "TRAINER") {
       res.status(403).json({ succes: false, messsage: "invalid role" })
     }
+     if (!req.file) {
+      return res.status(400).json({ succes: false, message: "No file uploaded" })
+    }
+
     const response = await db.query(
-      `INSERT INTO courses (title, description, created_by)
-      VALUES ($1, $2, $3)
+      `INSERT INTO courses (title, description, created_by, picture)
+      VALUES ($1, $2, $3, $4)
       RETURNING *`,
-      [title, description, req.user.id]
+      [title, description, req.user.id, req.file.path]
     );
 
     if (response.rows.length === 0) {
@@ -4485,7 +4511,7 @@ app.get("/admin/message/search", async (req, res) => {
         ui.profile_pic 
       FROM users u
       JOIN users_info ui ON ui.id = u.id
-      WHERE u.username ILIKE $1 AND u.username <> $2
+      WHERE (u.username ILIKE $1 OR ui.first_name ILIKE $1 OR ui.surname ILIKE $1) AND u.username <> $2
       `,
       [`%${q}%`, req.user.username]
     );
@@ -4694,13 +4720,13 @@ app.get("/admin/:chatId", async (req, res) => {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
     const messages = await db.query(
-      `SELECT 
-         m.id,
-         u.first_name,
-         m.message,
-         m.created_at
-       FROM messages m
-       JOIN users_info AS u ON m.sender_id = u.id
+      `SELECT
+        m.id,
+        m.sender_id,
+        u.first_name,
+        m.message,
+        m.created_at
+      FROM messages m       JOIN users_info AS u ON m.sender_id = u.id
        WHERE m.chat_id = $1
        ORDER BY m.created_at ASC`,
       [chatId]
@@ -4745,7 +4771,7 @@ app.get("/trainer/message/search", async (req, res) => {
         ui.profile_pic 
       FROM users u
       JOIN users_info ui ON ui.id = u.id
-      WHERE u.username ILIKE $1 AND u.username <> $2
+      WHERE (u.username ILIKE $1 OR ui.first_name ILIKE $1 OR ui.surname ILIKE $1) AND u.username <> $2
       `,
       [`%${q}%`, req.user.username]
     );
@@ -4956,13 +4982,13 @@ app.get("/trainer/:chatId", async (req, res) => {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
     const messages = await db.query(
-      `SELECT 
-         m.id,
-         u.first_name,
-         m.message,
-         m.created_at
-       FROM messages m
-       JOIN users_info AS u ON m.sender_id = u.id
+      `SELECT
+        m.id,
+        m.sender_id,
+        u.first_name,
+        m.message,
+        m.created_at
+      FROM messages m       JOIN users_info AS u ON m.sender_id = u.id
        WHERE m.chat_id = $1
        ORDER BY m.created_at ASC`,
       [chatId]
@@ -5007,7 +5033,7 @@ app.get("/trainee/message/search", async (req, res) => {
         ui.profile_pic 
       FROM users u
       JOIN users_info ui ON ui.id = u.id
-      WHERE u.username ILIKE $1 AND u.username <> $2
+      WHERE (u.username ILIKE $1 OR ui.first_name ILIKE $1 OR ui.surname ILIKE $1) AND u.username <> $2
       `,
       [`%${q}%`, req.user.username]
     );
@@ -5217,13 +5243,13 @@ app.get("/trainee/:chatId", async (req, res) => {
       res.status(401).json({ success: false, message: 'invalid role' })
     }
     const messages = await db.query(
-      `SELECT 
-         m.id,
-         u.first_name,
-         m.message,
-         m.created_at
-       FROM messages m
-       JOIN users_info AS u ON m.sender_id = u.id
+      `SELECT
+        m.id,
+        m.sender_id,
+        u.first_name,
+        m.message,
+        m.created_at
+      FROM messages m       JOIN users_info AS u ON m.sender_id = u.id
        WHERE m.chat_id = $1
        ORDER BY m.created_at ASC`,
       [chatId]

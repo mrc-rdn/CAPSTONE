@@ -1,101 +1,135 @@
 import React, { useState } from "react";
 import axios from "axios";
 import CloseIcon from '@mui/icons-material/Close';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { API_URL } from "../../../../api.js";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function UploadProfile(props) {
-  const exit = false
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [isImageUploaded, setIsImageUploaded] = useState(false)
-  
+  const [isImageUploaded, setIsImageUploaded] = useState(false);
 
-
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleImageUpload = async (e) => {
     e.preventDefault();
+    if (!image) return;
+
     const formData = new FormData();
     formData.append("image", image);
 
-
     try {
       setUploading(true);
-      const res = await axios.post(`${API_URL}/trainee/EditProfile/UploadProfile`, formData, {withCredentials:true});
-      
-      console.log("Upload success:", res.data);
+      await axios.post(`${API_URL}/trainee/EditProfile/UploadProfile`, formData, { withCredentials: true });
+      setIsImageUploaded(true);
     } catch (error) {
-      setIsImageUploaded(false)
-      console.error(" Upload failed:", error);
+      setIsImageUploaded(false);
+      console.error("Upload failed:", error);
     } finally {
       setUploading(false);
-      setIsImageUploaded(true)
-      
     }
-    
   };
 
   return (
-    
-
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-
-  <div className="w-[520px] max-w-[90%] h-[360px] bg-white/30 backdrop-blur-xl border border-white/30 rounded-2xl shadow-xl p-5 relative">
-
-    <button
-      onClick={()=>{props.onExit(exit)}}
-      className="absolute top-4 right-4 text-gray-700 hover:text-red-500 transition"
-    >
-      <CloseIcon />
-    </button>
-
-    <p className="text-lg font-semibold text-white mb-6 text-center">
-      Upload Profile Picture
-    </p>
-
-    {isImageUploaded
-      ? (
-        <p className="text-green-700 font-medium text-center mt-20">
-          Successfully uploaded image
-        </p>
-      )
-      : (
-        <form
-          onSubmit={handleImageUpload}
-          className="w-full h-full flex flex-col items-center justify-center gap-6"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-[480px] max-w-full bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-200/60 dark:border-slate-800 p-8 relative overflow-hidden transition-all duration-300"
+      >
+        {/* Header Section */}
+        <button
+          onClick={() => props.onExit(false)}
+          className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-red-500 transition-all"
         >
+          <CloseIcon sx={{ fontSize: 20 }} />
+        </button>
 
-          <input
-            className="w-10/12 h-12 text-sm bg-white/40 backdrop-blur-md border border-white/40 rounded-xl px-3 cursor-pointer"
-            type="file"
-            onChange={(e) => setImage(e.target.files[0])}
-            required
-          />
+        <div className="text-center mb-8">
+          <h2 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight">
+            Identity Update
+          </h2>
+          <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-1">
+            Professional Profile Picture
+          </p>
+        </div>
 
-          <button
-            type="submit"
-            disabled={uploading}
-            className="
-              w-48 h-11
-              rounded-xl
-              font-semibold
-              text-[#2D4F2B]
-              bg-white/50
-              border-2 border-[#2D4F2B]/80
-              hover:bg-[#2D4F2B]
-              hover:text-white
-              transition
-              disabled:opacity-60
-            "
-          >
-            {uploading ? "Uploading..." : "Upload"}
-          </button>
+        <AnimatePresence mode="wait">
+          {isImageUploaded ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center justify-center py-10 gap-4"
+            >
+              <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-950/30 rounded-[1.5rem] flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50">
+                <span className="text-3xl">✓</span>
+              </div>
+              <p className="text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest text-[11px]">
+                Synchronization Successful
+              </p>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleImageUpload} className="space-y-6">
+              {/* Profile Preview Circle */}
+              <div className="flex flex-col items-center gap-4">
+                <label className="relative cursor-pointer group">
+                  <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center transition-all overflow-hidden ${
+                    preview 
+                      ? 'border-[#2D4F2B]' 
+                      : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50'
+                  }`}>
+                    {preview ? (
+                      <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <CloudUploadIcon className="text-slate-300 dark:text-slate-600" sx={{ fontSize: 40 }} />
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  
+                  {/* Floating Add Button */}
+                  {!preview && (
+                    <div className="absolute bottom-0 right-0 w-10 h-10 bg-[#2D4F2B] rounded-full flex items-center justify-center text-white shadow-lg border-4 border-white dark:border-slate-900 group-hover:scale-110 transition-transform">
+                      <span className="text-xl font-bold">+</span>
+                    </div>
+                  )}
+                </label>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  {preview ? "Click to change photo" : "Select your photo"}
+                </p>
+              </div>
 
-        </form>
-      )
-    }
-
-  </div>
-</div>
-
+              {/* Action Button */}
+              <button
+                type="submit"
+                disabled={uploading || !image}
+                className="w-full h-14 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#2D4F2B] hover:bg-[#1a301a] shadow-lg shadow-[#2D4F2B]/20 transition-all active:scale-[0.98] disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed mt-4"
+              >
+                {uploading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  "Update Profile"
+                )}
+              </button>
+            </form>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
   );
 }

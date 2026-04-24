@@ -1,41 +1,58 @@
 import React from 'react'
-import {Link, useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import axios from 'axios';
 import { API_URL } from '../../../api.js';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { motion, AnimatePresence } from 'framer-motion';
 
-
-export default function Logout() {
+export default function Logout({ isCollapsed }) {
     const navigate = useNavigate();
 
     async function handleLogout(event){
         event.preventDefault();
         try {
+            // KEPT: Trainee specific endpoint
             const res = await axios.post(`${API_URL}/trainee/dashboard/logout`, {}, { withCredentials: true })
-           console.log(res.data)
             
-          if (res.data.message === "Successfully logged out") {
-              navigate(res.data.redirectTo);
-          }
+            if (res.data.message === "Successfully logged out") {
+                navigate(res.data.redirectTo);
+            }
         } catch (error) {
-            console.log("logout error",error.message)
+            console.log("logout error", error.message)
         }
     }
-  return (
-   <div className='flex flex-col gap-6 px-4'>
-      <button onClick={handleLogout} className=" w-full
-    flex items-center justify-center gap-2
-    px-4 py-3
-    rounded-xl
-    font-semibold
-    text-[#2D4F2B]
-    bg-white/20
-    backdrop-blur-md
-    border border-white/30
-    shadow-md
-    hover:bg-red-500/20
-    hover:text-[#CF0F0F]
-    hover:border-red-400/40
-    transition-all duration-200">Logout</button>
-    </div>
-  )
+
+    return (
+        <button 
+            onClick={handleLogout} 
+            title={isCollapsed ? "Logout" : ""}
+            className={`
+                w-full
+                flex items-center gap-4
+                px-4 py-3.5
+                rounded-2xl
+                transition-all duration-300
+                group
+                ${isCollapsed ? "justify-center px-0" : "justify-start"}
+                text-slate-400 dark:text-slate-500
+                hover:bg-red-50 dark:hover:bg-red-950/30
+                hover:text-red-600 dark:hover:text-red-400
+            `}
+        >
+            <LogoutIcon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+            
+            <AnimatePresence>
+                {!isCollapsed && (
+                    <motion.span 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="text-xs font-black tracking-wide uppercase whitespace-nowrap"
+                    >
+                        Sign Out
+                    </motion.span>
+                )}
+            </AnimatePresence>
+        </button>
+    )
 }

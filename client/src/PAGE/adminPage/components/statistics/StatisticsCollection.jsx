@@ -187,7 +187,7 @@ export default function StatisticsCollection() {
         </div>
        
         <select
-            className="border rounded-lg px-3 py-2 m-3"
+            className=" border rounded-lg px-3 py-2 m-3 "
             value={role}
             onChange={e => setRole(e.target.value)}
         >

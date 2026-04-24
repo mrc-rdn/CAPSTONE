@@ -1,117 +1,130 @@
-import React ,{useEffect,useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios';
 import { API_URL } from '../../../../api.js';
-import CloseIcon from '@mui/icons-material/Close';
+import PeopleIcon from '@mui/icons-material/People';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import { useTheme } from '../../../../ThemeContext';
 
 export default function Course(props) {
-    const open = true
+    const { isDarkMode } = useTheme();
     const [enrolled, setenrolled] = useState([])
     const [openModal, setOpenModal] = useState(false)
-    const [isMouseOver, setMouseOver] = useState(false)
-    const [isMouseOver1, setMouseOver1] = useState(false)
-    const [isCourseDelete, setIscourseDelete] = useState(false)
 
     function slugify(text) {
-          return text.toLowerCase().replace(/\s+/g, '-');
-      } 
-    useEffect(()=>{
-      const fetchData = async()=>{
-        
-          const res = await axios.get(`${API_URL}/admin/${props.id}/enrolled`,{withCredentials:true})
-          setenrolled(res.data.data)
-        
-      }   
-      fetchData() 
-    },[])
-
-    const handleSubmit = async(e)=>{
-      e.preventDefault()
-      try {
-        const  result = await axios.delete(`${API_URL}/admin/coursedelete/${props.id}`, 
-          {withCredentials:true})
-          props.handleRefresh()
-        setIscourseDelete(true)
-        setOpenModal(false)
-      } catch (error) {
-        setChapterAdded(false)
-        console.log(error)
-      }
+        return text.toLowerCase().replace(/\s+/g, '-');
     }
 
-      
-  return (
-   <div>
-  {openModal && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-[380px] max-w-[90%] h-[260px] bg-white/30 backdrop-blur-xl border border-white/30 rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center">
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Admin specific enrollment endpoint
+                const res = await axios.get(`${API_URL}/admin/${props.id}/enrolled`, { withCredentials: true })
+                setenrolled(res.data.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchData()
+    }, [props.id])
 
-        <h1 className="text-xl font-semibold text-[#2D4F2B] mb-6">
-          Delete Course
-        </h1>
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        try {
+            // Admin specific delete endpoint
+            await axios.delete(`${API_URL}/admin/coursedelete/${props.id}`, { withCredentials: true })
+            setOpenModal(false)
+            if (props.handleRefresh) props.handleRefresh();
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
-        <button
-          className={
-            isMouseOver
-              ? "w-full h-11 mb-3 text-white bg-green-600 rounded-xl font-medium transition"
-              : "w-full h-11 mb-3 text-green-700 bg-white/60 border border-green-500/40 rounded-xl font-medium transition"
-          }
-          onMouseOver={() => setMouseOver(true)}
-          onMouseOut={() => setMouseOver(false)}
-          onClick={() => { props.handleRefresh(); setOpenModal(false); }}
-        >
-          NO
-        </button>
+    return (
+        <div className="relative">
+            {/* High-Fidelity Delete Modal */}
+            {openModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 dark:bg-slate-950/80 backdrop-blur-md p-4">
+                    <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-white/20 dark:border-slate-800">
+                        <div className="p-8 text-center">
+                            <div className="w-20 h-20 bg-red-100 dark:bg-red-950/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <span className="text-4xl">⚠️</span>
+                            </div>
+                            <h2 className="text-2xl font-black text-[#2D4F2B] dark:text-emerald-400 mb-2 tracking-tight">Delete Course?</h2>
+                            <p className="text-[#2D4F2B]/60 dark:text-slate-400 mb-8 font-medium">This administrative action cannot be undone.</p>
+                            
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    className="w-full py-4 bg-red-500 text-white rounded-2xl font-black hover:bg-red-600 transition-all shadow-lg shadow-red-500/20 uppercase text-xs tracking-widest"
+                                    onClick={handleSubmit}
+                                >
+                                    YES, DELETE IT
+                                </button>
+                                <button
+                                    className="w-full py-4 bg-[#2D4F2B]/5 dark:bg-slate-800 text-[#2D4F2B] dark:text-slate-100 rounded-2xl font-black hover:bg-[#2D4F2B]/10 dark:hover:bg-slate-700 transition-all uppercase text-xs tracking-widest"
+                                    onClick={() => setOpenModal(false)}
+                                >
+                                    CANCEL
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-        <button
-          className={
-            isMouseOver1
-              ? "w-full h-11 text-white bg-red-600 rounded-xl font-medium transition"
-              : "w-full h-11 text-red-600 bg-white/60 border border-red-500/40 rounded-xl font-medium transition"
-          }
-          onMouseOver={() => setMouseOver1(true)}
-          onMouseOut={() => setMouseOver1(false)}
-          onClick={handleSubmit}
-        >
-          DELETE COURSE
-        </button>
+            {/* Course Card Design */}
+            <div className="group w-72 h-96 flex flex-col rounded-[2.5rem] bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                
+                {/* Image Header with Delete Trigger */}
+                <div className="relative h-36 bg-[#2D4F2B] dark:bg-emerald-800 overflow-hidden">
+                    {props.image ? (
+                        <img src={props.image} alt="Course" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <PlayCircleOutlineIcon sx={{ fontSize: 60, color: 'white', opacity: 0.3 }} />
+                        </div>
+                    )}
+                    
+                    {/* Floating Delete Button */}
+                    <div className="absolute top-4 right-4">
+                        <button 
+                            onClick={(e) => { e.preventDefault(); setOpenModal(true); }}
+                            className="w-8 h-8 rounded-full bg-black/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-red-500 transition-colors"
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
 
-      </div>
-    </div>
-  )}
+                {/* Content Area */}
+                <div className="flex-1 p-6 flex flex-col">
+                    <div className="flex-1">
+                        <h3 className="text-xl font-black text-[#2D4F2B] dark:text-emerald-400 line-clamp-1 mb-1 uppercase tracking-tight">
+                            {props.title}
+                        </h3>
+                        <p className="text-sm text-[#2D4F2B]/60 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed mb-4">
+                            {props.description || "No description available for this curriculum."}
+                        </p>
+                    </div>
 
-  <div className="w-65 h-50 m-4 p-4 rounded-2xl bg-white/25 backdrop-blur-md border border-white/30 shadow-lg flex flex-col justify-between">
+                    {/* Enrollment Stat */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-100/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30">
+                            <PeopleIcon sx={{ fontSize: 18, color: isDarkMode ? '#10b981' : '#2D4F2B' }} />
+                            <span className="text-[10px] font-black text-[#2D4F2B] dark:text-emerald-400 uppercase tracking-wider">
+                                {enrolled.length} Enrolled
+                            </span>
+                        </div>
+                    </div>
 
-    <div>
-      <p className="text-2xl font-bold text-[#2D4F2B]">
-        {props.title}
-      </p>
-
-      <p className="text-sm text-[#5F7A61] mt-1">
-        {props.description}
-      </p>
-    </div>
-
-    <div className="flex justify-between mt-4">
-      <p className="w-28 h-9 flex items-center justify-center rounded-xl bg-white/40 text-[#2D4F2B] text-sm font-medium">
-        {enrolled.length} Student
-      </p>
-
-      <button
-        className="w-28 h-9 flex items-center justify-center rounded-xl bg-white/40 text-red-600 text-sm font-medium hover:bg-red-500 hover:text-white transition"
-        onClick={() => setOpenModal(true)}
-      >
-        Delete
-      </button>
-    </div>
-
-    <Link to={`/admin/course/${props.id}/${slugify(props.title)}`}>
-      <button className="w-full h-10 mt-4 rounded-xl bg-white/70 text-[#2D4F2B] font-semibold hover:bg-green-600 hover:text-white transition">
-        ENTER SUBJECT
-      </button>
-    </Link>
-  </div>
-</div>
-
-  )
+                    {/* Navigation Link */}
+                    <Link to={`/admin/course/${props.id}/${slugify(props.title)}`} className="w-full">
+                        <button className="w-full h-12 rounded-2xl bg-[#2D4F2B] dark:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[#1e3a1c] dark:hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-[#2D4F2B]/10 dark:shadow-none">
+                            Enter Subject
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        </div>
+    )
 }

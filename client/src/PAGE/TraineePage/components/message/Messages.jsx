@@ -1,39 +1,41 @@
-import React from 'react'
+import React from 'react';
+import { motion } from 'framer-motion';
 
-export default function messages(props) {
-  console.log(props.message.first_name)
-  console.log(props.userData)
+export default function Messages({ message, userData }) {
+  // Logic remains consistent to identify if the current user sent the message
+  const isSender = message.sender_id === userData.id || message.first_name === userData.first_name;
+  
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   return (
-    
-   <div className="w-full">
-    {props.message.first_name !== props.userData.first_name &&
-    props.message.sender_id !== props.userData.id ? (
-      // RECEIVER (LEFT)
-      <div className="flex justify-start my-2">
-        <div className="ml-3 inline-block max-w-[40%] rounded-xl bg-white/80 backdrop-blur-sm border border-black/10 px-4 py-2 shadow-sm">
-          <p
-            className="whitespace-pre-wrap text-sm text-gray-800"
-            style={{ overflowWrap: "anywhere", wordBreak: "normal" }}
-          >
-            {props.message.message}
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`w-full flex ${isSender ? 'justify-end' : 'justify-start'} my-2 px-4`}
+    >
+      <div className={`flex flex-col ${isSender ? 'items-end' : 'items-start'} max-w-[75%]`}>
+        {/* Message Bubble */}
+        <div 
+          className={`px-4 py-2.5 shadow-sm relative text-[14px] leading-relaxed font-medium transition-colors duration-300 ${
+            isSender 
+              ? 'bg-[#2D4F2B] text-white rounded-2xl rounded-tr-none shadow-[#2D4F2B]/10' 
+              : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/50 rounded-2xl rounded-tl-none'
+          }`}
+        >
+          <p className="whitespace-pre-wrap break-words">
+            {message.message}
           </p>
         </div>
+        
+        {/* Timestamp - Refined for High Fidelity */}
+        <span className="text-[9px] mt-1.5 text-slate-400 dark:text-slate-500 px-1 uppercase font-black tracking-[0.15em] leading-none">
+          {formatTime(message.created_at)}
+        </span>
       </div>
-    ) : (
-      // SENDER (RIGHT)
-      <div className="flex justify-end my-2">
-        <div className="mr-3 inline-block max-w-[40%] rounded-xl bg-[#2D4F2B] px-4 py-2 shadow-md">
-          <p
-            className="whitespace-pre-wrap text-sm text-white"
-            style={{ overflowWrap: "anywhere", wordBreak: "normal" }}
-          >
-            {props.message.message}
-          </p>
-        </div>
-      </div>
-    )}
-  </div>
-);
+    </motion.div>
+  );
 }
-
-

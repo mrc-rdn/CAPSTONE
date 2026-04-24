@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --color-dark-bg: #0f172a;
+  --color-brand-green: #2D4F2B;
+  --color-brand-green-light: #708A58;
+}
+
+@variant dark (&:where(.dark, .dark *));
+
 /* scroll bar customize */
 ::-webkit-scrollbar {
   width: 5px;
