@@ -1,45 +1,53 @@
-import React , {useState} from 'react'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import React, { useState } from 'react';
 import TableRow from './TableRow.';
 
 export default function Table(props) {
-  console.log(props.result)
-  
+  // Shared text style for table headers to match dashboard typography
+  const thClass = "py-4 px-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800";
+
   return (
-     <div className='w-full h-70 overflow-y-scroll gird place-items-center'>
-        
-          <table className="w-11/12 h-1/12 bg-white/10  shadow-xl rounded-xl overflow-hidden border border-black/10 m-2 relative">
-            <thead className="bg-gradient-to-r from-green-700 to-green-600 text-white sticky top-0 shadow">
-                <tr>
-                <th className="py-3 px-4 text-center">#</th>
-                <th className="py-3 px-6 text-left">ID</th>
-                <th className="py-3 px-6 text-left">Name</th>
-                <th className="py-3 px-6 text-center">Role</th>
-                <th className="py-3 px-6 text-center">View</th>
-                </tr>
-            </thead>
-            <tbody className="text-gray-700 divide-">
-            {(props.list.map((info, index)=>{
-                return(
-                <TableRow 
-                  key={index} 
-                  index={index} 
-                  id={info.id} 
-                  first_name={info.first_name} 
-                  surname={info.surname} 
-                  role={info.role}
-                  profile={info.profile_pic} 
-                  color={info.color} 
-                  shade={info.shades} 
-                  result={props.result} 
-                  info={info} />
-                
-                )
-            }))}
-           
-            </tbody>
-          </table >
-          
-        </div>
-  )
+    <div className="w-full h-[500px] overflow-y-auto custom-scrollbar relative px-2">
+      <table className="w-full border-separate border-spacing-0">
+        {/* STICKY HEADER */}
+        <thead className="sticky top-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+          <tr>
+            <th className={`${thClass} text-center w-16 rounded-tl-2xl`}>#</th>
+            <th className={`${thClass} text-left`}>User Identity</th>
+            <th className={`${thClass} text-left`}>Full Name</th>
+            <th className={`${thClass} text-center`}>System Role</th>
+            <th className={`${thClass} text-center rounded-tr-2xl`}>Action</th>
+          </tr>
+        </thead>
+
+        {/* TABLE BODY */}
+        <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+          {props.list.length > 0 ? (
+            props.list.map((info, index) => (
+              <TableRow
+                key={index}
+                index={index}
+                id={info.id}
+                first_name={info.first_name}
+                surname={info.surname}
+                role={info.role}
+                profile={info.profile_pic}
+                color={info.color}
+                shade={info.shades}
+                result={props.result}
+                info={info}
+              />
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="py-20 text-center">
+                <p className="text-xs font-black uppercase tracking-widest text-slate-300 dark:text-slate-700">
+                  No records found in master list
+                </p>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
 }

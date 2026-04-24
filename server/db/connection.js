@@ -16,14 +16,4 @@ const db = new pg.Pool({
     
 });
 
-// Confirm Neon DB connection
-db.connect((err, client, release) => {
-    if (err) {
-        console.error("❌ Failed to connect to Neon Database:", err.message );
-    } else {
-        console.log("✅ Successfully connected to Neon Database " );
-        release(); // release client back to pool
-    }
-});
-
 export default db;

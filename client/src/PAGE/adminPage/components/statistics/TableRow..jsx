@@ -1,125 +1,140 @@
-import React,{useState, useEffect} from 'react'
+import React, { useState } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import SelectedProfile from './SelectedProfile';
-import axios from 'axios';
-import { API_URL } from '../../../../api';
 import LinearProgress from '@mui/material/LinearProgress';
 
 export default function TableRow(props) {
-    const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
-   const colorMap = {
-          red: {200: 'bg-red-200',300: 'bg-red-300',400: 'bg-red-400',500: 'bg-red-500',600: 'bg-red-600',700: 'bg-red-700', 800: 'bg-red-800'},
-          yellow: {200: 'bg-yellow-200',300: 'bg-yellow-300',400: 'bg-yellow-400',500: 'bg-yellow-500',600: 'bg-yellow-600',700: 'bg-yellow-700',800: 'bg-yellow-800'},
-          green: {200: 'bg-green-200',300: 'bg-green-300',400: 'bg-green-400',500: 'bg-green-500',600: 'bg-green-600',700: 'bg-green-700',800: 'bg-green-800'},
-          orange: {200: 'bg-orange-200',300: 'bg-orange-300',400: 'bg-orange-400',500: 'bg-orange-500',600: 'bg-orange-600',700: 'bg-orange-700',800: 'bg-orange-800'},
-          blue: {200: 'bg-blue-200',300: 'bg-blue-300',400: 'bg-blue-400',500: 'bg-blue-500',600: 'bg-blue-600',700: 'bg-blue-700',800: 'bg-blue-800'},
-          purple: {200: 'bg-purple-200',300: 'bg-purple-300',400: 'bg-purple-400',500: 'bg-purple-500',600: 'bg-purple-600',700: 'bg-purple-700',800: 'bg-purple-800'},
-          pink: {200: 'bg-pink-200',300: 'bg-pink-300',400: 'bg-pink-400',500: 'bg-pink-500',600: 'bg-pink-600',700: 'bg-pink-700',800: 'bg-pink-800'},
-      }
-  
-    const userColorClass = colorMap[props.color]?.[props.shade] || 'bg-gray-500';
-    const result = props.result.filter((info)=> info.user_id === props.id)
-    console.log()
- 
-  return (<>
-            <tr 
-                  
-                  className="hover:bg-green-50 transition duration-200"
-                >
-                    <th className="py-3 px-4 text-center text-gray-500">{props.index + 1}</th>
+  const colorMap = {
+    red: 'bg-red-500', yellow: 'bg-yellow-500', green: 'bg-emerald-500',
+    orange: 'bg-orange-500', blue: 'bg-blue-500', purple: 'bg-purple-500', pink: 'bg-pink-500',
+  };
 
-                    <td className="py-4 px-6">{props.id}</td>
+  const userColorClass = colorMap[props.color] || 'bg-slate-500';
+  const result = props.result.filter((info) => info.user_id === props.id);
 
-                    <td className="py-4 px-6 font-medium">
-                      {props.surname.charAt(0).toUpperCase() + props.surname.slice(1)}{" "}
-                      {props.first_name.charAt(0).toUpperCase() + props.first_name.slice(1)}
-                    </td>
+  return (
+    <>
+      <tr className="group hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-all duration-300 border-b border-slate-50 dark:border-slate-800/50">
+        <td className="py-5 px-4 text-center">
+          <span className="text-[11px] font-black text-slate-400 group-hover:text-emerald-600 transition-colors">
+            {String(props.index + 1).padStart(2, '0')}
+          </span>
+        </td>
 
-                    <td className="py-4 px-6 text-center">
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                        {props.role}
-                      </span>
-                    </td>
+        <td className="py-5 px-6">
+          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider">
+            #{props.id}
+          </span>
+        </td>
 
-                    <td className="py-4 px-6 text-center text-green-700 hover:text-green-900 cursor-pointer"
-                    onClick={()=>setIsOpen(!isOpen)}>
-                      <KeyboardArrowDownIcon />
-                    </td>
-                    
-                </tr>
-                {isOpen && 
-                  <tr>
-                      <td colSpan='5' className='p-3 '>
-                        <div className='flex ml-50'>
-                     
-                          <div className="flex items-center gap-5 h-40 ">
-                            {props.profile ? (
-                              <img
-                                src={props.profile}
-                                alt=""
-                                className="w-28 h-28 rounded-full object-cover border border-gray-300"
-                              />
-                            ) : (
-                              <div
-                                className={`w-28 h-28 rounded-full flex items-center justify-center text-white text-3xl font-bold ${userColorClass}`}
-                              >
-                                {props.first_name.slice(0, 1).toUpperCase()}
-                              </div>
-                            )}
+        <td className="py-5 px-6">
+          <div className="flex items-center gap-3">
+             <div className={`w-8 h-8 rounded-lg ${userColorClass} bg-opacity-20 flex items-center justify-center`}>
+                <span className={`text-[10px] font-black ${userColorClass.replace('bg-', 'text-')}`}>
+                    {props.first_name[0]}{props.surname[0]}
+                </span>
+             </div>
+             <p className="text-sm font-black text-slate-700 dark:text-slate-200 uppercase tracking-tight">
+                {props.surname}, {props.first_name}
+             </p>
+          </div>
+        </td>
 
-                            <div className="flex flex-col">
-                              <p className="text-xl font-semibold text-gray-900">
-                                {props.first_name} {props.surname}
-                              </p>
+        <td className="py-5 px-6 text-center">
+          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+            props.role === 'TRAINER' 
+            ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' 
+            : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
+          }`}>
+            {props.role}
+          </span>
+        </td>
 
-                              <p className="text-sm text-gray-500 mt-1">
-                                username: {props.username}
-                              </p>
+        <td className="py-5 px-6 text-center">
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className={`p-1.5 rounded-xl transition-all duration-300 ${
+              isOpen 
+              ? 'bg-slate-900 text-white rotate-180' 
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white'
+            }`}
+          >
+            <KeyboardArrowDownIcon sx={{ fontSize: 18 }} />
+          </button>
+        </td>
+      </tr>
 
-                              <p className="text-xs text-gray-400">
-                                ID: {props.id}
-                              </p>
-                            </div>
-                          </div>
-                          {result[0] && <div className='bg-white w-90 h-40 m-3 ml-5 rounded-xl p-4 border-1'>
-                            <p className='text-2xl font-bold '>{result[0]?.courseTitle}</p>
-                            <p className='mt-3'>Progress</p>
-                            <div className='flex items-center'>
-                            
-                            <div className='w-10/12'>
-                              <LinearProgress
-                                variant="determinate"
-                                value={result[0]?.percentage}
-                                sx={{
-                                  height: 10,
-                                  borderRadius: 5,
-                                  backgroundColor: "#e0e0e0",
-                                  "& .MuiLinearProgress-bar": {
-                                    backgroundColor: "#6F8A6A",
-                                  },
-                                }}
-                              />
-                            </div>
-                            <p className='ml-3'>{result[0]?.percentage}%</p>
-                            </div>
-                            <p>Status: {result[0]?.percentage === 100 ? (
-                              <span className="text-[#2D4F2B] font-medium">
-                                Completed
-                                </span>
-                              ) : (
-                                <span className="text-[#6F8A6A]">
-                                  On Going
-                                </span>
-                              )}
-                            </p>
-                          </div>}
-                        </div>
-                      </td>
-                  </tr>
-                
-                    
-                 }
+      {/* EXPANDED SECTION */}
+      {isOpen && (
+        <tr className="bg-slate-50/50 dark:bg-slate-900/40">
+          <td colSpan="5" className="p-8">
+            <div className="flex flex-col lg:flex-row items-center gap-10 animate-in fade-in slide-in-from-top-2 duration-300">
+              
+              {/* Profile Bio */}
+              <div className="flex items-center gap-6 min-w-[300px]">
+                {props.profile ? (
+                  <img
+                    src={props.profile}
+                    alt=""
+                    className="w-24 h-24 rounded-3xl object-cover border-4 border-white dark:border-slate-800 shadow-xl"
+                  />
+                ) : (
+                  <div className={`w-24 h-24 rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-lg ${userColorClass}`}>
+                    {props.first_name[0]}
+                  </div>
+                )}
+                <div>
+                  <h4 className="text-lg font-black text-slate-800 dark:text-white leading-tight uppercase">
+                    {props.first_name} {props.surname}
+                  </h4>
+                  <p className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mt-1">@{props.username || 'user'}</p>
+                  <div className="mt-3 flex gap-2">
+                     <div className="px-2 py-1 bg-slate-200 dark:bg-slate-800 rounded text-[9px] font-black text-slate-500 uppercase">UID: {props.id}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Card */}
+              {result[0] && (
+                <div className="flex-1 w-full bg-white dark:bg-slate-800 rounded-[2rem] p-6 shadow-xl border border-slate-100 dark:border-slate-700/50">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Course</p>
+                      <h5 className="text-sm font-black text-slate-800 dark:text-white uppercase">{result[0]?.courseTitle}</h5>
+                    </div>
+                    <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${
+                      result[0]?.percentage === 100 ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600'
+                    }`}>
+                      {result[0]?.percentage === 100 ? 'COMPLETED' : 'IN PROGRESS'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-end">
+                      <span className="text-[10px] font-black text-slate-400 uppercase">Syllabus Progress</span>
+                      <span className="text-xs font-black text-slate-800 dark:text-white">{result[0]?.percentage}%</span>
+                    </div>
+                    <LinearProgress
+                      variant="determinate"
+                      value={result[0]?.percentage}
+                      sx={{
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: "rgba(0,0,0,0.05)",
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: result[0]?.percentage === 100 ? "#10b981" : "#3b82f6",
+                          borderRadius: 4
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
     </>
-  )
+  );
 }
