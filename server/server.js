@@ -187,6 +187,10 @@ app.post("/ask", async (req, res) => {
 });
 
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
